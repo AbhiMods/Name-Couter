@@ -1,0 +1,226 @@
+.container {
+    padding: 2rem 1rem;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+
+.header h1 {
+    font-family: var(--font-display);
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.subtitle {
+    color: var(--color-text-secondary);
+    font-size: 1rem;
+}
+
+.overviewGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.statCard {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 1.25rem;
+    background: var(--color-bg-secondary);
+}
+
+.statIcon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-secondary);
+}
+
+.statInfo {
+    display: flex;
+    flex-direction: column;
+}
+
+.statLabel {
+    font-size: 0.8rem;
+    color: var(--color-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.statValue {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+}
+
+.chartCard {
+    padding: 0;
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+.chartHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.chartTitle {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.chartTitle h3 {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.titleIcon {
+    color: var(--color-primary);
+}
+
+.rangeSelector {
+    display: flex;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 3px;
+    border-radius: 8px;
+}
+
+.rangeSelector button {
+    background: none;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.activeRange {
+    background: var(--color-bg-primary) !important;
+    color: var(--color-text-primary) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.chartBody {
+    padding: 2rem 1.5rem 3rem 1.5rem;
+    overflow-x: auto;
+}
+
+.svgChart {
+    width: 100%;
+    min-width: 300px;
+    height: 200px;
+}
+
+.bar {
+    cursor: pointer;
+    transition: filter 0.2s;
+}
+
+.bar:hover {
+    filter: brightness(1.2) drop-shadow(0 0 5px var(--color-primary-glow));
+}
+
+.chartLabel {
+    fill: var(--color-text-tertiary);
+    font-size: 10px;
+}
+
+.historyList {
+    margin-top: 3rem;
+}
+
+.historyList h3 {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+.listContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.historyRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    background: var(--color-bg-secondary);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+}
+
+.rowDate {
+    font-weight: 500;
+    color: var(--color-text-primary);
+}
+
+.rowCount {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+}
+
+.rowCount span {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-primary);
+}
+
+.rowCount small {
+    color: var(--color-text-tertiary);
+    font-size: 0.8rem;
+}
+
+.emptyState {
+    text-align: center;
+    padding: 3rem;
+    color: var(--color-text-tertiary);
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px dashed var(--color-border);
+    border-radius: var(--radius-md);
+}
+
+@media (max-width: 600px) {
+    .header h1 {
+        font-size: 2rem;
+    }
+
+    .overviewGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .chartHeader {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .rangeSelector {
+        width: 100%;
+    }
+
+    .rangeSelector button {
+        flex: 1;
+    }
+}

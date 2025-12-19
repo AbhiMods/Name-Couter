@@ -77,14 +77,19 @@ export const StatsProvider = ({ children }) => {
     // Calculate stats for the last N days
     const getHistory = (days = 7) => {
         const history = [];
+        const today = new Date();
         for (let i = 0; i < days; i++) {
-            const d = new Date();
+            const d = new Date(today);
             d.setDate(d.getDate() - i);
             const year = d.getFullYear();
             const month = String(d.getMonth() + 1).padStart(2, '0');
             const day = String(d.getDate()).padStart(2, '0');
             const key = `${year} -${month} -${day} `;
-            history.push({ date: key, count: dailyCounts[key] || 0 });
+            history.push({
+                date: key,
+                label: d.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric' }),
+                count: dailyCounts[key] || 0
+            });
         }
         return history.reverse(); // Return oldest to newest
     };

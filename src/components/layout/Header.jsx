@@ -1,13 +1,15 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Flower, Settings, Sun, Moon, WifiOff, CloudUpload } from 'lucide-react';
+import { Flower, Settings, Sun, Moon, WifiOff, CloudUpload, Shield } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { useStats } from '../../context/StatsContext';
+import { useAuth } from '../../context/AuthContext';
 import styles from './Header.module.css';
 
 const Header = () => {
     const { theme, toggleTheme } = useTheme();
     const { isOnline, pendingSync } = useStats();
+    const { user } = useAuth();
 
     return (
         <header className={styles.header}>
@@ -37,6 +39,15 @@ const Header = () => {
                     >
                         {theme === 'dark' ? <Sun size={24} /> : <Moon size={24} />}
                     </button>
+                    {user?.role === 'admin' && (
+                        <NavLink
+                            to="/admin"
+                            className={({ isActive }) => isActive ? `${styles.navLink} ${styles.navLinkActive}` : styles.navLink}
+                            title="Admin Panel"
+                        >
+                            <Shield size={24} />
+                        </NavLink>
+                    )}
                     <NavLink
                         to="/settings"
                         className={({ isActive }) => isActive ? `${styles.navLink} ${styles.navLinkActive}` : styles.navLink}

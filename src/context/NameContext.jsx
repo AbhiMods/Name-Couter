@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 
 const NameContext = createContext();
 
@@ -19,6 +19,15 @@ export const NameProvider = ({ children }) => {
     });
     const [volume, setVolume] = useState(0.5);
 
+    // Custom Admin Audio Mappings (nameId -> base64Data)
+    const [customAudios, setCustomAudios] = useState(() => {
+        const saved = localStorage.getItem('divine_custom_audios');
+        return saved ? JSON.parse(saved) : {};
+    });
+
+    // Audio Ref to prevent multiple overlaps
+    const audioRef = useRef(null);
+
     useEffect(() => {
         localStorage.setItem('divine_selected_name', selectedNameId);
     }, [selectedNameId]);
@@ -26,6 +35,10 @@ export const NameProvider = ({ children }) => {
     useEffect(() => {
         localStorage.setItem('divine_sound_enabled', soundEnabled);
     }, [soundEnabled]);
+
+    useEffect(() => {
+        localStorage.setItem('divine_custom_audios', JSON.stringify(customAudios));
+    }, [customAudios]);
 
     const selectedName = NAMES.find(n => n.id === selectedNameId) || NAMES[0];
 
@@ -37,26 +50,47 @@ export const NameProvider = ({ children }) => {
 
     const toggleSound = () => setSoundEnabled(prev => !prev);
 
-    // Simple audio player (TTS for now)
+    const updateCustomAudio = (nameId, audioData) => {
+        setCustomAudios(prev => {
+            const next = { ...prev };
+            if (audioData) {
+                next[nameId] = audioData;
+            } else {
+                delete next[nameId];
+            }
+            return next;
+        });
+    };
+
+    // Simple audio player
     const playChant = () => {
         if (!soundEnabled) return;
 
         try {
-            // In a real app, check for selectedName.audioSrc first
-            // Fallback to SpeechSynthesis
+            // Priority 1: Admin Custom Audio
+            if (customAudios[selectedNameId]) {
+                if (audioRef.current) {
+                    audioRef.current.pause();
+                    audioRef.current.currentTime = 0;
+                }
+                const audio = new Audio(customAudios[selectedNameId]);
+                audio.volume = volume;
+                audio.play().catch(e => console.warn('Audio play blocked:', e));
+                audioRef.current = audio;
+                return;
+            }
+
+            // Priority 2: Fallback to SpeechSynthesis (TTS)
             if ('speechSynthesis' in window) {
-                // Cancel previous to avoid queue buildup on fast tapping
                 window.speechSynthesis.cancel();
 
                 const utterance = new SpeechSynthesisUtterance(selectedName.text);
-                utterance.rate = 1.1; // Slightly faster for chanting
-                utterance.pitch = 0.9; // Slightly deeper
+                utterance.rate = 1.1;
+                utterance.pitch = 0.9;
                 utterance.volume = volume;
 
-                // Error handler for specific utterance
                 utterance.onerror = (e) => console.warn('Speech synthesis error:', e);
 
-                // Try to find a Hindi voice if available
                 const voices = window.speechSynthesis.getVoices();
                 const hindiVoice = voices.find(v => v.lang.includes('hi'));
                 if (hindiVoice) utterance.voice = hindiVoice;
@@ -65,7 +99,6 @@ export const NameProvider = ({ children }) => {
             }
         } catch (e) {
             console.error('Audio playback failed', e);
-            // Optionally disable sound if it keeps failing
         }
     };
 
@@ -79,7 +112,9 @@ export const NameProvider = ({ children }) => {
             toggleSound,
             volume,
             setVolume,
-            playChant
+            playChant,
+            customAudios,
+            updateCustomAudio
         }}>
             {children}
         </NameContext.Provider>

@@ -1,3 +1,13 @@
+.sectionTitle {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    color: var(--color-primary);
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    opacity: 0.9;
+}
+
 .container {
     display: flex;
     flex-direction: column;
@@ -13,8 +23,11 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 340px;
-    height: 340px;
+    width: min(85vw, 400px);
+    aspect-ratio: 1 / 1;
+    height: auto;
+    margin: 2rem 0;
+    flex-shrink: 0;
 }
 
 /* The SVG ring container */
@@ -34,18 +47,125 @@
 .progressCircleBg {
     fill: none;
     stroke: rgba(255, 255, 255, 0.05);
-    stroke-width: 4;
 }
 
 .progressCircleFg {
     fill: none;
     stroke: var(--color-primary);
-    /* Gold */
-    stroke-width: 4;
     stroke-linecap: round;
     transition: stroke-dashoffset 0.1s linear;
-    /* Smooth fill */
-    filter: drop-shadow(0 0 4px var(--color-primary-glow));
+    filter: drop-shadow(0 0 8px var(--color-primary-glow));
+}
+
+.controlsWrapper {
+    position: relative;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    z-index: 100;
+}
+
+.controls {
+    display: flex;
+    gap: 2rem;
+    /* Increased spacing */
+    background: rgba(var(--color-bg-secondary-rgb), 0.6);
+    backdrop-filter: blur(25px);
+    padding: 0.85rem 2.25rem;
+    border-radius: 2.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+    z-index: 101;
+}
+
+.activeButton {
+    color: var(--color-primary) !important;
+    background: rgba(var(--color-primary-rgb), 0.15) !important;
+    box-shadow: 0 0 15px rgba(var(--color-primary-rgb), 0.3);
+}
+
+.menuBackdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(2px);
+    z-index: 90;
+}
+
+.moreMenu {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    transform: none;
+    background: rgba(var(--color-bg-secondary-rgb), 0.85);
+    backdrop-filter: blur(30px);
+    border: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 2rem 2rem 0 0;
+    padding: 1.5rem;
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.6);
+    z-index: 105;
+    display: flex;
+    flex-direction: column;
+}
+
+.menuHeader {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.menuIndicator {
+    width: 40px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+}
+
+.menuHeader h4 {
+    margin: 0;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-text-tertiary);
+}
+
+.menuGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+}
+
+.menuItem {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1.25rem 0.5rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    color: var(--color-text-secondary);
+    font-size: 0.85rem;
+    border-radius: 1rem;
+    cursor: pointer;
+    transition: all 0.25s;
+    text-align: center;
+}
+
+.menuItem:hover {
+    background: rgba(var(--color-primary-rgb), 0.1);
+    border-color: rgba(var(--color-primary-rgb), 0.2);
+    color: var(--color-text-primary);
+    transform: translateY(-2px);
+}
+
+.menuItem svg {
+    color: var(--color-primary);
+    opacity: 0.8;
 }
 
 .counterCircle {
@@ -53,22 +173,42 @@
     border: none;
     padding: 0;
     border-radius: 50%;
-    width: 280px;
-    height: 280px;
+    width: 82%;
+    aspect-ratio: 1 / 1;
+    height: auto;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
     box-shadow:
         0 10px 30px rgba(0, 0, 0, 0.5),
         inset 0 4px 20px rgba(255, 255, 255, 0.02);
     position: relative;
-    transition: transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     cursor: pointer;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
     outline: none;
     z-index: 1;
+    overflow: hidden;
+}
+
+.breathingCircle {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle, var(--color-primary) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.pulseWave {
+    position: absolute;
+    inset: 10%;
+    border: 2px solid var(--color-primary);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 2;
 }
 
 .counterCircle:active {
@@ -131,13 +271,33 @@
 
 .countValue {
     font-family: var(--font-display);
-    font-size: 6rem;
-    /* Huge */
+    font-size: clamp(3rem, 15vw, 6rem);
     font-weight: 700;
     color: var(--color-primary);
     text-shadow: 0 0 30px var(--color-primary-glow);
     line-height: 1;
     font-variant-numeric: tabular-nums;
+    z-index: 2;
+}
+
+.floatingContainer {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.floatingText {
+    position: absolute;
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 600;
+    white-space: nowrap;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    pointer-events: none;
 }
 
 .nameTrigger {
@@ -212,45 +372,29 @@
 
 /* RESPONSIVE BREAKPOINTS */
 
-/* Tablet / Small Laptop */
 @media (max-width: 768px) {
+    .container {
+        gap: var(--space-8);
+        padding: 1rem;
+    }
+
     .counterWrapper {
-        /* Scale down slightly */
-        transform: scale(0.9);
+        margin: 1rem 0;
     }
 }
 
-/* Mobile */
 @media (max-width: 480px) {
     .container {
-        gap: var(--space-8);
-        min-height: 80vh;
-        /* Adjust for mobile browser bars */
+        justify-content: space-evenly;
+        height: 100vh;
+        height: 100svh;
+        padding: 1rem 0;
     }
 
     .counterWrapper {
-        width: 300px;
-        height: 300px;
-        transform: scale(0.85);
-        /* Further scale down */
-    }
-
-    /* SVG adjustments handled by scaling parent, 
-       but we need to override fixed SVG attrs if they conflict 
-       (usually scaling parent is enough) */
-
-    .counterCircle {
-        width: 240px;
-        height: 240px;
-    }
-
-    .countValue {
-        font-size: 4.5rem;
-    }
-
-    .countLabel {
-        font-size: 0.7rem;
-        letter-spacing: 0.1em;
+        width: min(90vw, 320px);
+        aspect-ratio: 1 / 1;
+        height: auto;
     }
 
     .nameDisplay {
@@ -258,19 +402,20 @@
     }
 
     .controls {
-        gap: var(--space-4);
+        gap: var(--space-3);
     }
 
     .malaCount {
-        bottom: -30px;
+        bottom: -25px;
         font-size: var(--text-xs);
     }
 }
 
-/* Tiny Screens (e.g. iPhone SE) */
 @media (max-width: 360px) {
     .counterWrapper {
-        transform: scale(0.75);
+        width: 85vw;
+        aspect-ratio: 1 / 1;
+        height: auto;
     }
 
     .nameDisplay {

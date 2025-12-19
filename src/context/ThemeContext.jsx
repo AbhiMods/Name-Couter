@@ -22,6 +22,14 @@ export const ThemeProvider = ({ children }) => {
         return saved ? JSON.parse(saved) : { showName: false, showControls: false };
     });
 
+    const [floatingAnimations, setFloatingAnimations] = useState(() => {
+        return localStorage.getItem('divine_floating_animations') !== 'false';
+    });
+
+    const [floatingTextColor, setFloatingTextColor] = useState(() => {
+        return localStorage.getItem('divine_floating_text_color') || '';
+    });
+
     useEffect(() => {
         const root = window.document.documentElement;
         root.classList.remove('light', 'dark');
@@ -36,6 +44,14 @@ export const ThemeProvider = ({ children }) => {
     useEffect(() => {
         localStorage.setItem('divine_immersive_config', JSON.stringify(immersiveConfig));
     }, [immersiveConfig]);
+
+    useEffect(() => {
+        localStorage.setItem('divine_floating_animations', floatingAnimations);
+    }, [floatingAnimations]);
+
+    useEffect(() => {
+        localStorage.setItem('divine_floating_text_color', floatingTextColor);
+    }, [floatingTextColor]);
 
     const toggleTheme = () => setTheme(prev => prev === 'dark' ? 'light' : 'dark');
     const toggleTextSize = () => setTextSize(prev => prev === 'normal' ? 'large' : 'normal');
@@ -53,7 +69,9 @@ export const ThemeProvider = ({ children }) => {
             textSize, toggleTextSize,
             contrast, toggleContrast,
             immersiveMode, toggleImmersiveMode,
-            immersiveConfig, updateImmersiveConfig
+            immersiveConfig, updateImmersiveConfig,
+            floatingAnimations, setFloatingAnimations,
+            floatingTextColor, setFloatingTextColor
         }}>
             {children}
         </ThemeContext.Provider>

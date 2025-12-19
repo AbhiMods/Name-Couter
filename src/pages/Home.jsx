@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Volume2, RotateCcw, ChevronDown, ChevronUp, VolumeX, Target, Award, X, MessageSquare, Maximize2, Minimize2 } from 'lucide-react';
+import { Volume2, RotateCcw, ChevronDown, ChevronUp, VolumeX, Target, Award, X, MessageSquare, Maximize2, Minimize2, MoreVertical, Trophy, BarChart2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import clsx from 'clsx';
 import Card from '../components/ui/Card';
@@ -16,6 +17,7 @@ import styles from './Home.module.css';
 
 const Home = () => {
     useDocumentTitle('Divine Name | Japa Counter');
+    const navigate = useNavigate();
     const [count, setCount] = useState(0);
     const [showSelector, setShowSelector] = useState(false);
     const [showTargetModal, setShowTargetModal] = useState(false);
@@ -25,10 +27,15 @@ const Home = () => {
     const [target, setTarget] = useState(() => {
         return parseInt(localStorage.getItem('divine_target'), 10) || 0;
     });
+    const [floatingTexts, setFloatingTexts] = useState([]);
+    const [showMoreMenu, setShowMoreMenu] = useState(false);
 
     const { selectedName, playChant, toggleSound, soundEnabled } = useName();
     const { incrementStats } = useStats();
-    const { immersiveMode, toggleImmersiveMode, immersiveConfig } = useTheme();
+    const {
+        immersiveMode, toggleImmersiveMode, immersiveConfig,
+        floatingAnimations, floatingTextColor
+    } = useTheme();
 
     // Progress Calculation
     const MALA_SIZE = 108;
@@ -36,11 +43,10 @@ const Home = () => {
     const progressMax = isTargetMode ? target : MALA_SIZE;
     const progressCurrent = isTargetMode ? Math.min(count, target) : count % MALA_SIZE;
     const progressRatio = progressCurrent / progressMax;
-    const malasCompleted = Math.floor(count / MALA_SIZE);
-
-    const radius = 160;
+    const radius = 150; // Increased padding slightly for safety
     const circumference = 2 * Math.PI * radius;
     const strokeDashoffset = circumference - progressRatio * circumference;
+    const malasCompleted = Math.floor(count / MALA_SIZE);
 
     // Double Tap Logic
     const lastTapTime = useRef(0);
@@ -97,6 +103,24 @@ const Home = () => {
 
         setIsAnimating(true);
         setTimeout(() => setIsAnimating(false), 400);
+
+        if (floatingAnimations) {
+            const id = Date.now() + Math.random();
+            const xOffset = (Math.random() - 0.5) * 100; // -50 to 50
+            const yOffset = -50 - Math.random() * 50; // -50 to -100
+
+            setFloatingTexts(prev => [...prev.slice(-15), {
+                id,
+                text: selectedName.text.split(' ')[0], // Just the first word if multiple
+                x: xOffset,
+                y: yOffset
+            }]);
+
+            // Auto-cleanup after animation duration (2s)
+            setTimeout(() => {
+                setFloatingTexts(prev => prev.filter(t => t.id !== id));
+            }, 2000);
+        }
     };
 
     const handleReset = (e) => {
@@ -162,14 +186,37 @@ const Home = () => {
                 className={styles.counterWrapper}
                 style={immersiveMode && !immersiveConfig?.showControls && !immersiveConfig?.showName ? { transform: 'scale(1.1)' } : {}}
             >
-                <svg className={styles.progressRing} width="340" height="340">
-                    <circle className={styles.progressCircleBg} stroke="white" strokeWidth="4" fill="transparent" r={radius} cx="170" cy="170" />
-                    <circle className={styles.progressCircleFg} stroke="white" strokeWidth="4" fill="transparent" r={radius} cx="170" cy="170"
+                <svg className={styles.progressRing} viewBox="0 0 340 340" preserveAspectRatio="xMidYMid meet">
+                    <circle className={styles.progressCircleBg} stroke="white" strokeWidth="8" fill="transparent" r={radius} cx="170" cy="170" />
+                    <circle className={styles.progressCircleFg} stroke="white" strokeWidth="8" fill="transparent" r={radius} cx="170" cy="170"
                         style={{ strokeDasharray: `${circumference} ${circumference}`, strokeDashoffset, transition: 'stroke-dashoffset 0.1s linear' }}
                     />
                 </svg>
 
                 <button className={styles.counterCircle} onClick={handleIncrement} aria-label="Increment Counter">
+                    <motion.div
+                        className={styles.breathingCircle}
+                        animate={{
+                            scale: [1, 1.03, 1],
+                            opacity: [0.3, 0.5, 0.3]
+                        }}
+                        transition={{
+                            duration: 4,
+                            repeat: Infinity,
+                            ease: "easeInOut"
+                        }}
+                    />
+                    <AnimatePresence>
+                        {isAnimating && (
+                            <motion.div
+                                className={styles.pulseWave}
+                                initial={{ scale: 0.8, opacity: 0.5 }}
+                                animate={{ scale: 1.5, opacity: 0 }}
+                                exit={{ opacity: 0 }}
+                                transition={{ duration: 0.5, ease: "easeOut" }}
+                            />
+                        )}
+                    </AnimatePresence>
                     <div className={styles.countLabel}>Repetitions</div>
                     <div className={styles.countValue}>{count}</div>
                     {isTargetMode && (
@@ -178,6 +225,25 @@ const Home = () => {
                         </div>
                     )}
                     <div className={clsx(styles.tapFeedback, isAnimating && styles.animating)}></div>
+
+                    {/* Floating Texts Container */}
+                    <div className={styles.floatingContainer}>
+                        <AnimatePresence>
+                            {floatingTexts.map((item) => (
+                                <motion.span
+                                    key={item.id}
+                                    initial={{ opacity: 0, scale: 0.5, y: 0, x: item.x }}
+                                    animate={{ opacity: 1, scale: 1.2, y: item.y }}
+                                    exit={{ opacity: 0, scale: 0.8, y: item.y - 100 }}
+                                    transition={{ duration: 1.5, ease: "easeOut" }}
+                                    className={styles.floatingText}
+                                    style={{ color: floatingTextColor || 'var(--color-primary)' }}
+                                >
+                                    {item.text}
+                                </motion.span>
+                            ))}
+                        </AnimatePresence>
+                    </div>
                 </button>
 
                 <div className={styles.malaCount}>
@@ -203,31 +269,100 @@ const Home = () => {
 
             <AnimatePresence>
                 {showControls && (
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 20 }}
-                        className={styles.controls}
-                    >
-                        <Button variant="secondary" size="icon" onClick={() => setShowTargetModal(true)} title="Set Goal">
-                            <Target size={20} color={target > 0 ? "var(--color-primary)" : "currentColor"} />
-                        </Button>
-                        <Button variant="secondary" size="icon" onClick={() => setShowBadges(true)} title="Achievements">
-                            <Award size={20} />
-                        </Button>
-                        <Button variant="secondary" size="icon" onClick={toggleImmersiveMode} title={immersiveMode ? "Exit Full Screen" : "Full Screen"}>
-                            {immersiveMode ? <Minimize2 size={20} /> : <Maximize2 size={20} />}
-                        </Button>
-                        <Button variant="secondary" size="icon" onClick={() => setShowFeedback(true)} title="Send Feedback">
-                            <MessageSquare size={20} />
-                        </Button>
-                        <Button variant="secondary" size="icon" onClick={handleReset} title="Reset">
-                            <RotateCcw size={20} />
-                        </Button>
-                        <Button variant={soundEnabled ? "primary" : "secondary"} size="icon" onClick={toggleSound} title={soundEnabled ? "Mute Sound" : "Enable Sound"}>
-                            {soundEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
-                        </Button>
-                    </motion.div>
+                    <div className={styles.controlsWrapper}>
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 20 }}
+                            className={styles.controls}
+                        >
+                            <Button
+                                variant="secondary"
+                                size="icon"
+                                onClick={() => setShowTargetModal(true)}
+                                title="Set Goal"
+                                className={target > 0 ? styles.activeButton : ''}
+                            >
+                                <Target size={20} />
+                            </Button>
+
+                            <Button
+                                variant={soundEnabled ? "primary" : "secondary"}
+                                size="icon"
+                                onClick={toggleSound}
+                                title={soundEnabled ? "Mute Sound" : "Enable Sound"}
+                            >
+                                {soundEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
+                            </Button>
+
+                            <Button
+                                variant="secondary"
+                                size="icon"
+                                onClick={toggleImmersiveMode}
+                                title={immersiveMode ? "Exit Full Screen" : "Full Screen"}
+                            >
+                                {immersiveMode ? <Minimize2 size={20} /> : <Maximize2 size={20} />}
+                            </Button>
+
+                            <Button
+                                variant="secondary"
+                                size="icon"
+                                onClick={() => setShowMoreMenu(!showMoreMenu)}
+                                title="More Options"
+                                className={showMoreMenu ? styles.activeButton : ''}
+                            >
+                                <MoreVertical size={20} />
+                            </Button>
+                        </motion.div>
+
+                        <AnimatePresence>
+                            {showMoreMenu && (
+                                <>
+                                    <motion.div
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        exit={{ opacity: 0 }}
+                                        className={styles.menuBackdrop}
+                                        onClick={() => setShowMoreMenu(false)}
+                                    />
+                                    <motion.div
+                                        initial={{ y: "100%", opacity: 0 }}
+                                        animate={{ y: 0, opacity: 1 }}
+                                        exit={{ y: "100%", opacity: 0 }}
+                                        transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
+                                        className={styles.moreMenu}
+                                    >
+                                        <div className={styles.menuHeader}>
+                                            <div className={styles.menuIndicator} />
+                                            <h4>Quick Options</h4>
+                                        </div>
+                                        <div className={styles.menuGrid}>
+                                            <button onClick={() => { setShowBadges(true); setShowMoreMenu(false); }} className={styles.menuItem}>
+                                                <Award size={18} />
+                                                <span>Achievements</span>
+                                            </button>
+                                            <button onClick={() => { navigate('/leaderboard'); setShowMoreMenu(false); }} className={styles.menuItem}>
+                                                <Trophy size={18} />
+                                                <span>Leaderboard</span>
+                                            </button>
+                                            <button onClick={() => { navigate('/progress'); setShowMoreMenu(false); }} className={styles.menuItem}>
+                                                <BarChart2 size={18} />
+                                                <span>Progress Stats</span>
+                                            </button>
+                                            <button onClick={() => { setShowFeedback(true); setShowMoreMenu(false); }} className={styles.menuItem}>
+                                                <MessageSquare size={18} />
+                                                <span>Feedback</span>
+                                            </button>
+                                            <button onClick={(e) => { handleReset(e); setShowMoreMenu(false); }} className={styles.menuItem}>
+                                                <RotateCcw size={18} />
+                                                <span>Reset Counter</span>
+                                            </button>
+                                        </div>
+                                    </motion.div>
+                                </>
+                            )}
+                        </AnimatePresence>
+                    </div>
                 )}
             </AnimatePresence>
         </div>

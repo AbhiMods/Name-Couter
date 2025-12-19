@@ -32,7 +32,13 @@ export const AuthProvider = ({ children }) => {
         if (password.length < 6) throw new Error('Password must be at least 6 characters');
 
         // Simulate success
-        const mockUser = { id: 'u_123', email, name: email.split('@')[0] };
+        const isAdmin = email.toLowerCase() === 'admin@example.com';
+        const mockUser = {
+            id: 'u_123',
+            email,
+            name: email.split('@')[0],
+            role: isAdmin ? 'admin' : 'user'
+        };
         setUser(mockUser);
         localStorage.setItem('divine_auth_user', JSON.stringify(mockUser));
         return mockUser;
