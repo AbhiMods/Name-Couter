@@ -1,0 +1,104 @@
+/* Button.module.css */
+.button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+
+    font-family: var(--font-sans);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+
+    cursor: pointer;
+    transition: all var(--duration-fast) var(--ease-out);
+
+    /* Defaults */
+    border: none;
+    outline: none;
+}
+
+.button:active {
+    transform: scale(0.96);
+}
+
+.button:focus-visible {
+    box-shadow: 0 0 0 2px var(--color-bg-main), 0 0 0 4px var(--color-primary);
+}
+
+/* SIZES */
+.sm {
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-sm);
+    border-radius: var(--radius-sm);
+    gap: var(--space-2);
+}
+
+.md {
+    padding: var(--space-3) var(--space-6);
+    font-size: var(--text-base);
+    border-radius: var(--radius-md);
+    gap: var(--space-2);
+    min-height: 48px;
+    /* Large touch target */
+}
+
+.lg {
+    padding: var(--space-4) var(--space-8);
+    font-size: var(--text-lg);
+    border-radius: var(--radius-lg);
+    gap: var(--space-3);
+    min-height: 56px;
+}
+
+.icon {
+    padding: var(--space-3);
+    border-radius: var(--radius-full);
+    aspect-ratio: 1;
+    min-width: 48px;
+    /* Touch friendly */
+    min-height: 48px;
+}
+
+/* VARIANTS */
+.primary {
+    background: var(--color-primary);
+    color: #000;
+    /* Contrast on gold */
+    box-shadow: var(--shadow-sm);
+}
+
+.primary:hover {
+    background: #f0c978;
+    /* Slightly lighter gold */
+    box-shadow: var(--glow-primary);
+    transform: translateY(-1px);
+}
+
+.secondary {
+    background: var(--color-surface);
+    color: var(--color-text-primary);
+    border: 1px solid var(--color-border);
+}
+
+.secondary:hover {
+    background: var(--color-surface-hover);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.ghost {
+    background: transparent;
+    color: var(--color-text-secondary);
+}
+
+.ghost:hover {
+    background: var(--color-surface);
+    color: var(--color-text-primary);
+}
+
+/* Loading State */
+.loading {
+    opacity: 0.7;
+    pointer-events: none;
+}

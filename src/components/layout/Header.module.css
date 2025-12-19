@@ -1,0 +1,65 @@
+/* Header.module.css */
+.header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    width: 100%;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    background: rgba(2, 2, 5, 0.6);
+    /* Very dark transluscent */
+    border-bottom: 1px solid var(--color-border);
+    padding: var(--space-4) 0;
+}
+
+.headerContent {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-family: var(--font-display);
+    font-weight: 800;
+    /* Bolder */
+    font-size: var(--text-lg);
+    color: var(--color-text-primary);
+    letter-spacing: -0.01em;
+}
+
+.logoIcon {
+    color: var(--color-primary);
+    filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.4));
+}
+
+.nav {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+}
+
+.navLink {
+    color: var(--color-text-tertiary);
+    transition: all var(--duration-fast);
+    padding: var(--space-2);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.navLink:hover {
+    color: var(--color-text-primary);
+    background: rgba(255, 255, 255, 0.05);
+    /* Subtle highlight */
+}
+
+.navLinkActive {
+    color: var(--color-primary);
+    background: rgba(255, 215, 0, 0.08);
+    /* Gold tint */
+}
