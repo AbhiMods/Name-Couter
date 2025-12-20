@@ -45,14 +45,14 @@ const TargetSettings = ({ currentTarget, onSetTarget, onClose }) => {
                 <form onSubmit={handleCustomSubmit} className={styles.customInputWrapper}>
                     <input
                         type="number"
-                        placeholder="Custom count..."
+                        placeholder="Enter custom count..."
                         className={styles.input}
                         value={customVal}
                         onChange={e => setCustomVal(e.target.value)}
                         min="1"
                     />
-                    <Button type="submit" variant="secondary" size="icon">
-                        <Check size={18} />
+                    <Button type="submit" variant="primary" size="md" className={styles.submitButton}>
+                        Set Goal
                     </Button>
                 </form>
             </div>

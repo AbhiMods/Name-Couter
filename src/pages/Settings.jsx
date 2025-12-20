@@ -7,11 +7,12 @@ import {
     Palette, Type, MousePointerClick, Moon, Sun,
     Music, Volume2, Maximize2, Coffee, Zap,
     Eye, Activity, Download, Trash2, Smartphone,
-    Youtube, Instagram, Send, Globe, Heart,
-    Bell, Clock, Award
+    Youtube, Instagram, Send, Globe,
+    Bell, Clock, Award, MessageSquare
 } from 'lucide-react';
 import styles from './Settings.module.css';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
+import FeedbackModal from '../components/feedback/FeedbackModal';
 
 // Custom Toggle Component if Switch doesn't exist
 const Toggle = ({ active, onToggle }) => (
@@ -63,6 +64,7 @@ const Settings = () => {
     const [zenPreset, setZenPreset] = useState('custom');
     const [fadeDuration, setFadeDuration] = useState(3);
     const [hapticStrength, setHapticStrength] = useState('medium');
+    const [showFeedback, setShowFeedback] = useState(false);
 
     const colorPresets = [
         { name: 'Default', value: '' },
@@ -283,6 +285,22 @@ const Settings = () => {
                             }}
                         />
                     </div>
+
+                    <div className={styles.row}>
+                        <div className={styles.rowContent}>
+                            <div className={styles.rowText}>
+                                <span className={styles.label}>Show Controls</span>
+                                <span className={styles.description}>In full screen</span>
+                            </div>
+                        </div>
+                        <Toggle
+                            active={immersiveConfig.showControls}
+                            onToggle={() => {
+                                updateImmersiveConfig('showControls');
+                                setZenPreset('custom');
+                            }}
+                        />
+                    </div>
                 </div>
             </section>
 
@@ -352,8 +370,25 @@ const Settings = () => {
                 </div>
             </section>
 
-            {/* 6. ABOUT & SOCIAL */}
+            {/* 7. FEEDBACK */}
             <section className={styles.section}>
+                <h2 className={styles.sectionTitle}>Feedback</h2>
+                <div className={styles.card} onClick={() => setShowFeedback(true)} style={{ cursor: 'pointer' }}>
+                    <div className={styles.row}>
+                        <div className={styles.rowContent}>
+                            <div className={styles.rowIcon}><MessageSquare size={20} /></div>
+                            <div className={styles.rowText}>
+                                <span className={styles.label}>Send Feedback</span>
+                                <span className={styles.description}>Share your thoughts to help us improve.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* 8. ABOUT & SOCIAL */}
+            <section className={styles.section}>
+                <h2 className={styles.sectionTitle}>About</h2>
                 <div className={styles.aboutCard}>
                     <div className={styles.socialRow}>
                         <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className={styles.socialIcon}><Youtube size={24} /></a>
@@ -362,12 +397,36 @@ const Settings = () => {
                         <a href="https://features.com" target="_blank" rel="noopener noreferrer" className={styles.socialIcon}><Globe size={24} /></a>
                     </div>
                     <p className={styles.version}>Divine Name v1.0.0</p>
-                    <div className={styles.devotion}>
-                        <Heart size={12} style={{ display: 'inline', marginRight: '4px', fill: 'currentColor' }} />
-                        Made with devotion
-                    </div>
                 </div>
             </section>
+
+            {/* 9. DEVELOPER INFO */}
+            <section className={styles.section} style={{ marginTop: '2rem', textAlign: 'center', paddingBottom: '2rem' }}>
+                <h3 style={{
+                    fontSize: '0.75rem',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.1em',
+                    color: 'var(--color-text-tertiary)',
+                    marginBottom: '0.5rem',
+                    opacity: 0.7
+                }}>
+                    Developer
+                </h3>
+                <p style={{
+                    fontSize: '0.9rem',
+                    color: 'var(--color-text-secondary)',
+                    fontFamily: 'var(--font-display)',
+                    letterSpacing: '0.02em',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '0.5rem'
+                }}>
+                    Developed by Abhishek
+                </p>
+            </section>
+
+            {showFeedback && <FeedbackModal onClose={() => setShowFeedback(false)} />}
         </div>
     );
 };

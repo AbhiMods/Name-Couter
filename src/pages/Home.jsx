@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Volume2, RotateCcw, VolumeX, Target, Award, X, MessageSquare, Maximize2, Minimize2, MoreVertical, Trophy, BarChart2, LogOut, Music } from 'lucide-react';
+import { Volume2, RotateCcw, VolumeX, Target, Award, X, Maximize2, Minimize2, MoreVertical, LogOut } from 'lucide-react';
 import SessionSummary from '../components/chant/SessionSummary';
 import ImageCarousel from '../components/chant/ImageCarousel';
 import { useNavigate } from 'react-router-dom';
@@ -11,7 +11,6 @@ import NameSelector from '../components/chant/NameSelector';
 import BhajanModal from '../components/chant/BhajanModal';
 import TargetSettings from '../components/chant/TargetSettings';
 import Badges from '../components/stats/Badges';
-import FeedbackModal from '../components/feedback/FeedbackModal';
 import { useName } from '../context/NameContext';
 import { useStats } from '../context/StatsContext';
 import { useTheme } from '../context/ThemeContext';
@@ -24,10 +23,10 @@ const Home = () => {
     useDocumentTitle('Divine Name | Japa Counter');
     const navigate = useNavigate();
     const [count, setCount] = useState(0);
-    // Removed showSelector state
+
     const [showTargetModal, setShowTargetModal] = useState(false);
     const [showBadges, setShowBadges] = useState(false);
-    const [showFeedback, setShowFeedback] = useState(false);
+
     const [isAnimating, setIsAnimating] = useState(false);
     const [target, setTarget] = useState(() => {
         return parseInt(localStorage.getItem('divine_target'), 10) || 0;
@@ -35,22 +34,23 @@ const Home = () => {
     const [floatingTexts, setFloatingTexts] = useState([]);
     const [showMoreMenu, setShowMoreMenu] = useState(false);
     const [showBhajanModal, setShowBhajanModal] = useState(false);
+    const [showIntention, setShowIntention] = useState(false);
 
     // Session State
     const [showSummary, setShowSummary] = useState(false);
-    const [sessionStartTime, setSessionStartTime] = useState(null); // Initialize as null to track active session
+    const [sessionStartTime, setSessionStartTime] = useState(null);
     const [sessionStartCount, setSessionStartCount] = useState(0);
-    const [sessionDuration, setSessionDuration] = useState('00:00'); // Final duration string
-    const [liveTimer, setLiveTimer] = useState('00:00'); // Live display string
+    const [sessionDuration, setSessionDuration] = useState('00:00');
+    const [liveTimer, setLiveTimer] = useState('00:00');
 
     const { selectedName, playChant, toggleSound, soundEnabled } = useName();
-    const { incrementStats, setIsJapaActive } = useStats(); // Added setIsJapaActive
+    const { incrementStats, setIsJapaActive } = useStats();
     const {
         immersiveMode, toggleImmersiveMode, immersiveConfig,
         floatingAnimations, floatingTextColor
     } = useTheme();
     const { play: playBgMusic, stop: stopBgMusic } = useBgMusic();
-    const { pause: pauseBhajan, currentSong, isPlaying } = useBhajan();
+    const { pause: pauseBhajan, currentSong, isPlaying, playTrack } = useBhajan();
 
     // Progress Calculation
     const MALA_SIZE = 108;
@@ -58,18 +58,22 @@ const Home = () => {
     const progressMax = isTargetMode ? target : MALA_SIZE;
     const progressCurrent = isTargetMode ? Math.min(count, target) : count % MALA_SIZE;
     const progressRatio = progressCurrent / progressMax;
-    const radius = 150; // Increased padding slightly for safety
+
+    const radius = 150;
     const circumference = 2 * Math.PI * radius;
     const strokeDashoffset = circumference - progressRatio * circumference;
     const malasCompleted = Math.floor(count / MALA_SIZE);
 
-    // Double Tap Logic
+    const remainingCount = isTargetMode ? (target - count) : (MALA_SIZE - (count % MALA_SIZE));
+
+    // Double Tap & Zen Logic
     const lastTapTime = useRef(0);
+    const [isGhostVisible, setIsGhostVisible] = useState(false);
+    const controlTimeoutRef = useRef(null);
+
     const handleContainerClick = (e) => {
-        // Ignore clicks on buttons/interactive elements to avoid conflict
         if (e.target.closest('button') || e.target.closest('.modal-content')) return;
 
-        // START TIMER ON TAP ANYWHERE if not started
         if (!sessionStartTime) {
             startSession();
         }
@@ -82,6 +86,12 @@ const Home = () => {
         } else {
             if (!e.target.closest(`.${styles.counterCircle}`)) {
                 handleIncrement();
+            }
+
+            if (immersiveMode) {
+                setIsGhostVisible(true);
+                if (controlTimeoutRef.current) clearTimeout(controlTimeoutRef.current);
+                controlTimeoutRef.current = setTimeout(() => setIsGhostVisible(false), 2000);
             }
         }
         lastTapTime.current = currentTime;
@@ -114,7 +124,6 @@ const Home = () => {
         localStorage.setItem('divine_target', target);
     }, [target]);
 
-    // Live Timer Effect
     useEffect(() => {
         let interval;
         if (sessionStartTime && !showSummary) {
@@ -129,36 +138,28 @@ const Home = () => {
         return () => clearInterval(interval);
     }, [sessionStartTime, showSummary]);
 
-
     const startSession = () => {
         setSessionStartTime(Date.now());
         setSessionStartCount(count);
-        setIsJapaActive(true); // Tell StatsContext Japa is active
+        setIsJapaActive(true);
 
-        // Smart Sync: Auto-play Music if available and not playing
-        if (!isPlaying && !immersiveMode) { // Optional: Don't auto-start in Zen mode if that's preferred, but user just said "auto-play"
-            // Play from Bhajan Context if we have a current song or playlist
-            // If no current song, play the first one/random?
-            // For now, let's assume if there's a current song, resume it, else play first.
+        setShowIntention(true);
+        setTimeout(() => setShowIntention(false), 4000);
+
+        if (!immersiveMode) {
+            toggleImmersiveMode();
+        }
+
+        if (!isPlaying) {
             if (currentSong) {
                 playTrack(currentSong);
-            } else {
-                // Trigger play logic in context (maybe need a 'playRandom' or 'playFirst' exposed?)
-                // BhajanContext 'playTrack' needs a track.
-                // We can access playlist from context if we needed to.
-                // Ideally BhajanContext should have a 'resumeOrPlayFirst()' method.
-                // As a fallback, we won't force-start if no song selected to avoid confusion.
             }
         }
     };
 
     const handleIncrement = () => {
-        // Start session on first increment if not started
-        if (!sessionStartTime) {
-            startSession();
-        }
+        if (!sessionStartTime) startSession();
 
-        // Refresh Japa Active State (keep alive)
         setIsJapaActive(true);
 
         const nextCount = count + 1;
@@ -167,8 +168,11 @@ const Home = () => {
         playChant();
 
         if (navigator.vibrate) {
-            if (isTargetMode && nextCount === target) {
-                try { navigator.vibrate(1000); } catch (e) { }
+            const isMalaComplete = nextCount % 108 === 0;
+            const isTargetComplete = isTargetMode && nextCount === target;
+
+            if (isTargetComplete || isMalaComplete) {
+                try { navigator.vibrate([100, 50, 100]); } catch (e) { }
             } else {
                 try { navigator.vibrate(10); } catch (e) { }
             }
@@ -183,17 +187,16 @@ const Home = () => {
 
         if (floatingAnimations) {
             const id = Date.now() + Math.random();
-            const xOffset = (Math.random() - 0.5) * 100; // -50 to 50
-            const yOffset = -50 - Math.random() * 50; // -50 to -100
+            const xOffset = (Math.random() - 0.5) * 100;
+            const yOffset = -50 - Math.random() * 50;
 
             setFloatingTexts(prev => [...prev.slice(-15), {
                 id,
-                text: selectedName.text.split(' ')[0], // Just the first word if multiple
+                text: selectedName.text.split(' ')[0],
                 x: xOffset,
                 y: yOffset
             }]);
 
-            // Auto-cleanup after animation duration (2s)
             setTimeout(() => {
                 setFloatingTexts(prev => prev.filter(t => t.id !== id));
             }, 2000);
@@ -209,7 +212,7 @@ const Home = () => {
             setLiveTimer('00:00');
             setIsJapaActive(false);
             stopBgMusic();
-            pauseBhajan(); // Stop music on reset
+            pauseBhajan();
         }
     };
 
@@ -226,20 +229,13 @@ const Home = () => {
         setShowSummary(true);
         setIsJapaActive(false);
         stopBgMusic();
-
-        // Smart Sync: Fade out/Pause music on completion
         pauseBhajan();
     };
 
     const handleContinue = () => {
         setShowSummary(false);
-        // Resume session
-        setSessionStartTime(Date.now()); // Reset start time for next segment? Or just continue?
-        // Usually, continue means "Keep counting".
+        setSessionStartTime(Date.now());
         setIsJapaActive(true);
-
-        // Resume music if it was auto-paused? 
-        // User might want to resume music.
         if (currentSong) playTrack(currentSong);
     };
 
@@ -252,20 +248,15 @@ const Home = () => {
         pauseBhajan();
     };
 
-    // Determine visibility based on mode and config
-    const showName = !immersiveMode || immersiveConfig?.showName;
-    const showControls = !immersiveMode || immersiveConfig?.showControls;
-
     return (
         <div
             className={clsx(styles.container, immersiveMode && styles.immersiveContainer)}
-            style={immersiveMode ? { justifyContent: 'center', height: '100%', padding: '2rem 0' } : {}}
+            style={immersiveMode ? { justifyContent: 'center', height: '100%', padding: '0' } : {}}
             onClick={handleContainerClick}
         >
             {showTargetModal && (
                 <TargetSettings currentTarget={target} onSetTarget={setTarget} onClose={() => setShowTargetModal(false)} />
             )}
-            {showFeedback && <FeedbackModal onClose={() => setShowFeedback(false)} />}
             {showBadges && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" onClick={() => setShowBadges(false)}>
                     <div className="relative w-full max-w-lg bg-[#0a0a0f] border border-[#222] rounded-2xl overflow-hidden" onClick={e => e.stopPropagation()}>
@@ -277,14 +268,28 @@ const Home = () => {
                 </div>
             )}
 
-
             {showBhajanModal && <BhajanModal onClose={() => setShowBhajanModal(false)} />}
 
-            {/* Name Display Section Removed */}
+            <AnimatePresence>
+                {showIntention && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0 }}
+                        className={styles.intentionMessage}
+                    >
+                        Chant with focus and surrender 🙏
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
-            {/* Image Carousel - MOVED TOP */}
-            <div style={{ width: 'min(85vw, 400px)', zIndex: 5, marginBottom: '0.5rem', marginTop: '0' }}>
+            {/* Image Carousel - Now Persist in Zen Mode with extra classes */}
+            <div
+                className={clsx(styles.imageWrapper, immersiveMode && styles.zenImageWrapper)}
+                onClick={(e) => e.stopPropagation()}
+            >
                 <ImageCarousel />
+                {immersiveMode && <div className={styles.imageOverlay} />}
             </div>
 
             <AnimatePresence>
@@ -301,11 +306,11 @@ const Home = () => {
             <motion.div
                 layout
                 className={styles.counterWrapper}
-                style={immersiveMode && !immersiveConfig?.showControls && !immersiveConfig?.showName ? { transform: 'scale(1.1)' } : {}}
+                style={immersiveMode ? { transform: 'scale(1.1)', marginTop: '2rem' } : { marginTop: '1rem' }}
             >
                 <svg className={styles.progressRing} viewBox="0 0 340 340" preserveAspectRatio="xMidYMid meet">
-                    <circle className={styles.progressCircleBg} stroke="white" strokeWidth="8" fill="transparent" r={radius} cx="170" cy="170" />
-                    <circle className={styles.progressCircleFg} stroke="white" strokeWidth="8" fill="transparent" r={radius} cx="170" cy="170"
+                    <circle className={styles.progressCircleBg} stroke="white" strokeWidth="6" fill="transparent" r={radius} cx="170" cy="170" />
+                    <circle className={styles.progressCircleFg} stroke="white" strokeWidth="6" fill="transparent" r={radius} cx="170" cy="170"
                         style={{ strokeDasharray: `${circumference} ${circumference}`, strokeDashoffset, transition: 'stroke-dashoffset 0.1s linear' }}
                     />
                 </svg>
@@ -314,11 +319,12 @@ const Home = () => {
                     <motion.div
                         className={styles.breathingCircle}
                         animate={{
-                            scale: [1, 1.03, 1],
-                            opacity: [0.3, 0.5, 0.3]
+                            scale: [1, 1.05, 1],
+                            opacity: [0.3, 0.6, 0.3],
+                            filter: ['blur(10px)', 'blur(15px)', 'blur(10px)']
                         }}
                         transition={{
-                            duration: 4,
+                            duration: 3.5,
                             repeat: Infinity,
                             ease: "easeInOut"
                         }}
@@ -328,22 +334,21 @@ const Home = () => {
                             <motion.div
                                 className={styles.pulseWave}
                                 initial={{ scale: 0.8, opacity: 0.5 }}
-                                animate={{ scale: 1.5, opacity: 0 }}
+                                animate={{ scale: 1.4, opacity: 0 }}
                                 exit={{ opacity: 0 }}
                                 transition={{ duration: 0.5, ease: "easeOut" }}
                             />
                         )}
                     </AnimatePresence>
-                    <div className={styles.countLabel}>Repetitions</div>
+
                     <div className={styles.countValue}>{count}</div>
-                    {isTargetMode && (
-                        <div style={{ fontSize: '0.9rem', color: 'var(--color-primary)', marginTop: '0.5rem', opacity: 0.8 }}>
-                            Target: {target}
-                        </div>
-                    )}
+
+                    <div className={styles.remainingLabel}>
+                        <span style={{ opacity: 0.8 }}>{remainingCount}</span> chants remaining
+                    </div>
+
                     <div className={clsx(styles.tapFeedback, isAnimating && styles.animating)}></div>
 
-                    {/* Floating Texts Container */}
                     <div className={styles.floatingContainer}>
                         <AnimatePresence>
                             {floatingTexts.map((item) => (
@@ -363,34 +368,49 @@ const Home = () => {
                     </div>
                 </button>
 
-                <div className={styles.malaCount}>
-                    {isTargetMode ? `${Math.round(progressRatio * 100)}% Completed ${count >= target ? '🎉' : ''}` : `${malasCompleted} Malas Completed`}
-                </div>
-
-                {/* Session Timer */}
-                <div className={styles.sessionTimer}>
-                    {liveTimer}
+                {/* Combined Session Stats (Timer + Progress) */}
+                <div className={styles.sessionLine}>
+                    <span>{liveTimer}</span>
+                    <span className={styles.statDivider}>•</span>
+                    <span>{isTargetMode ? `${Math.round(progressRatio * 100)}% Goal` : `${malasCompleted} Malas`}</span>
                 </div>
             </motion.div>
 
-            {/* Immersive Mode Exit Button (Floating) */}
+            {/* ZEN CONTROLS (Floating Pill) */}
             <AnimatePresence>
-                {immersiveMode && !showControls && (
-                    <motion.button
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.8 }}
-                        onClick={toggleImmersiveMode}
-                        className="fixed bottom-8 right-8 z-50 p-4 rounded-full bg-white/10 backdrop-blur-md text-white border border-white/20 shadow-lg hover:bg-white/20 transition-all"
-                        title="Exit Full Screen"
+                {immersiveMode && (isGhostVisible || immersiveConfig?.showControls) && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 30, scale: 0.9 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 30, scale: 0.9 }}
+                        className={styles.zenControlsPill}
+                        onClick={(e) => e.stopPropagation()}
                     >
-                        <Minimize2 size={24} />
-                    </motion.button>
+                        <button
+                            onClick={(e) => { e.stopPropagation(); setShowSummary(true); setIsJapaActive(false); }}
+                            className={styles.zenIconButton}
+                            title="Pause Session"
+                        >
+                            <div className={styles.pauseIcon} />
+                        </button>
+
+                        <div className={styles.zenDivider} />
+
+                        <button
+                            onClick={(e) => { e.stopPropagation(); handleSessionComplete(); }}
+                            className={styles.zenIconButton}
+                            title="End Session"
+                            style={{ color: '#ff4444' }}
+                        >
+                            <LogOut size={20} />
+                        </button>
+                    </motion.div>
                 )}
             </AnimatePresence>
 
+            {/* STANDARD CONTROLS */}
             <AnimatePresence>
-                {showControls && (
+                {!immersiveMode && (
                     <div className={styles.controlsWrapper}>
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
@@ -421,32 +441,18 @@ const Home = () => {
                                 variant="secondary"
                                 size="icon"
                                 onClick={toggleImmersiveMode}
-                                title={immersiveMode ? "Exit Full Screen" : "Full Screen"}
+                                title="Enter Zen Mode"
                             >
-                                {immersiveMode ? <Minimize2 size={20} /> : <Maximize2 size={20} />}
+                                <Maximize2 size={20} />
                             </Button>
 
                             <Button
                                 variant="secondary"
                                 size="icon"
-                                onClick={() => setShowBhajanModal(true)}
-                                title="Bhajan Playlist"
-                                className={clsx(showBhajanModal && styles.activeButton)}
-                                style={{ position: 'relative' }}
+                                onClick={() => setShowBadges(true)}
+                                title="Achievements"
                             >
-                                <Music size={20} className={isPlaying ? styles.pulseIcon : ''} />
-                                {isPlaying && (
-                                    <span style={{
-                                        position: 'absolute',
-                                        top: '6px',
-                                        right: '6px',
-                                        width: '8px',
-                                        height: '8px',
-                                        borderRadius: '50%',
-                                        backgroundColor: 'var(--color-primary)',
-                                        boxShadow: '0 0 5px var(--color-primary)'
-                                    }} />
-                                )}
+                                <Award size={20} />
                             </Button>
 
                             <Button
@@ -482,7 +488,6 @@ const Home = () => {
                                             <h4>Quick Options</h4>
                                         </div>
 
-                                        {/* Divine Name Selection */}
                                         <div style={{ marginBottom: '1.5rem', width: '100%' }}>
                                             <h4 style={{
                                                 fontSize: '0.8rem',
@@ -501,10 +506,6 @@ const Home = () => {
                                             <button onClick={() => { handleSessionComplete(); setShowMoreMenu(false); }} className={styles.menuItem}>
                                                 <LogOut size={18} />
                                                 <span>End Session</span>
-                                            </button>
-                                            <button onClick={() => { setShowFeedback(true); setShowMoreMenu(false); }} className={styles.menuItem}>
-                                                <MessageSquare size={18} />
-                                                <span>Feedback</span>
                                             </button>
                                             <button onClick={(e) => { handleReset(e); setShowMoreMenu(false); }} className={styles.menuItem}>
                                                 <RotateCcw size={18} />

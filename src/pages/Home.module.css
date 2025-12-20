@@ -13,10 +13,22 @@
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    padding-top: var(--space-6);
+    padding-top: 1rem;
     gap: var(--space-4);
     min-height: 70vh;
     text-align: center;
+}
+
+/* Image Wrappers */
+.imageWrapper {
+    width: min(85vw, 400px);
+    z-index: 5;
+    margin-bottom: 0.5rem;
+    margin-top: 0;
+    transition: all 0.5s ease;
+    position: relative;
+    border-radius: 1rem;
+    overflow: hidden;
 }
 
 .counterWrapper {
@@ -27,8 +39,9 @@
     width: min(85vw, 400px);
     aspect-ratio: 1 / 1;
     height: auto;
-    margin: 0.5rem 0 1rem 0;
+    margin: 0.5rem 0 6rem 0;
     flex-shrink: 0;
+    transition: all 0.5s ease;
 }
 
 /* The SVG ring container */
@@ -39,9 +52,7 @@
     width: 100%;
     height: 100%;
     pointer-events: none;
-    /* Let clicks pass through to the button */
     transform: rotate(-90deg);
-    /* Start from top */
     z-index: 0;
 }
 
@@ -69,7 +80,6 @@
 .controls {
     display: flex;
     gap: 2rem;
-    /* Increased spacing */
     background: rgba(var(--color-bg-secondary-rgb), 0.6);
     backdrop-filter: blur(25px);
     padding: 0.85rem 2.25rem;
@@ -77,6 +87,7 @@
     border: 1px solid var(--color-border);
     box-shadow: var(--shadow-lg);
     z-index: 101;
+    transition: all 0.3s ease;
 }
 
 .activeButton {
@@ -247,25 +258,33 @@
     }
 }
 
-.malaCount {
+/* Combined Session Info Line */
+.sessionLine {
     position: absolute;
-    bottom: -40px;
-    font-family: var(--font-sans);
-    font-size: var(--text-sm);
+    bottom: -60px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    white-space: nowrap;
+
+    font-family: var(--font-mono);
+    font-size: 1.1rem;
     color: var(--color-text-secondary);
     background: rgba(255, 255, 255, 0.05);
-    padding: 4px 12px;
-    border-radius: 20px;
+    padding: 0.6rem 1.2rem;
+    border-radius: 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(4px);
+    width: max-content;
 }
 
-.sessionTimer {
-    position: absolute;
-    bottom: -70px;
-    font-family: var(--font-mono);
-    font-size: var(--text-sm);
+.statDivider {
     color: var(--color-text-tertiary);
-    opacity: 0.8;
-    letter-spacing: 0.05em;
+    opacity: 0.5;
+    font-size: 0.8rem;
 }
 
 .countLabel {
@@ -274,20 +293,49 @@
     text-transform: uppercase;
     letter-spacing: 0.15em;
     color: var(--color-text-tertiary);
-    /* Very muted */
     margin-bottom: var(--space-4);
 }
 
 .countValue {
     font-family: var(--font-display);
-    font-size: clamp(3rem, 15vw, 6rem);
+    font-size: clamp(3.5rem, 18vw, 7rem);
     font-weight: 700;
     color: var(--color-primary);
     text-shadow: 0 0 30px var(--color-primary-glow);
     line-height: 1;
     font-variant-numeric: tabular-nums;
     z-index: 2;
+    margin-bottom: 0.25rem;
 }
+
+.remainingLabel {
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+    color: var(--color-text-secondary);
+    letter-spacing: 0.05em;
+    opacity: 0.9;
+    margin-top: 0.5rem;
+}
+
+.intentionMessage {
+    position: fixed;
+    top: 15%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    color: var(--color-text-secondary);
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0.5rem 1.5rem;
+    border-radius: 2rem;
+    backdrop-filter: blur(4px);
+    z-index: 50;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    white-space: nowrap;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    pointer-events: none;
+}
+
 
 .floatingContainer {
     position: absolute;
@@ -342,12 +390,6 @@
     font-size: var(--text-base);
     margin-top: var(--space-2);
     max-width: 400px;
-}
-
-.controls {
-    display: flex;
-    gap: var(--space-6);
-    margin-top: var(--space-4);
 }
 
 .selectorDropdown {
@@ -413,11 +455,6 @@
     .controls {
         gap: var(--space-3);
     }
-
-    .malaCount {
-        bottom: -25px;
-        font-size: var(--text-xs);
-    }
 }
 
 @media (max-width: 360px) {
@@ -429,5 +466,89 @@
 
     .nameDisplay {
         font-size: var(--text-xl);
+    }
+}
+
+/* ZEN CONTROLS PILL */
+.zenControlsPill {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(20, 20, 25, 0.6);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 2rem;
+    padding: 0.5rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    z-index: 1000;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.zenIconButton {
+    background: none;
+    border: none;
+    padding: 0.5rem;
+    border-radius: 50%;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.zenIconButton:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: scale(1.1);
+}
+
+.zenDivider {
+    width: 1px;
+    height: 1.5rem;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.pauseIcon {
+    width: 14px;
+    height: 14px;
+    background: white;
+    border-radius: 2px;
+}
+
+/* PRINT STYLES */
+@media print {
+
+    .print-hidden,
+    .controls,
+    .controlsWrapper,
+    .zenControlsPill,
+    .immersiveContainer button,
+    .menuBackdrop,
+    .moreMenu {
+        display: none !important;
+    }
+
+    .container {
+        padding: 0;
+        min-height: auto;
+        justify-content: flex-start;
+    }
+
+    .counterWrapper {
+        transform: scale(1) !important;
+        margin-top: 2rem;
+    }
+
+    body {
+        background: white;
+        color: black;
+    }
+
+    * {
+        text-shadow: none !important;
+        box-shadow: none !important;
     }
 }

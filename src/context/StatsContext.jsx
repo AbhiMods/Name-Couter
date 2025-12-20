@@ -4,13 +4,19 @@ import { dbRequest } from '../services/StorageService';
 const StatsContext = createContext(null);
 
 const ACHIEVEMENTS_LIST = [
-    { id: 'begin', label: 'First Step', threshold: 1, type: 'count', icon: '🙏', desc: 'Chanted your first name' },
-    { id: 'mala_1', label: 'One Mala', threshold: 108, type: 'count', icon: '📿', desc: 'Completed 108 chants' },
-    { id: 'streak_3', label: 'Dedicated', threshold: 3, type: 'streak', icon: '🔥', desc: '3-day chanting streak' },
-    { id: 'mala_10', label: 'Devotee', threshold: 1080, type: 'count', icon: '✨', desc: 'Completed 10 Malas' },
-    { id: 'streak_7', label: 'Unstoppable', threshold: 7, type: 'streak', icon: '⚡', desc: '7-day chanting streak' },
-    { id: 'grand_10k', label: 'Saintly', threshold: 10000, type: 'count', icon: '🌟', desc: 'Reached 10,000 chants' },
-    { id: 'master_100k', label: 'Divine Connection', threshold: 100000, type: 'count', icon: '🕉️', desc: 'Reached 100,000 chants' },
+    // Beginner
+    { id: 'begin', label: 'First Step', threshold: 1, type: 'count', icon: '🙏', category: 'Beginner', condition: 'Chant your first name', desc: 'The journey of a thousand miles begins with a single step.' },
+    { id: 'streak_3', label: 'Dedicated', threshold: 3, type: 'streak', icon: '🌱', category: 'Beginner', condition: 'Chant for 3 days in a row', desc: 'Consistency is the key to spiritual growth.' },
+    { id: 'mala_1', label: 'One Mala', threshold: 108, type: 'count', icon: '📿', category: 'Beginner', condition: 'Complete 108 chants', desc: 'You have completed your first full round.' },
+
+    // Consistency
+    { id: 'streak_7', label: 'Unstoppable', threshold: 7, type: 'streak', icon: '🔥', category: 'Consistency', condition: 'Chant for 7 days in a row', desc: 'Your devotion is burning bright.' },
+    { id: 'streak_21', label: 'Habit Formed', threshold: 21, type: 'streak', icon: '🧠', category: 'Consistency', condition: 'Chant for 21 days in a row', desc: 'A new spiritual habit has been forged.' },
+
+    // Spiritual Depth
+    { id: 'mala_10', label: 'Devotee', threshold: 1080, type: 'count', icon: '✨', category: 'Spiritual Depth', condition: 'Complete 10 Malas (1080 chants)', desc: 'Deepening your connection with every name.' },
+    { id: 'grand_10k', label: 'Saintly', threshold: 10000, type: 'count', icon: '🌟', category: 'Spiritual Depth', condition: 'Reach 10,000 chants', desc: 'A monumental milestone of devotion.' },
+    { id: 'master_100k', label: 'Divine Connection', threshold: 100000, type: 'count', icon: '🕉️', category: 'Spiritual Depth', condition: 'Reach 100,000 chants', desc: 'You are immersed in the divine vibration.' },
 ];
 
 export const StatsProvider = ({ children }) => {
