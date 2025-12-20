@@ -1,5 +1,5 @@
 import React, { Suspense, lazy } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Layout from './components/layout/Layout';
 import { NameProvider } from './context/NameContext';
 import { StatsProvider } from './context/StatsContext';
@@ -29,6 +29,14 @@ const PageLoader = () => (
   </div>
 );
 
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+  React.useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+};
+
 function App() {
   return (
     <ErrorBoundary>
@@ -40,6 +48,7 @@ function App() {
                 <NameProvider>
                   <LeaderboardProvider>
                     <BrowserRouter>
+                      <ScrollToTop />
                       <Suspense fallback={<PageLoader />}>
                         <Routes>
                           <Route path="/login" element={<Login />} />

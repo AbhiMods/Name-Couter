@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Volume2, RotateCcw, VolumeX, Target, Award, X, Maximize2, Minimize2, MoreVertical, LogOut } from 'lucide-react';
+import { Volume2, RotateCcw, VolumeX, Target, X, Maximize2, Minimize2, MoreVertical, LogOut } from 'lucide-react';
 import SessionSummary from '../components/chant/SessionSummary';
 import ImageCarousel from '../components/chant/ImageCarousel';
 import { useNavigate } from 'react-router-dom';
@@ -10,7 +10,6 @@ import Button from '../components/ui/Button';
 import NameSelector from '../components/chant/NameSelector';
 import BhajanModal from '../components/chant/BhajanModal';
 import TargetSettings from '../components/chant/TargetSettings';
-import Badges from '../components/stats/Badges';
 import { useName } from '../context/NameContext';
 import { useStats } from '../context/StatsContext';
 import { useTheme } from '../context/ThemeContext';
@@ -25,7 +24,6 @@ const Home = () => {
     const [count, setCount] = useState(0);
 
     const [showTargetModal, setShowTargetModal] = useState(false);
-    const [showBadges, setShowBadges] = useState(false);
 
     const [isAnimating, setIsAnimating] = useState(false);
     const [target, setTarget] = useState(() => {
@@ -257,16 +255,6 @@ const Home = () => {
             {showTargetModal && (
                 <TargetSettings currentTarget={target} onSetTarget={setTarget} onClose={() => setShowTargetModal(false)} />
             )}
-            {showBadges && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" onClick={() => setShowBadges(false)}>
-                    <div className="relative w-full max-w-lg bg-[#0a0a0f] border border-[#222] rounded-2xl overflow-hidden" onClick={e => e.stopPropagation()}>
-                        <button onClick={() => setShowBadges(false)} className="absolute top-4 right-4 p-2 text-gray-400 hover:text-white">
-                            <X size={24} />
-                        </button>
-                        <Badges />
-                    </div>
-                </div>
-            )}
 
             {showBhajanModal && <BhajanModal onClose={() => setShowBhajanModal(false)} />}
 
@@ -446,14 +434,7 @@ const Home = () => {
                                 <Maximize2 size={20} />
                             </Button>
 
-                            <Button
-                                variant="secondary"
-                                size="icon"
-                                onClick={() => setShowBadges(true)}
-                                title="Achievements"
-                            >
-                                <Award size={20} />
-                            </Button>
+
 
                             <Button
                                 variant="secondary"

@@ -36,20 +36,7 @@ const MiniPlayer = ({ onExpand }) => {
             className={styles.container}
             onClick={onExpand}
         >
-            <input
-                type="range"
-                min="0"
-                max={duration || 100}
-                value={displayTime}
-                onChange={handleSeekChange}
-                onMouseUp={handleSeekCommit}
-                onTouchEnd={handleSeekCommit}
-                onClick={(e) => e.stopPropagation()} // Prevent expand on seek
-                className={styles.miniSeekBar}
-                style={{
-                    background: `linear-gradient(to right, var(--color-primary) ${progressPercent}%, rgba(255,255,255,0.1) ${progressPercent}%)`
-                }}
-            />
+
 
             <div className={styles.playerCard}>
                 <div className={styles.content}>

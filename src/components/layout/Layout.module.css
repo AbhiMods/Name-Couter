@@ -37,4 +37,9 @@
         padding-bottom: 80px;
         /* Space for BottomNav */
     }
+
+    .mainWithPlayer {
+        padding-bottom: 160px;
+        /* Space for BottomNav + MiniPlayer */
+    }
 }

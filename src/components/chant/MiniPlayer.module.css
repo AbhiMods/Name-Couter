@@ -221,8 +221,8 @@
 /* Mobile Tweaks */
 @media (max-width: 768px) {
     .container {
-        bottom: 74px;
-        /* Standard nav height */
+        bottom: 92px;
+        /* Increased to clear BottomNav (~80px) */
         padding: 0 0.5rem;
     }
 }
