@@ -1,29 +1,32 @@
 /* BottomNav.module.css */
 .bottomNav {
     position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 400px;
     z-index: 100;
-    background: rgba(var(--color-bg-secondary-rgb), 0.85);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-top-left-radius: 20px;
-    border-top-right-radius: 20px;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.2);
+    background: rgba(15, 15, 20, 0.6);
+    /* Very transparent dark */
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border-radius: 32px;
+    /* Soft pill shape */
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.4),
+        0 0 0 1px rgba(255, 255, 255, 0.05);
     display: none;
-    /* Hidden by default on desktop */
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .navContainer {
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     align-items: center;
-    padding: 0.75rem 0.5rem 1.25rem 0.5rem;
-    /* Extra padding at bottom for safe area */
-    max-width: 600px;
-    margin: 0 auto;
+    padding: 0.75rem 1.5rem;
+    height: 64px;
 }
 
 .navItem {
@@ -33,19 +36,38 @@
     justify-content: center;
     gap: 4px;
     text-decoration: none;
-    color: var(--color-text-tertiary);
-    font-size: 0.75rem;
-    font-weight: 500;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    color: rgba(255, 255, 255, 0.4);
+    /* Muted inactive */
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     position: relative;
-    padding: 0.5rem;
-    border-radius: 12px;
-    width: 64px;
+    width: 48px;
     -webkit-tap-highlight-color: transparent;
 }
 
+.iconWrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
 .icon {
-    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    width: 24px;
+    height: 24px;
+    stroke-width: 2px;
+}
+
+.label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    opacity: 0;
+    transform: translateY(4px);
+    transition: all 0.3s ease;
+    position: absolute;
+    bottom: -14px;
+    white-space: nowrap;
 }
 
 /* Active State */
@@ -53,45 +75,83 @@
     color: var(--color-primary);
 }
 
-.active .icon {
+.active .iconWrapper {
     transform: translateY(-2px);
-    filter: drop-shadow(0 0 8px var(--color-primary-glow));
+    filter: drop-shadow(0 0 12px var(--color-primary-glow));
 }
 
 .active .label {
     opacity: 1;
-    font-weight: 600;
+    transform: translateY(0);
+    color: var(--color-primary);
 }
 
-/* Hover Effect (for desktops if visible, or touch feedback) */
-.navItem:active {
-    transform: scale(0.95);
-    background: rgba(255, 255, 255, 0.03);
-}
-
-/* Ripple effect hint */
+/* Glowing Indicator Dot */
 .navItem::after {
     content: '';
     position: absolute;
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
+    bottom: -8px;
+    width: 4px;
+    height: 4px;
     background: var(--color-primary);
+    border-radius: 50%;
     opacity: 0;
-    transform: scale(0.5);
-    transition: all 0.4s;
-    z-index: -1;
+    transform: scale(0);
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 0 8px var(--color-primary);
 }
 
 .active::after {
-    opacity: 0.08;
+    opacity: 1;
     transform: scale(1);
-    border-radius: 12px;
+}
+
+/* Hover/Touch Feedback */
+.navItem:active .iconWrapper {
+    transform: scale(0.9);
 }
 
 /* Mobile Visibility */
 @media (max-width: 768px) {
     .bottomNav {
         display: block;
+    }
+}
+
+/* Equalizer Animation for Music Icon when playing */
+.visualizer {
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 16px;
+    width: 16px;
+}
+
+.bar {
+    width: 2px;
+    background: currentColor;
+    border-radius: 1px;
+    animation: visualize 0.5s ease-in-out infinite alternate;
+}
+
+.bar:nth-child(1) {
+    animation-delay: 0s;
+}
+
+.bar:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.bar:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes visualize {
+    0% {
+        height: 20%;
+    }
+
+    100% {
+        height: 100%;
     }
 }
