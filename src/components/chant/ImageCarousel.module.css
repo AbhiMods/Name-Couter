@@ -1,0 +1,84 @@
+.carouselContainer {
+    width: 100%;
+    margin-top: 1.5rem;
+    position: relative;
+    border-radius: 5px;
+    overflow: hidden;
+    aspect-ratio: 16 / 9;
+    box-shadow: var(--shadow-md);
+    cursor: grab;
+    touch-action: pan-y;
+    /* Allow vertical scroll, handle horizontal swipe in JS */
+}
+
+.carouselContainer:active {
+    cursor: grabbing;
+}
+
+.imageSlide {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 5px;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.controls {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    transform: translateY(-50%);
+    display: flex;
+    justify-content: space-between;
+    padding: 0 10px;
+    pointer-events: none;
+    /* Let clicks pass through to image for swipe */
+}
+
+.arrow {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(4px);
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    cursor: pointer;
+    pointer-events: auto;
+    /* Re-enable pointer events for buttons */
+    transition: background 0.2s;
+}
+
+.arrow:hover {
+    background: rgba(255, 255, 255, 0.4);
+}
+
+.dots {
+    position: absolute;
+    bottom: 10px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+}
+
+.dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.4);
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.dotActive {
+    background: white;
+    transform: scale(1.2);
+}

@@ -39,7 +39,7 @@
     width: 44px;
     height: 44px;
     border-radius: 12px;
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--color-surface-active);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -96,7 +96,7 @@
 
 .rangeSelector {
     display: flex;
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--color-surface-active);
     padding: 3px;
     border-radius: 8px;
 }
@@ -196,7 +196,10 @@
     text-align: center;
     padding: 3rem;
     color: var(--color-text-tertiary);
-    background: rgba(255, 255, 255, 0.02);
+    text-align: center;
+    padding: 3rem;
+    color: var(--color-text-tertiary);
+    background: var(--color-bg-secondary);
     border: 1px dashed var(--color-border);
     border-radius: var(--radius-md);
 }

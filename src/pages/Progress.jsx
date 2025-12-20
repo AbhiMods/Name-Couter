@@ -86,7 +86,7 @@ const Progress = () => {
                                 y1={chartHeight - level * (chartHeight - chartPadding)}
                                 x2="100%"
                                 y2={chartHeight - level * (chartHeight - chartPadding)}
-                                stroke="rgba(255,255,255,0.05)"
+                                stroke="var(--color-border)"
                                 strokeWidth="1"
                             />
                         ))}
@@ -107,7 +107,7 @@ const Progress = () => {
                                         width="20"
                                         rx="4"
                                         className={styles.bar}
-                                        fill={d.count > 0 ? "var(--color-primary)" : "rgba(255,255,255,0.05)"}
+                                        fill={d.count > 0 ? "var(--color-primary)" : "var(--color-surface-active)"}
                                     />
                                     {viewRange === 7 && (
                                         <text

@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTheme } from '../context/ThemeContext';
-import { Type, Eye, Palette, Maximize2, TrendingUp } from 'lucide-react';
+import { useBgMusic } from '../context/BgMusicContext';
+import { Type, Eye, Palette, Maximize2, TrendingUp, Music, Volume2 } from 'lucide-react';
 import styles from './Home.module.css'; // Reusing sectionTitle style if exists or I'll add new
 import Button from '../components/ui/Button';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
@@ -15,6 +16,8 @@ const Settings = () => {
         floatingAnimations, setFloatingAnimations,
         floatingTextColor, setFloatingTextColor
     } = useTheme();
+
+    const { tracks, selectedTrackId, setSelectedTrackId, volume, setVolume } = useBgMusic();
 
     const colorPresets = [
         { name: 'Default', value: '' },
@@ -84,6 +87,70 @@ const Settings = () => {
                                 </div>
                             )}
                         </div>
+                    </div>
+                </div>
+
+                {/* SECTION: Background Ambience */}
+                <div>
+                    <h2 className={styles.sectionTitle}>Background Ambience</h2>
+                    <div className="card" style={{ padding: '1.25rem', background: 'var(--color-bg-secondary)' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.25rem' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                <Music size={20} color="var(--color-primary)" />
+                                <div>
+                                    <h3 style={{ fontSize: '1rem', margin: 0 }}>Music Track</h3>
+                                    <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.85rem' }}>Plays automatically during chant</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Track Selector */}
+                        <div style={{ marginBottom: '1rem' }}>
+                            <select
+                                value={selectedTrackId}
+                                onChange={(e) => setSelectedTrackId(e.target.value)}
+                                style={{
+                                    width: '100%',
+                                    padding: '0.75rem',
+                                    borderRadius: 'var(--radius-md)',
+                                    border: '1px solid var(--color-border)',
+                                    background: 'var(--color-bg-tertiary)',
+                                    color: 'var(--color-text-primary)',
+                                    fontSize: '1rem',
+                                    outline: 'none'
+                                }}
+                            >
+                                {tracks.map(track => (
+                                    <option key={track.id} value={track.id}>{track.label}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {/* Volume Slider */}
+                        {selectedTrackId !== 'none' && (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                <Volume2 size={16} color="var(--color-text-secondary)" />
+                                <input
+                                    type="range"
+                                    min="0"
+                                    max="1"
+                                    step="0.05"
+                                    value={volume}
+                                    onChange={(e) => setVolume(parseFloat(e.target.value))}
+                                    style={{
+                                        flex: 1,
+                                        height: '4px',
+                                        background: 'var(--color-bg-tertiary)',
+                                        appearance: 'none',
+                                        borderRadius: '2px',
+                                        cursor: 'pointer'
+                                    }}
+                                />
+                                <span style={{ fontSize: '0.8rem', width: '30px', textAlign: 'right' }}>
+                                    {Math.round(volume * 100)}%
+                                </span>
+                            </div>
+                        )}
                     </div>
                 </div>
 

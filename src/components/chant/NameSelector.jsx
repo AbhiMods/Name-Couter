@@ -4,7 +4,7 @@ import clsx from 'clsx';
 import { useName } from '../../context/NameContext';
 import styles from './NameSelector.module.css';
 
-const NameSelector = ({ className }) => {
+const NameSelector = ({ className, onSelect }) => {
     const { allNames, selectedNameId, updateName } = useName();
 
     return (
@@ -16,7 +16,10 @@ const NameSelector = ({ className }) => {
                         styles.selectorCard,
                         selectedNameId === name.id && styles.selected
                     )}
-                    onClick={() => updateName(name.id)}
+                    onClick={() => {
+                        updateName(name.id);
+                        if (onSelect) onSelect();
+                    }}
                     role="radio"
                     aria-checked={selectedNameId === name.id}
                 >

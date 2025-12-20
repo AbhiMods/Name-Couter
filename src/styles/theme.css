@@ -41,6 +41,7 @@
 [data-theme="dark"] {
     --color-bg-main: #020205;
     --color-bg-secondary: #0a0a12;
+    --color-bg-secondary-rgb: 10, 10, 18;
     --color-bg-gradient: radial-gradient(circle at 50% 0%, #1a1635 0%, #020205 60%);
 
     --color-surface: rgba(20, 20, 30, 0.6);
@@ -49,6 +50,7 @@
     --color-border: rgba(255, 255, 255, 0.1);
 
     --color-primary: #FFD700;
+    --color-primary-rgb: 255, 215, 0;
     --color-primary-glow: rgba(255, 215, 0, 0.5);
     --color-primary-dim: #c5a000;
 
@@ -63,31 +65,41 @@
 }
 
 /* LIGHT MODE */
+/* LIGHT MODE */
 [data-theme="light"] {
-    --color-bg-main: #F8F9FA;
-    --color-bg-secondary: #fffff0;
-    /* Very subtle cream */
-    --color-bg-gradient: radial-gradient(circle at 50% 0%, #FFF8E1 0%, #F8F9FA 70%);
+    --color-bg-main: #FDFBF7;
+    /* Warm antique white base */
+    --color-bg-secondary: #FFFDF9;
+    --color-bg-secondary-rgb: 255, 253, 249;
+    --color-bg-gradient: radial-gradient(circle at 50% 0%, #FFF8E7 0%, #FDFBF7 80%);
+    /* Soft glow gradient */
 
-    --color-surface: rgba(255, 255, 255, 0.8);
-    --color-surface-hover: rgba(255, 255, 255, 0.95);
-    --color-surface-active: rgba(0, 0, 0, 0.05);
-    --color-border: rgba(0, 0, 0, 0.08);
+    --color-surface: rgba(255, 255, 255, 0.7);
+    --color-surface-hover: rgba(255, 255, 255, 0.9);
+    --color-surface-active: rgba(240, 235, 225, 0.5);
+    --color-border: rgba(180, 160, 140, 0.15);
+    /* Warm subtle border */
 
-    --color-primary: #D4AF37;
-    /* Slightly darker gold for light mode visibility */
-    --color-primary-glow: rgba(212, 175, 55, 0.4);
-    --color-primary-dim: #b8962c;
+    --color-primary: #B8860B;
+    /* Dark Goldenrod - muted, professional gold */
+    --color-primary-rgb: 184, 134, 11;
+    --color-primary-glow: rgba(184, 134, 11, 0.15);
+    --color-primary-dim: #9A7009;
 
-    --color-secondary: #4A4A5A;
+    --color-secondary: #5D5C68;
 
-    --color-text-primary: #1A1A1A;
-    --color-text-secondary: #555566;
-    --color-text-tertiary: #888899;
+    --color-text-primary: #2C241B;
+    /* Deep warm charcoal */
+    --color-text-secondary: #5C554D;
+    /* Warm grey */
+    --color-text-tertiary: #928A80;
 
-    --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.08);
-    --glow-text: 0 0 0 rgba(0, 0, 0, 0);
-    /* No text glow in light mode */
+    --shadow-lg:
+        0 10px 40px -10px rgba(60, 50, 40, 0.08),
+        0 0 1px rgba(60, 50, 40, 0.05);
+    /* Soft, diffused warm shadow */
+
+    --glow-text: none;
 }
 
 /* ACCESSIBILITY OVERRIDES */

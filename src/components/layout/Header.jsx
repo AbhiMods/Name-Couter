@@ -16,7 +16,7 @@ const Header = () => {
             <div className={`container ${styles.headerContent}`}>
                 <NavLink to="/" className={styles.logo}>
                     <Flower className={styles.logoIcon} size={28} />
-                    <span className="text-gradient">Divine Name</span>
+                    <span className="text-gradient">Name Couter</span>
                 </NavLink>
 
                 <nav className={styles.nav}>

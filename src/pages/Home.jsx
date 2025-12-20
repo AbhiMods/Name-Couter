@@ -1,17 +1,22 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Volume2, RotateCcw, ChevronDown, ChevronUp, VolumeX, Target, Award, X, MessageSquare, Maximize2, Minimize2, MoreVertical, Trophy, BarChart2 } from 'lucide-react';
+import { Volume2, RotateCcw, VolumeX, Target, Award, X, MessageSquare, Maximize2, Minimize2, MoreVertical, Trophy, BarChart2, LogOut, Music } from 'lucide-react';
+import SessionSummary from '../components/chant/SessionSummary';
+import ImageCarousel from '../components/chant/ImageCarousel';
 import { useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import clsx from 'clsx';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import NameSelector from '../components/chant/NameSelector';
+import BhajanModal from '../components/chant/BhajanModal';
 import TargetSettings from '../components/chant/TargetSettings';
 import Badges from '../components/stats/Badges';
 import FeedbackModal from '../components/feedback/FeedbackModal';
 import { useName } from '../context/NameContext';
 import { useStats } from '../context/StatsContext';
 import { useTheme } from '../context/ThemeContext';
+import { useBgMusic } from '../context/BgMusicContext';
+import { useBhajan } from '../context/BhajanContext';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import styles from './Home.module.css';
 
@@ -19,7 +24,7 @@ const Home = () => {
     useDocumentTitle('Divine Name | Japa Counter');
     const navigate = useNavigate();
     const [count, setCount] = useState(0);
-    const [showSelector, setShowSelector] = useState(false);
+    // Removed showSelector state
     const [showTargetModal, setShowTargetModal] = useState(false);
     const [showBadges, setShowBadges] = useState(false);
     const [showFeedback, setShowFeedback] = useState(false);
@@ -29,6 +34,14 @@ const Home = () => {
     });
     const [floatingTexts, setFloatingTexts] = useState([]);
     const [showMoreMenu, setShowMoreMenu] = useState(false);
+    const [showBhajanModal, setShowBhajanModal] = useState(false);
+
+    // Session State
+    const [showSummary, setShowSummary] = useState(false);
+    const [sessionStartTime, setSessionStartTime] = useState(null); // Initialize as null to track active session
+    const [sessionStartCount, setSessionStartCount] = useState(0);
+    const [sessionDuration, setSessionDuration] = useState('00:00'); // Final duration string
+    const [liveTimer, setLiveTimer] = useState('00:00'); // Live display string
 
     const { selectedName, playChant, toggleSound, soundEnabled } = useName();
     const { incrementStats } = useStats();
@@ -36,6 +49,8 @@ const Home = () => {
         immersiveMode, toggleImmersiveMode, immersiveConfig,
         floatingAnimations, floatingTextColor
     } = useTheme();
+    const { play: playBgMusic, stop: stopBgMusic } = useBgMusic();
+    const { pause: pauseBhajan, currentSong, isPlaying } = useBhajan();
 
     // Progress Calculation
     const MALA_SIZE = 108;
@@ -54,11 +69,20 @@ const Home = () => {
         // Ignore clicks on buttons/interactive elements to avoid conflict
         if (e.target.closest('button') || e.target.closest('.modal-content')) return;
 
+        // START TIMER ON TAP ANYWHERE if not started
+        if (!sessionStartTime) {
+            startSession();
+        }
+
         const currentTime = new Date().getTime();
         const tapLength = currentTime - lastTapTime.current;
         if (tapLength < 300 && tapLength > 0) {
             toggleImmersiveMode();
             e.preventDefault();
+        } else {
+            if (!e.target.closest(`.${styles.counterCircle}`)) {
+                handleIncrement();
+            }
         }
         lastTapTime.current = currentTime;
     };
@@ -72,11 +96,14 @@ const Home = () => {
         };
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [count, target, isTargetMode, soundEnabled, selectedName]);
+    }, [count, target, isTargetMode, soundEnabled, selectedName, sessionStartTime]);
 
     useEffect(() => {
         const savedCount = localStorage.getItem('divine_count');
-        if (savedCount) setCount(parseInt(savedCount, 10));
+        if (savedCount) {
+            const parsed = parseInt(savedCount, 10);
+            setCount(parsed);
+        }
     }, []);
 
     useEffect(() => {
@@ -87,7 +114,33 @@ const Home = () => {
         localStorage.setItem('divine_target', target);
     }, [target]);
 
+    // Live Timer Effect
+    useEffect(() => {
+        let interval;
+        if (sessionStartTime && !showSummary) {
+            interval = setInterval(() => {
+                const now = Date.now();
+                const diff = now - sessionStartTime;
+                setLiveTimer(formatDuration(diff));
+            }, 1000);
+        } else if (!sessionStartTime) {
+            setLiveTimer('00:00');
+        }
+        return () => clearInterval(interval);
+    }, [sessionStartTime, showSummary]);
+
+
+    const startSession = () => {
+        setSessionStartTime(Date.now());
+        setSessionStartCount(count);
+    };
+
     const handleIncrement = () => {
+        // Start session on first increment if not started
+        if (!sessionStartTime) {
+            startSession();
+        }
+
         const nextCount = count + 1;
         setCount(nextCount);
         incrementStats(1);
@@ -99,6 +152,10 @@ const Home = () => {
             } else {
                 try { navigator.vibrate(10); } catch (e) { }
             }
+        }
+
+        if (isTargetMode && nextCount === target) {
+            handleSessionComplete();
         }
 
         setIsAnimating(true);
@@ -124,10 +181,49 @@ const Home = () => {
     };
 
     const handleReset = (e) => {
-        e.stopPropagation();
+        if (e) e.stopPropagation();
         if (window.confirm('Reset counter to zero?')) {
             setCount(0);
+            setSessionStartCount(0);
+            setSessionStartTime(null);
+            setLiveTimer('00:00');
+            stopBgMusic();
         }
+    };
+
+    const formatDuration = (ms) => {
+        const totalSeconds = Math.floor(ms / 1000);
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+        return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    };
+
+    const handleSessionComplete = () => {
+        const durationMs = sessionStartTime ? Date.now() - sessionStartTime : 0;
+        setSessionDuration(formatDuration(durationMs));
+        setShowSummary(true);
+        stopBgMusic();
+    };
+
+    const handleContinue = () => {
+        setShowSummary(false);
+        // Resume not requested explicitly but 'Continue' implies more chanting.
+        // If we stopped on complete, we might want to resume here? 
+        // User said: "continuous... only pause or stop when user ENDS session".
+        // Wait, handleSessionComplete usually means 'Target Reached'. 
+        // The requirement says: "The music should only pause or stop when the user ends the session or manually stops it."
+        // Reaching target doesn't necessarily mean end of session if they want to continue.
+        // BUT, SessionSummary overlay pops up. The music should probably pause? 
+        // "Continue Chanting" button -> resume music if it was paused.
+        pauseBhajan();
+        playBgMusic();
+    };
+
+    const handleEndSession = () => {
+        setShowSummary(false);
+        setSessionStartTime(null);
+        setLiveTimer('00:00');
+        stopBgMusic();
     };
 
     // Determine visibility based on mode and config
@@ -155,29 +251,24 @@ const Home = () => {
                 </div>
             )}
 
+
+            {showBhajanModal && <BhajanModal onClose={() => setShowBhajanModal(false)} />}
+
+            {/* Name Display Section Removed */}
+
+            {/* Image Carousel - MOVED TOP */}
+            <div style={{ width: 'min(85vw, 400px)', zIndex: 5, marginBottom: '0.5rem', marginTop: '0' }}>
+                <ImageCarousel />
+            </div>
+
             <AnimatePresence>
-                {showName && (
-                    <motion.div
-                        initial={{ opacity: 0, y: -20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
-                        transition={{ duration: 0.3 }}
-                        className="text-center"
-                        style={{ position: 'relative', zIndex: 10 }}
-                    >
-                        <button className={styles.nameTrigger} onClick={() => setShowSelector(!showSelector)} title="Change Name">
-                            <h2 className={styles.nameDisplay}>
-                                {selectedName.label}
-                                {showSelector ? <ChevronUp size={24} /> : <ChevronDown size={24} />}
-                            </h2>
-                        </button>
-                        <p className={styles.mantraSubtitle}>{selectedName.subtitle}</p>
-                        {showSelector && (
-                            <div className={styles.selectorDropdown}>
-                                <NameSelector />
-                            </div>
-                        )}
-                    </motion.div>
+                {showSummary && (
+                    <SessionSummary
+                        count={count - sessionStartCount}
+                        duration={sessionDuration}
+                        onContinue={handleContinue}
+                        onEnd={handleEndSession}
+                    />
                 )}
             </AnimatePresence>
 
@@ -193,7 +284,7 @@ const Home = () => {
                     />
                 </svg>
 
-                <button className={styles.counterCircle} onClick={handleIncrement} aria-label="Increment Counter">
+                <button className={styles.counterCircle} onClick={(e) => { e.stopPropagation(); handleIncrement(); }} aria-label="Increment Counter">
                     <motion.div
                         className={styles.breathingCircle}
                         animate={{
@@ -248,6 +339,11 @@ const Home = () => {
 
                 <div className={styles.malaCount}>
                     {isTargetMode ? `${Math.round(progressRatio * 100)}% Completed ${count >= target ? '🎉' : ''}` : `${malasCompleted} Malas Completed`}
+                </div>
+
+                {/* Session Timer */}
+                <div className={styles.sessionTimer}>
+                    {liveTimer}
                 </div>
             </motion.div>
 
@@ -307,6 +403,29 @@ const Home = () => {
                             <Button
                                 variant="secondary"
                                 size="icon"
+                                onClick={() => setShowBhajanModal(true)}
+                                title="Bhajan Playlist"
+                                className={clsx(showBhajanModal && styles.activeButton)}
+                                style={{ position: 'relative' }}
+                            >
+                                <Music size={20} className={isPlaying ? styles.pulseIcon : ''} />
+                                {isPlaying && (
+                                    <span style={{
+                                        position: 'absolute',
+                                        top: '6px',
+                                        right: '6px',
+                                        width: '8px',
+                                        height: '8px',
+                                        borderRadius: '50%',
+                                        backgroundColor: 'var(--color-primary)',
+                                        boxShadow: '0 0 5px var(--color-primary)'
+                                    }} />
+                                )}
+                            </Button>
+
+                            <Button
+                                variant="secondary"
+                                size="icon"
                                 onClick={() => setShowMoreMenu(!showMoreMenu)}
                                 title="More Options"
                                 className={showMoreMenu ? styles.activeButton : ''}
@@ -336,7 +455,27 @@ const Home = () => {
                                             <div className={styles.menuIndicator} />
                                             <h4>Quick Options</h4>
                                         </div>
+
+                                        {/* Divine Name Selection */}
+                                        <div style={{ marginBottom: '1.5rem', width: '100%' }}>
+                                            <h4 style={{
+                                                fontSize: '0.8rem',
+                                                textTransform: 'uppercase',
+                                                letterSpacing: '0.1em',
+                                                color: 'var(--color-text-tertiary)',
+                                                marginBottom: '0.75rem',
+                                                textAlign: 'center'
+                                            }}>
+                                                Select Divine Name
+                                            </h4>
+                                            <NameSelector onSelect={() => setShowMoreMenu(false)} />
+                                        </div>
+
                                         <div className={styles.menuGrid}>
+                                            <button onClick={() => { handleSessionComplete(); setShowMoreMenu(false); }} className={styles.menuItem}>
+                                                <LogOut size={18} />
+                                                <span>End Session</span>
+                                            </button>
                                             <button onClick={() => { setShowBadges(true); setShowMoreMenu(false); }} className={styles.menuItem}>
                                                 <Award size={18} />
                                                 <span>Achievements</span>

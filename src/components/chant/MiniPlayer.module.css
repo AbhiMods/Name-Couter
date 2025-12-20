@@ -1,0 +1,128 @@
+.container {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 56px;
+    /* Max height requirement */
+    z-index: 50;
+    /* Below Controls (101) and Menu (105) */
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
+    /* Allow clicks through wrapper to sides if centered */
+    /* Animate slide in handled by Framer Motion */
+}
+
+.playerCard {
+    pointer-events: auto;
+    /* Re-enable clicks on the card itself */
+    width: 100%;
+    max-width: 500px;
+    height: 100%;
+    background: rgba(var(--color-bg-elevated-rgb), 0.85);
+    /* Glass effect */
+    backdrop-filter: blur(12px);
+    border-top: 1px solid var(--color-border);
+    border-radius: 16px 16px 0 0;
+    /* Rounded top corners only */
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+@media (min-width: 768px) {
+    .playerCard {
+        /* On desktop, maybe we float it or keep it docked? User said "Sticky or fixed at bottom". Keeps it consistent. */
+        border-right: 1px solid var(--color-border);
+        border-left: 1px solid var(--color-border);
+    }
+}
+
+.content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    padding: 0 1rem;
+    gap: 0.75rem;
+}
+
+.progressBar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.progressFill {
+    height: 100%;
+    background: var(--color-primary);
+    transition: width 0.2s linear;
+}
+
+.icon {
+    width: 32px;
+    height: 32px;
+    background: rgba(var(--color-primary-rgb), 0.1);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.title {
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.2;
+}
+
+.artist {
+    margin: 0;
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+    line-height: 1.2;
+}
+
+.controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.playBtn {
+    background: none;
+    border: none;
+    color: var(--color-text-primary);
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+.playBtn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.expandBtn {
+    /* Optional expand arrow if needed, but whole card is clickable */
+}
