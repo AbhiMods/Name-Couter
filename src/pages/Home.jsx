@@ -44,7 +44,7 @@ const Home = () => {
     const [liveTimer, setLiveTimer] = useState('00:00'); // Live display string
 
     const { selectedName, playChant, toggleSound, soundEnabled } = useName();
-    const { incrementStats } = useStats();
+    const { incrementStats, setIsJapaActive } = useStats(); // Added setIsJapaActive
     const {
         immersiveMode, toggleImmersiveMode, immersiveConfig,
         floatingAnimations, floatingTextColor
@@ -133,6 +133,23 @@ const Home = () => {
     const startSession = () => {
         setSessionStartTime(Date.now());
         setSessionStartCount(count);
+        setIsJapaActive(true); // Tell StatsContext Japa is active
+
+        // Smart Sync: Auto-play Music if available and not playing
+        if (!isPlaying && !immersiveMode) { // Optional: Don't auto-start in Zen mode if that's preferred, but user just said "auto-play"
+            // Play from Bhajan Context if we have a current song or playlist
+            // If no current song, play the first one/random?
+            // For now, let's assume if there's a current song, resume it, else play first.
+            if (currentSong) {
+                playTrack(currentSong);
+            } else {
+                // Trigger play logic in context (maybe need a 'playRandom' or 'playFirst' exposed?)
+                // BhajanContext 'playTrack' needs a track.
+                // We can access playlist from context if we needed to.
+                // Ideally BhajanContext should have a 'resumeOrPlayFirst()' method.
+                // As a fallback, we won't force-start if no song selected to avoid confusion.
+            }
+        }
     };
 
     const handleIncrement = () => {
@@ -140,6 +157,9 @@ const Home = () => {
         if (!sessionStartTime) {
             startSession();
         }
+
+        // Refresh Japa Active State (keep alive)
+        setIsJapaActive(true);
 
         const nextCount = count + 1;
         setCount(nextCount);
@@ -187,7 +207,9 @@ const Home = () => {
             setSessionStartCount(0);
             setSessionStartTime(null);
             setLiveTimer('00:00');
+            setIsJapaActive(false);
             stopBgMusic();
+            pauseBhajan(); // Stop music on reset
         }
     };
 
@@ -202,28 +224,32 @@ const Home = () => {
         const durationMs = sessionStartTime ? Date.now() - sessionStartTime : 0;
         setSessionDuration(formatDuration(durationMs));
         setShowSummary(true);
+        setIsJapaActive(false);
         stopBgMusic();
+
+        // Smart Sync: Fade out/Pause music on completion
+        pauseBhajan();
     };
 
     const handleContinue = () => {
         setShowSummary(false);
-        // Resume not requested explicitly but 'Continue' implies more chanting.
-        // If we stopped on complete, we might want to resume here? 
-        // User said: "continuous... only pause or stop when user ENDS session".
-        // Wait, handleSessionComplete usually means 'Target Reached'. 
-        // The requirement says: "The music should only pause or stop when the user ends the session or manually stops it."
-        // Reaching target doesn't necessarily mean end of session if they want to continue.
-        // BUT, SessionSummary overlay pops up. The music should probably pause? 
-        // "Continue Chanting" button -> resume music if it was paused.
-        pauseBhajan();
-        playBgMusic();
+        // Resume session
+        setSessionStartTime(Date.now()); // Reset start time for next segment? Or just continue?
+        // Usually, continue means "Keep counting".
+        setIsJapaActive(true);
+
+        // Resume music if it was auto-paused? 
+        // User might want to resume music.
+        if (currentSong) playTrack(currentSong);
     };
 
     const handleEndSession = () => {
         setShowSummary(false);
         setSessionStartTime(null);
         setLiveTimer('00:00');
+        setIsJapaActive(false);
         stopBgMusic();
+        pauseBhajan();
     };
 
     // Determine visibility based on mode and config
@@ -475,18 +501,6 @@ const Home = () => {
                                             <button onClick={() => { handleSessionComplete(); setShowMoreMenu(false); }} className={styles.menuItem}>
                                                 <LogOut size={18} />
                                                 <span>End Session</span>
-                                            </button>
-                                            <button onClick={() => { setShowBadges(true); setShowMoreMenu(false); }} className={styles.menuItem}>
-                                                <Award size={18} />
-                                                <span>Achievements</span>
-                                            </button>
-                                            <button onClick={() => { navigate('/leaderboard'); setShowMoreMenu(false); }} className={styles.menuItem}>
-                                                <Trophy size={18} />
-                                                <span>Leaderboard</span>
-                                            </button>
-                                            <button onClick={() => { navigate('/progress'); setShowMoreMenu(false); }} className={styles.menuItem}>
-                                                <BarChart2 size={18} />
-                                                <span>Progress Stats</span>
                                             </button>
                                             <button onClick={() => { setShowFeedback(true); setShowMoreMenu(false); }} className={styles.menuItem}>
                                                 <MessageSquare size={18} />

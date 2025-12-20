@@ -1,0 +1,155 @@
+/* TimeAnalytics.module.css */
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.titleInfo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--color-text-primary);
+}
+
+.titleInfo h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.headerIcon {
+    color: var(--color-primary);
+}
+
+.rangeSelector {
+    display: flex;
+    background: var(--color-surface-active);
+    padding: 2px;
+    border-radius: 8px;
+}
+
+.rangeSelector button {
+    background: none;
+    border: none;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.activeRange {
+    background: var(--color-bg-primary) !important;
+    color: var(--color-text-primary) !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-weight: 500;
+}
+
+.totalCard {
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.totalContent {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+.ringContainer {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    flex-shrink: 0;
+}
+
+.ringChart {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+.ringLabel {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.totalValue {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+}
+
+.totalLabel {
+    font-size: 0.7rem;
+    color: var(--color-text-tertiary);
+    text-transform: uppercase;
+}
+
+.breakdown {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.statRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.statLabel {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--color-text-secondary);
+}
+
+.dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.statValue {
+    font-family: var(--font-number);
+    font-weight: 500;
+    color: var(--color-text-primary);
+    font-size: 0.95rem;
+}
+
+.message {
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    text-align: center;
+    font-size: 0.9rem;
+    color: var(--color-text-tertiary);
+    font-style: italic;
+}
+
+@media (max-width: 400px) {
+    .totalContent {
+        flex-direction: column;
+        gap: 1.5rem;
+        text-align: center;
+    }
+}

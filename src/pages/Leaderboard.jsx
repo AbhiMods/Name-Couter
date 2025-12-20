@@ -9,21 +9,54 @@ import styles from './Leaderboard.module.css';
 const Leaderboard = () => {
     useDocumentTitle('Leaderboard | Divine Name');
     const { leaderboardData, myRank } = useLeaderboard();
+    const [isLoading, setIsLoading] = React.useState(true);
+
+    React.useEffect(() => {
+        // Simulate initial load
+        const timer = setTimeout(() => setIsLoading(false), 1500);
+        return () => clearTimeout(timer);
+    }, []);
+
+    const currentUserRef = React.useRef(null);
+
+    React.useEffect(() => {
+        if (!isLoading && currentUserRef.current) {
+            setTimeout(() => {
+                currentUserRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 500); // Small delay to allow animations to start
+        }
+    }, [isLoading]);
 
     const getMedalIcon = (rank) => {
         switch (rank) {
-            case 1: return <Trophy size={24} className={styles.gold} />;
-            case 2: return <Medal size={24} className={styles.silver} />;
-            case 3: return <Medal size={24} className={styles.bronze} />;
+            case 1: return <Trophy size={28} className={styles.gold} />;
+            case 2: return <Medal size={26} className={styles.silver} />;
+            case 3: return <Medal size={26} className={styles.bronze} />;
             default: return <span className={styles.rankNumber}>{rank}</span>;
         }
     };
 
+    const LoadingSkeleton = () => (
+        <div className={styles.skeletonContainer}>
+            {[1, 2, 3, 4, 5].map((i) => (
+                <div key={i} className={styles.skeletonRow}>
+                    <div className={styles.skeletonRank} />
+                    <div className={styles.skeletonAvatar} />
+                    <div className={styles.skeletonText} />
+                </div>
+            ))}
+        </div>
+    );
+
     return (
         <div className={styles.container}>
+            {/* ... (Header & Stats Overview remain) */}
             <header className={styles.header}>
                 <h1 className="text-gradient">Spiritual Leaderboard</h1>
-                <p className={styles.subtitle}>Fellow seekers on the path of devotion</p>
+                <div className={styles.liveIndicator}>
+                    <span className={styles.pulsingDot}></span>
+                    Live updating
+                </div>
             </header>
 
             <div className={styles.statsOverview}>
@@ -32,56 +65,60 @@ const Leaderboard = () => {
                     <div className={styles.myRankValue}>#{myRank}</div>
                     <div className={styles.myRankTrend}>
                         <ChevronUp size={16} />
-                        Keep chanting to climb higher!
+                        Top {Math.max(1, Math.floor((myRank / 100) * 100))}% of chanters
                     </div>
                 </Card>
             </div>
 
-            <div className={styles.board}>
-                <div className={styles.boardHeader}>
-                    <div className={styles.colRank}>Rank</div>
-                    <div className={styles.colUser}>Seeker</div>
-                    <div className={styles.colCount}>Total Chants</div>
-                </div>
-
-                <div className={styles.rows}>
+            {isLoading ? (
+                <LoadingSkeleton />
+            ) : (
+                <div className={styles.list}>
                     {leaderboardData.map((item, index) => {
                         const rank = index + 1;
+                        const isTop3 = rank <= 3;
                         return (
                             <motion.div
                                 key={item.id}
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: index * 0.05 }}
-                                className={`${styles.row} ${item.isMe ? styles.highlighted : ''}`}
+                                ref={item.isMe ? currentUserRef : null}
+                                initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                transition={{ delay: index * 0.05 + 0.2 }}
+                                className={`
+                                    ${styles.card} 
+                                    ${item.isMe ? styles.highlighted : ''} 
+                                    ${isTop3 ? styles.topRank : ''}
+                                `}
                             >
-                                <div className={styles.colRank}>
-                                    {getMedalIcon(rank)}
-                                </div>
-                                <div className={styles.colUser}>
-                                    <div className={styles.avatar}>{item.avatar}</div>
-                                    <span className={styles.userName}>
-                                        {item.name}
-                                        {item.isMe && <span className={styles.meBadge}>YOU</span>}
-                                    </span>
-                                </div>
-                                <div className={styles.colCount}>
-                                    <div className={styles.countValue}>
-                                        {item.count.toLocaleString()}
+                                <div className={styles.cardLeft}>
+                                    <div className={styles.rankBadge}>{getMedalIcon(rank)}</div>
+                                    <div className={styles.userInfo}>
+                                        <div className={styles.avatar}>{item.avatar}</div>
+                                        <div className={styles.nameColumn}>
+                                            <span className={styles.userName}>
+                                                {item.name}
+                                                {item.isMe && <span className={styles.meBadge}>YOU</span>}
+                                            </span>
+                                            {isTop3 && <span className={styles.topLabel}>Top Seeker</span>}
+                                        </div>
                                     </div>
-                                    {rank <= 3 && <Star size={14} className={styles.starIcon} />}
+                                </div>
+                                <div className={styles.cardRight}>
+                                    <span className={styles.countValue}>{item.count.toLocaleString()}</span>
+                                    <span className={styles.countLabel}>Chants</span>
                                 </div>
                             </motion.div>
                         );
                     })}
                 </div>
-            </div>
+            )}
 
+            {/* ... (Footer remains) */}
             <footer className={styles.footer}>
-                <p>Leaderboard updates in real-time as you chant.</p>
+                <p>Last updated just now</p>
                 <div className={styles.tip}>
                     <Star size={12} />
-                    Friendly competition encourages mindfulness and consistency.
+                    Chant consistently to rise in the spiritual ranks.
                 </div>
             </footer>
         </div>

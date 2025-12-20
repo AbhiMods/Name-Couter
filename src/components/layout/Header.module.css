@@ -49,6 +49,15 @@
     gap: var(--space-4);
 }
 
+@media (max-width: 768px) {
+
+    /* Hide Settings link in Header on mobile as it's in BottomNav */
+    /* We target the anchor tag with specific href */
+    .nav a[href="/settings"] {
+        display: none;
+    }
+}
+
 .navLink {
     color: var(--color-text-tertiary);
     transition: all var(--duration-fast);

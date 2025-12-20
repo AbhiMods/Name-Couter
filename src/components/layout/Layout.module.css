@@ -31,3 +31,10 @@
     position: relative;
     z-index: 1;
 }
+
+@media (max-width: 768px) {
+    .main {
+        padding-bottom: 80px;
+        /* Space for BottomNav */
+    }
+}

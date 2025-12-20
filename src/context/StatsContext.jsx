@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { dbRequest } from '../services/StorageService';
 
 const StatsContext = createContext(null);
@@ -20,22 +20,32 @@ export const StatsProvider = ({ children }) => {
     const [unlockedAchievements, setUnlockedAchievements] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
+    // Time Stats State (structure: { japa: { date: seconds }, music: { date: seconds }, overlap: { date: seconds } })
+    const [timeStats, setTimeStats] = useState({ japa: {}, music: {}, overlap: {} });
+
+    // Active States for Real-time Tracking
+    const [isJapaActive, setIsJapaActive] = useState(false);
+    const [isMusicActive, setIsMusicActive] = useState(false);
+
+    const lastInteractionTime = useRef(0);
+
     // Initial Data Fetch
     useEffect(() => {
         const loadData = async () => {
             try {
-                // Parallel fetch
-                const [total, daily, achievements, pending] = await Promise.all([
+                const [total, daily, achievements, pending, savedTimeStats] = await Promise.all([
                     dbRequest.getSetting('divine_total_count', 0),
                     dbRequest.getAllDailyStats(),
                     dbRequest.getSetting('divine_achievements', []),
-                    dbRequest.getSetting('divine_pending_sync', false)
+                    dbRequest.getSetting('divine_pending_sync', false),
+                    dbRequest.getSetting('divine_time_stats', { japa: {}, music: {}, overlap: {} })
                 ]);
 
                 setTotalCount(total);
                 setDailyCounts(daily || {});
                 setUnlockedAchievements(achievements || []);
                 setPendingSync(pending);
+                setTimeStats(savedTimeStats || { japa: {}, music: {}, overlap: {} });
             } catch (e) {
                 console.error('Failed to load stats', e);
             } finally {
@@ -44,6 +54,13 @@ export const StatsProvider = ({ children }) => {
         };
         loadData();
     }, []);
+
+    // Persist Time Stats
+    useEffect(() => {
+        if (!isLoading) {
+            dbRequest.setSetting('divine_time_stats', timeStats);
+        }
+    }, [timeStats, isLoading]);
 
     // Persist Effects
     useEffect(() => {
@@ -58,16 +75,13 @@ export const StatsProvider = ({ children }) => {
         }
     }, [unlockedAchievements, isLoading]);
 
-    // We don't persist dailyCounts as a huge JSON blob anymore. 
-    // We persist individiual daily items in incrementStats.
-
     // Helper to get local date string YYYY-MM-DD
     const getTodayKey = () => {
         const d = new Date();
         const year = d.getFullYear();
         const month = String(d.getMonth() + 1).padStart(2, '0');
         const day = String(d.getDate()).padStart(2, '0');
-        return `${year} -${month} -${day} `;
+        return `${year}-${month}-${day}`;
     };
 
     const getTodayCount = () => {
@@ -84,7 +98,7 @@ export const StatsProvider = ({ children }) => {
             const year = d.getFullYear();
             const month = String(d.getMonth() + 1).padStart(2, '0');
             const day = String(d.getDate()).padStart(2, '0');
-            const key = `${year} -${month} -${day} `;
+            const key = `${year}-${month}-${day}`;
             history.push({
                 date: key,
                 label: d.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric' }),
@@ -109,7 +123,7 @@ export const StatsProvider = ({ children }) => {
             const year = d.getFullYear();
             const month = String(d.getMonth() + 1).padStart(2, '0');
             const day = String(d.getDate()).padStart(2, '0');
-            const key = `${year} -${month} -${day} `;
+            const key = `${year}-${month}-${day}`;
 
             if ((dailyCounts[key] || 0) > 0) {
                 streak++;
@@ -123,25 +137,6 @@ export const StatsProvider = ({ children }) => {
     // Achievement Checker
     const checkAchievements = (newTotal, currentDailyCounts) => {
         const newUnlocked = [];
-        // Note: Streak calculation inside here needs access to currentDailyCounts if we want it to be perfectly accurate in the same tick.
-        // But getStreak uses 'dailyCounts' state. Since we update state before calling this, it might be stale if used blindly.
-        // However, incrementStats calls this with updated counts passed as arg? 
-        // No, getStreak() reads from closure-captured state 'dailyCounts'. 
-        // For now, simpler is better. We'll rely on state effects or just approximate logic.
-        // Actually, let's fix checkAchievements to simply use the state getters which will be updated on next render, 
-        // or pass the new stats explicitly.
-        // For simplicity: We trigger checks AFTER state update in the useEffect or just optimistically.
-        // Let's stick to the previous simple logic:
-
-        // We know 'getStreak' reads from 'dailyCounts'.
-        // To make it accurate immediately, we should probably pass the new counts to getStreak,
-        // but for now let's just use the current logic which might be 1 tick delayed for streak badges. That's acceptable.
-        // WAIT: 'getStreak' uses `dailyCounts` from scope. 
-        // In `incrementStats`, we setDailyCounts(newDailyCounts).
-        // React batching means `dailyCounts` is OLD inside `incrementStats`.
-        // So checking streak achievements immediately inside incrementStats using `getStreak()` will use OLD data.
-        // That's fine, the badge will pop on the NEXT click. Not critical.
-
         const currentStreak = getStreak();
 
         ACHIEVEMENTS_LIST.forEach(ach => {
@@ -191,6 +186,11 @@ export const StatsProvider = ({ children }) => {
         const currentTodayCount = dailyCounts[today] || 0;
         const newTodayCount = currentTodayCount + amount;
 
+        // Update interaction time for active session tracking
+        lastInteractionTime.current = Date.now();
+        // Implicitly active if incrementing stats
+        setIsJapaActive(true);
+
         const newDailyCounts = {
             ...dailyCounts,
             [today]: newTodayCount
@@ -213,6 +213,139 @@ export const StatsProvider = ({ children }) => {
         });
     };
 
+    // --- TIME TRACKING LOGIC ---
+
+    const incrementTime = (updates) => {
+        const today = getTodayKey();
+        setTimeStats(prev => {
+            const newState = { ...prev };
+
+            Object.keys(updates).forEach(type => {
+                if (!newState[type]) newState[type] = {};
+                const current = newState[type][today] || 0;
+                newState[type][today] = current + updates[type];
+            });
+
+            return newState;
+        });
+    };
+
+    // --- NOTIFICATION LOGIC ---
+    const [milestoneAlerts, setMilestoneAlerts] = useState(true);
+    const [reminderTime, setReminderTime] = useState(''); // "HH:MM" format
+
+    useEffect(() => {
+        dbRequest.getSetting('divine_notification_config', { milestone: true, time: '' })
+            .then(config => {
+                setMilestoneAlerts(config.milestone);
+                setReminderTime(config.time || '');
+            });
+    }, []);
+
+    useEffect(() => {
+        if (!isLoading) {
+            dbRequest.setSetting('divine_notification_config', { milestone: milestoneAlerts, time: reminderTime });
+        }
+    }, [milestoneAlerts, reminderTime, isLoading]);
+
+    const sendNotification = (title, body) => {
+        if (!("Notification" in window)) return;
+
+        if (Notification.permission === "granted") {
+            new Notification(title, { body, icon: '/vite.svg' });
+        } else if (Notification.permission !== "denied") {
+            Notification.requestPermission().then(permission => {
+                if (permission === "granted") {
+                    new Notification(title, { body, icon: '/vite.svg' });
+                }
+            });
+        }
+    };
+
+    // Central Timer Interval
+    useEffect(() => {
+        const interval = setInterval(() => {
+            const now = Date.now();
+            const dateObj = new Date();
+
+            // Daily Reminder Check (Approximate minute match)
+            if (reminderTime && reminderTime !== '') {
+                const currentHM = `${String(dateObj.getHours()).padStart(2, '0')}:${String(dateObj.getMinutes()).padStart(2, '0')}`;
+                // Trigger only at 00 seconds to avoid multiple alerts
+                if (currentHM === reminderTime && dateObj.getSeconds() === 0) {
+                    sendNotification("Daily Chant Reminder", "It's time for your daily spiritual practice. 🙏");
+                }
+            }
+
+            // Safe fallback: If last interaction > 60s, assume paused?
+            if (isJapaActive && (now - lastInteractionTime.current > 60000)) {
+                // Logic kept simple as per original
+            }
+
+            const updates = {};
+            if (isJapaActive) updates.japa = 1;
+            if (isMusicActive) updates.music = 1;
+
+            // Track Overlap
+            if (isJapaActive && isMusicActive) {
+                updates.overlap = 1;
+            }
+
+            if (Object.keys(updates).length > 0) {
+                incrementTime(updates);
+            }
+
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, [isJapaActive, isMusicActive, reminderTime]); // dependent on reminderTime now
+
+
+    const getSpiritualTime = (range = 'today') => {
+        // range: 'today', 'week', 'month'
+        const todayKey = getTodayKey();
+
+        if (range === 'today') {
+            const japa = timeStats.japa?.[todayKey] || 0;
+            const music = timeStats.music?.[todayKey] || 0;
+            const overlap = timeStats.overlap?.[todayKey] || 0;
+            return { japa, music, overlap, total: (japa + music - overlap) }; // simple union logic
+        }
+
+        // Logic for week/month aggregation can be added here if needed
+        return { japa: 0, music: 0, overlap: 0, total: 0 };
+    };
+
+    // Aggregation Logic for Week/Month
+    const getAggregatedTime = (range) => {
+        let japaTotal = 0;
+        let musicTotal = 0;
+        let overlapTotal = 0;
+
+        const now = new Date();
+        const days = range === 'week' ? 7 : (range === 'month' ? 30 : 1);
+
+        for (let i = 0; i < days; i++) {
+            const d = new Date(now);
+            d.setDate(d.getDate() - i);
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            const key = `${year}-${month}-${day}`;
+
+            japaTotal += (timeStats.japa?.[key] || 0);
+            musicTotal += (timeStats.music?.[key] || 0);
+            overlapTotal += (timeStats.overlap?.[key] || 0);
+        }
+
+        return {
+            japa: japaTotal,
+            music: musicTotal,
+            overlap: overlapTotal,
+            total: (japaTotal + musicTotal - overlapTotal)
+        };
+    };
+
     const value = React.useMemo(() => ({
         totalCount,
         todayCount: dailyCounts[getTodayKey()] || 0,
@@ -223,8 +356,22 @@ export const StatsProvider = ({ children }) => {
         getStreak,
         isOnline,
         pendingSync,
-        isLoading
-    }), [totalCount, dailyCounts, unlockedAchievements, isOnline, pendingSync, isLoading]);
+        isLoading,
+        lastInteractionTime,
+        getSpiritualTime,
+        getAggregatedTime,
+        setIsJapaActive, // Exported setter
+        setIsMusicActive, // Exported setter
+        isJapaActive,
+        isMusicActive,
+        // Notifications
+        milestoneAlerts, setMilestoneAlerts,
+        reminderTime, setReminderTime
+    }), [
+        totalCount, dailyCounts, unlockedAchievements, isOnline, pendingSync,
+        isLoading, timeStats, isJapaActive, isMusicActive,
+        milestoneAlerts, reminderTime
+    ]);
 
     return (
         <StatsContext.Provider value={value}>

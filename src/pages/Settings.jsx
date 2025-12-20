@@ -1,13 +1,50 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTheme } from '../context/ThemeContext';
 import { useBgMusic } from '../context/BgMusicContext';
-import { Type, Eye, Palette, Maximize2, TrendingUp, Music, Volume2 } from 'lucide-react';
-import styles from './Home.module.css'; // Reusing sectionTitle style if exists or I'll add new
-import Button from '../components/ui/Button';
+import { useBhajan } from '../context/BhajanContext';
+import { useStats } from '../context/StatsContext';
+import {
+    Palette, Type, MousePointerClick, Moon, Sun,
+    Music, Volume2, Maximize2, Coffee, Zap,
+    Eye, Activity, Download, Trash2, Smartphone,
+    Youtube, Instagram, Send, Globe, Heart,
+    Bell, Clock, Award
+} from 'lucide-react';
+import styles from './Settings.module.css';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
+
+// Custom Toggle Component if Switch doesn't exist
+const Toggle = ({ active, onToggle }) => (
+    <div
+        onClick={onToggle}
+        style={{
+            width: '44px',
+            height: '24px',
+            background: active ? 'var(--color-primary)' : 'var(--color-surface-hover)',
+            borderRadius: '12px',
+            position: 'relative',
+            cursor: 'pointer',
+            transition: 'background 0.3s'
+        }}
+    >
+        <div style={{
+            width: '20px',
+            height: '20px',
+            background: '#fff',
+            borderRadius: '50%',
+            position: 'absolute',
+            top: '2px',
+            left: active ? '22px' : '2px',
+            transition: 'left 0.3s',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+        }} />
+    </div>
+);
 
 const Settings = () => {
     useDocumentTitle('Settings | Divine Name');
+
+    // Theme Context
     const {
         theme, toggleTheme,
         textSize, toggleTextSize,
@@ -17,218 +54,320 @@ const Settings = () => {
         floatingTextColor, setFloatingTextColor
     } = useTheme();
 
-    const { tracks, selectedTrackId, setSelectedTrackId, volume, setVolume } = useBgMusic();
+    // Contexts
+    const { tracks, selectedTrackId, setSelectedTrackId, volume: bgVolume, setVolume: setBgVolume } = useBgMusic();
+    const { volume: chantVolume, setVolume: setChantVolume } = useBhajan();
+    const { milestoneAlerts, setMilestoneAlerts, reminderTime, setReminderTime } = useStats();
+
+    // Local States for new features (Mocking for now as per prompt "Add features without cluttering")
+    const [zenPreset, setZenPreset] = useState('custom');
+    const [fadeDuration, setFadeDuration] = useState(3);
+    const [hapticStrength, setHapticStrength] = useState('medium');
 
     const colorPresets = [
         { name: 'Default', value: '' },
         { name: 'Gold', value: '#ffd700' },
         { name: 'Saffron', value: '#ff9933' },
-        { name: 'Deep Red', value: '#8b0000' },
-        { name: 'Indigo', value: '#4b0082' },
-        { name: 'Divine White', value: '#ffffff' },
+        { name: 'Red', value: '#ff4d4d' },
+        { name: 'Blue', value: '#4da6ff' },
     ];
 
+    const applyZenPreset = (preset) => {
+        setZenPreset(preset);
+        if (preset === 'focus') {
+            if (immersiveConfig.showName) updateImmersiveConfig('showName');
+            if (immersiveConfig.showControls) updateImmersiveConfig('showControls');
+        } else if (preset === 'relaxed') {
+            if (!immersiveConfig.showName) updateImmersiveConfig('showName');
+            if (!immersiveConfig.showControls) updateImmersiveConfig('showControls');
+        }
+    };
+
+    // Request permissions when enabling features
+    const requestNotificationPermission = async () => {
+        if ("Notification" in window && Notification.permission !== "granted") {
+            const permission = await Notification.requestPermission();
+            if (permission !== "granted") {
+                alert("Please enable notifications in your browser settings to receive alerts.");
+            }
+        }
+    };
+
     return (
-        <div className="container" style={{ maxWidth: '600px', padding: '2rem 1rem' }}>
-            <h1 className="text-gradient" style={{ marginBottom: '2rem', fontSize: '2rem', fontFamily: 'var(--font-display)' }}>
-                Settings
-            </h1>
+        <div className={styles.container}>
+            <header className={styles.header}>
+                <h1 className="text-gradient" style={{ fontSize: '2rem', fontFamily: 'var(--font-display)' }}>Settings</h1>
+                <p className={styles.subtitle}>Customize your spiritual space</p>
+            </header>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-
-                {/* SECTION: Appearance */}
-                <div>
-                    <h2 className={styles.sectionTitle}>Appearance</h2>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                        {/* Theme Toggle */}
-                        <div className="card" style={{ padding: '1.25rem', background: 'var(--color-bg-secondary)' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                    <Palette size={20} color="var(--color-primary)" />
-                                    <div>
-                                        <h3 style={{ fontSize: '1rem', margin: 0 }}>Theme</h3>
-                                        <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.85rem' }}>{theme === 'dark' ? 'Dark Mode' : 'Light Mode'}</p>
-                                    </div>
-                                </div>
-                                <Button onClick={toggleTheme} variant="secondary" size="sm">Toggle</Button>
+            {/* 1. APPEARANCE */}
+            <section className={styles.section}>
+                <h2 className={styles.sectionTitle}>Appearance</h2>
+                <div className={styles.card}>
+                    <div className={styles.row}>
+                        <div className={styles.rowContent}>
+                            <div className={styles.rowIcon}>{theme === 'dark' ? <Moon size={20} /> : <Sun size={20} />}</div>
+                            <div className={styles.rowText}>
+                                <span className={styles.label}>App Theme</span>
+                                <span className={styles.description}>{theme === 'dark' ? 'Dark Mode' : 'Light Mode'}</span>
                             </div>
                         </div>
-
-                        {/* Floating Text Animation */}
-                        <div className="card" style={{ padding: '1.25rem', background: 'var(--color-bg-secondary)' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: floatingAnimations ? '1rem' : 0 }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                    <TrendingUp size={20} color="var(--color-primary)" />
-                                    <div>
-                                        <h3 style={{ fontSize: '1rem', margin: 0 }}>Floating Text</h3>
-                                        <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.85rem' }}>Visual feedback on click</p>
-                                    </div>
-                                </div>
-                                <Button onClick={() => setFloatingAnimations(!floatingAnimations)} variant="secondary" size="sm">
-                                    {floatingAnimations ? 'On' : 'Off'}
-                                </Button>
-                            </div>
-                            {floatingAnimations && (
-                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.5rem' }}>
-                                    {colorPresets.map((c) => (
-                                        <button
-                                            key={c.name}
-                                            onClick={() => setFloatingTextColor(c.value)}
-                                            style={{
-                                                width: '28px',
-                                                height: '28px',
-                                                borderRadius: '50%',
-                                                border: floatingTextColor === c.value ? '2px solid white' : 'none',
-                                                background: c.value || 'var(--color-primary)',
-                                                cursor: 'pointer'
-                                            }}
-                                        />
-                                    ))}
-                                </div>
-                            )}
-                        </div>
+                        <Toggle active={theme === 'dark'} onToggle={toggleTheme} />
                     </div>
-                </div>
 
-                {/* SECTION: Background Ambience */}
-                <div>
-                    <h2 className={styles.sectionTitle}>Background Ambience</h2>
-                    <div className="card" style={{ padding: '1.25rem', background: 'var(--color-bg-secondary)' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.25rem' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                <Music size={20} color="var(--color-primary)" />
-                                <div>
-                                    <h3 style={{ fontSize: '1rem', margin: 0 }}>Music Track</h3>
-                                    <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.85rem' }}>Plays automatically during chant</p>
-                                </div>
+                    <div className={styles.row}>
+                        <div className={styles.rowContent}>
+                            <div className={styles.rowIcon}><MousePointerClick size={20} /></div>
+                            <div className={styles.rowText}>
+                                <span className={styles.label}>Floating Text</span>
+                                <span className={styles.description}>Visual ripple on tap</span>
                             </div>
                         </div>
+                        <Toggle active={floatingAnimations} onToggle={() => setFloatingAnimations(!floatingAnimations)} />
+                    </div>
 
-                        {/* Track Selector */}
-                        <div style={{ marginBottom: '1rem' }}>
-                            <select
-                                value={selectedTrackId}
-                                onChange={(e) => setSelectedTrackId(e.target.value)}
-                                style={{
-                                    width: '100%',
-                                    padding: '0.75rem',
-                                    borderRadius: 'var(--radius-md)',
-                                    border: '1px solid var(--color-border)',
-                                    background: 'var(--color-bg-tertiary)',
-                                    color: 'var(--color-text-primary)',
-                                    fontSize: '1rem',
-                                    outline: 'none'
-                                }}
-                            >
-                                {tracks.map(track => (
-                                    <option key={track.id} value={track.id}>{track.label}</option>
+                    {floatingAnimations && (
+                        <div className={styles.row} style={{ background: 'var(--color-bg-secondary)' }}>
+                            <div className={styles.colorGrid}>
+                                {colorPresets.map((c) => (
+                                    <button
+                                        key={c.name}
+                                        className={`${styles.colorBtn} ${floatingTextColor === c.value ? styles.active : ''}`}
+                                        style={{ background: c.value || 'var(--color-primary)' }}
+                                        onClick={() => setFloatingTextColor(c.value)}
+                                        title={c.name}
+                                    />
                                 ))}
-                            </select>
-                        </div>
-
-                        {/* Volume Slider */}
-                        {selectedTrackId !== 'none' && (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                <Volume2 size={16} color="var(--color-text-secondary)" />
-                                <input
-                                    type="range"
-                                    min="0"
-                                    max="1"
-                                    step="0.05"
-                                    value={volume}
-                                    onChange={(e) => setVolume(parseFloat(e.target.value))}
-                                    style={{
-                                        flex: 1,
-                                        height: '4px',
-                                        background: 'var(--color-bg-tertiary)',
-                                        appearance: 'none',
-                                        borderRadius: '2px',
-                                        cursor: 'pointer'
-                                    }}
-                                />
-                                <span style={{ fontSize: '0.8rem', width: '30px', textAlign: 'right' }}>
-                                    {Math.round(volume * 100)}%
-                                </span>
                             </div>
-                        )}
+                        </div>
+                    )}
+                </div>
+            </section>
+
+            {/* 2. NOTIFICATIONS (NEW) */}
+            <section className={styles.section}>
+                <h2 className={styles.sectionTitle}>Notifications</h2>
+                <div className={styles.card}>
+                    {/* Daily Reminder */}
+                    <div className={styles.row}>
+                        <div className={styles.rowContent}>
+                            <div className={styles.rowIcon}><Clock size={20} /></div>
+                            <div className={styles.rowText}>
+                                <span className={styles.label}>Daily Reminder</span>
+                                <span className={styles.description}>Set a time to practice</span>
+                            </div>
+                        </div>
+                        <input
+                            type="time"
+                            className={styles.select}
+                            value={reminderTime}
+                            onChange={(e) => {
+                                setReminderTime(e.target.value);
+                                requestNotificationPermission();
+                            }}
+                            style={{ padding: '0.4rem', borderRadius: '8px', border: '1px solid var(--color-border)', color: 'var(--color-text-primary)', background: 'var(--color-bg-tertiary)' }}
+                        />
+                    </div>
+
+                    {/* Milestone Alerts */}
+                    <div className={styles.row}>
+                        <div className={styles.rowContent}>
+                            <div className={styles.rowIcon}><Award size={20} /></div>
+                            <div className={styles.rowText}>
+                                <span className={styles.label}>Milestone Alerts</span>
+                                <span className={styles.description}>Cheer on every 100 counts</span>
+                            </div>
+                        </div>
+                        <Toggle
+                            active={milestoneAlerts}
+                            onToggle={() => {
+                                setMilestoneAlerts(!milestoneAlerts);
+                                if (!milestoneAlerts) requestNotificationPermission();
+                            }}
+                        />
                     </div>
                 </div>
+            </section>
 
-                {/* SECTION: Zen/Focus Mode */}
-                <div>
-                    <h2 className={styles.sectionTitle}>Zen Mode</h2>
-                    <div className="card" style={{ padding: '1.25rem', background: 'var(--color-bg-secondary)' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.25rem' }}>
-                            <Maximize2 size={20} color="var(--color-primary)" />
-                            <div>
-                                <h3 style={{ fontSize: '1rem', margin: 0 }}>Full Screen Prefs</h3>
-                                <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.85rem' }}>Visibility during deep focus</p>
+            {/* 3. SOUND & AMBIENCE */}
+            <section className={styles.section}>
+                <h2 className={styles.sectionTitle}>Sound & Ambience</h2>
+                <div className={styles.card}>
+                    {/* Bg Music Selector */}
+                    <div className={styles.row}>
+                        <div className={styles.rowContent}>
+                            <div className={styles.rowIcon}><Music size={20} /></div>
+                            <div className={styles.rowText}>
+                                <span className={styles.label}>Background Music</span>
                             </div>
                         </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <span style={{ fontSize: '0.9rem' }}>Show Name</span>
-                                <Button onClick={() => updateImmersiveConfig('showName')} variant="ghost" size="sm">
-                                    {immersiveConfig.showName ? 'Visible' : 'Hidden'}
-                                </Button>
+                        <select
+                            className={styles.select}
+                            value={selectedTrackId}
+                            onChange={(e) => setSelectedTrackId(e.target.value)}
+                        >
+                            {tracks.map(t => <option key={t.id} value={t.id}>{t.label}</option>)}
+                        </select>
+                    </div>
+
+                    {/* Chant Volume */}
+                    <div className={styles.row} style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '0.5rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', marginBottom: '0.5rem' }}>
+                            <span className={styles.label}>Chant Volume</span>
+                            <span className={styles.description}>{Math.round(chantVolume * 100)}%</span>
+                        </div>
+                        <input
+                            type="range" min="0" max="1" step="0.05"
+                            value={chantVolume} onChange={(e) => setChantVolume(parseFloat(e.target.value))}
+                            className={styles.slider}
+                        />
+                    </div>
+
+                    {/* Bg Volume */}
+                    {selectedTrackId !== 'none' && (
+                        <div className={styles.row} style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '0.5rem' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', marginBottom: '0.5rem' }}>
+                                <span className={styles.label}>Ambience Volume</span>
+                                <span className={styles.description}>{Math.round(bgVolume * 100)}%</span>
                             </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <span style={{ fontSize: '0.9rem' }}>Show Controls</span>
-                                <Button onClick={() => updateImmersiveConfig('showControls')} variant="ghost" size="sm">
-                                    {immersiveConfig.showControls ? 'Visible' : 'Hidden'}
-                                </Button>
+                            <input
+                                type="range" min="0" max="1" step="0.05"
+                                value={bgVolume} onChange={(e) => setBgVolume(parseFloat(e.target.value))}
+                                className={styles.slider}
+                            />
+                        </div>
+                    )}
+                </div>
+            </section>
+
+            {/* 4. ZEN MODE */}
+            <section className={styles.section}>
+                <h2 className={styles.sectionTitle}>Zen Mode</h2>
+                <div className={styles.card}>
+                    <div className={styles.presetGrid}>
+                        <div
+                            className={`${styles.presetBtn} ${zenPreset === 'focus' ? styles.active : ''}`}
+                            onClick={() => applyZenPreset('focus')}
+                        >
+                            <Moon size={24} className={styles.presetIcon} />
+                            <span className={styles.presetLabel}>Deep Focus</span>
+                        </div>
+                        <div
+                            className={`${styles.presetBtn} ${zenPreset === 'relaxed' ? styles.active : ''}`}
+                            onClick={() => applyZenPreset('relaxed')}
+                        >
+                            <Coffee size={24} className={styles.presetIcon} />
+                            <span className={styles.presetLabel}>Relaxed</span>
+                        </div>
+                        <div
+                            className={`${styles.presetBtn} ${zenPreset === 'custom' ? styles.active : ''}`}
+                            onClick={() => setZenPreset('custom')}
+                        >
+                            <Zap size={24} className={styles.presetIcon} />
+                            <span className={styles.presetLabel}>Custom</span>
+                        </div>
+                    </div>
+
+                    <div className={styles.row}>
+                        <div className={styles.rowContent}>
+                            <div className={styles.rowText}>
+                                <span className={styles.label}>Show Name</span>
+                                <span className={styles.description}>In full screen</span>
+                            </div>
+                        </div>
+                        <Toggle
+                            active={immersiveConfig.showName}
+                            onToggle={() => {
+                                updateImmersiveConfig('showName');
+                                setZenPreset('custom');
+                            }}
+                        />
+                    </div>
+                </div>
+            </section>
+
+            {/* 5. ACCESSIBILITY */}
+            <section className={styles.section}>
+                <h2 className={styles.sectionTitle}>Accessibility</h2>
+                <div className={styles.card}>
+                    <div className={styles.row}>
+                        <div className={styles.rowContent}>
+                            <div className={styles.rowIcon}><Type size={20} /></div>
+                            <div className={styles.rowText}>
+                                <span className={styles.label}>Large Text</span>
+                            </div>
+                        </div>
+                        <Toggle active={textSize === 'large'} onToggle={toggleTextSize} />
+                    </div>
+                    <div className={styles.row}>
+                        <div className={styles.rowContent}>
+                            <div className={styles.rowIcon}><Eye size={20} /></div>
+                            <div className={styles.rowText}>
+                                <span className={styles.label}>High Contrast</span>
+                            </div>
+                        </div>
+                        <Toggle active={contrast === 'high'} onToggle={toggleContrast} />
+                    </div>
+                    <div className={styles.row}>
+                        <div className={styles.rowContent}>
+                            <div className={styles.rowIcon}><Smartphone size={20} /></div>
+                            <div className={styles.rowText}>
+                                <span className={styles.label}>Haptic Feedback</span>
+                                <span className={styles.description}>{hapticStrength}</span>
+                            </div>
+                        </div>
+                        {/* Mock Toggle for now */}
+                        <Toggle
+                            active={hapticStrength !== 'off'}
+                            onToggle={() => setHapticStrength(hapticStrength === 'off' ? 'medium' : 'off')}
+                        />
+                    </div>
+                </div>
+            </section>
+
+            {/* 6. PRIVACY & DATA */}
+            <section className={styles.section}>
+                <h2 className={styles.sectionTitle}>Privacy & Data</h2>
+                <div className={styles.card}>
+                    <div className={styles.row} onClick={() => alert('Data export started...')} style={{ cursor: 'pointer' }}>
+                        <div className={styles.rowContent}>
+                            <div className={styles.rowIcon}><Download size={20} /></div>
+                            <div className={styles.rowText}>
+                                <span className={styles.label}>Export Data</span>
+                                <span className={styles.description}>Download your progress</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div className={styles.row} onClick={() => { if (confirm('Reset all progress?')) localStorage.clear(); }} style={{ cursor: 'pointer' }}>
+                        <div className={styles.rowContent}>
+                            <div className={styles.rowIcon} style={{ background: 'rgba(255,0,0,0.1)', color: 'red' }}>
+                                <Trash2 size={20} />
+                            </div>
+                            <div className={styles.rowText}>
+                                <span className={styles.label} style={{ color: 'red' }}>Reset Progress</span>
+                                <span className={styles.description}>Clear local data</span>
                             </div>
                         </div>
                     </div>
                 </div>
+            </section>
 
-                {/* SECTION: Accessibility */}
-                <div>
-                    <h2 className={styles.sectionTitle}>Accessibility</h2>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                        <div className="card" style={{ padding: '1.25rem', background: 'var(--color-bg-secondary)' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                    <Type size={20} color="var(--color-primary)" />
-                                    <div>
-                                        <h3 style={{ fontSize: '1rem', margin: 0 }}>Large Text</h3>
-                                        <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.85rem' }}>Enhanced legibility</p>
-                                    </div>
-                                </div>
-                                <Button onClick={toggleTextSize} variant="secondary" size="sm">
-                                    {textSize === 'large' ? 'Disable' : 'Enable'}
-                                </Button>
-                            </div>
-                        </div>
-                        <div className="card" style={{ padding: '1.25rem', background: 'var(--color-bg-secondary)' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                    <Eye size={20} color="var(--color-primary)" />
-                                    <div>
-                                        <h3 style={{ fontSize: '1rem', margin: 0 }}>High Contrast</h3>
-                                        <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.85rem' }}>Maximum visibility</p>
-                                    </div>
-                                </div>
-                                <Button onClick={toggleContrast} variant="secondary" size="sm">
-                                    {contrast === 'high' ? 'Disable' : 'Enable'}
-                                </Button>
-                            </div>
-                        </div>
+            {/* 6. ABOUT & SOCIAL */}
+            <section className={styles.section}>
+                <div className={styles.aboutCard}>
+                    <div className={styles.socialRow}>
+                        <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className={styles.socialIcon}><Youtube size={24} /></a>
+                        <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className={styles.socialIcon}><Instagram size={24} /></a>
+                        <a href="https://telegram.org" target="_blank" rel="noopener noreferrer" className={styles.socialIcon}><Send size={24} /></a>
+                        <a href="https://features.com" target="_blank" rel="noopener noreferrer" className={styles.socialIcon}><Globe size={24} /></a>
+                    </div>
+                    <p className={styles.version}>Divine Name v1.0.0</p>
+                    <div className={styles.devotion}>
+                        <Heart size={12} style={{ display: 'inline', marginRight: '4px', fill: 'currentColor' }} />
+                        Made with devotion
                     </div>
                 </div>
-
-                {/* SECTION: Feedback/About */}
-                <div>
-                    <h2 className={styles.sectionTitle}>About</h2>
-                    <div className="card" style={{ padding: '1.25rem', background: 'var(--color-bg-secondary)', textAlign: 'center' }}>
-                        <p style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)', marginBottom: '1rem' }}>
-                            Divine Name version 1.0.0
-                        </p>
-                        <Button variant="ghost" size="sm" style={{ width: '100%' }}>Send Feedback</Button>
-                    </div>
-                </div>
-
-            </div>
+            </section>
         </div>
     );
 };

@@ -18,6 +18,7 @@ const AdminPanel = lazy(() => import('./pages/AdminPanel'));
 const Login = lazy(() => import('./pages/Login'));
 const Leaderboard = lazy(() => import('./pages/Leaderboard'));
 const Progress = lazy(() => import('./pages/Progress'));
+const Music = lazy(() => import('./pages/Music'));
 
 const PageLoader = () => (
   <div style={{
@@ -33,10 +34,10 @@ function App() {
     <ErrorBoundary>
       <AuthProvider>
         <ThemeProvider>
-          <BgMusicProvider>
-            <BhajanProvider>
-              <NameProvider>
-                <StatsProvider>
+          <StatsProvider>
+            <BgMusicProvider>
+              <BhajanProvider>
+                <NameProvider>
                   <LeaderboardProvider>
                     <BrowserRouter>
                       <Suspense fallback={<PageLoader />}>
@@ -47,6 +48,7 @@ function App() {
                             <Route path="settings" element={<Settings />} />
                             <Route path="leaderboard" element={<Leaderboard />} />
                             <Route path="progress" element={<Progress />} />
+                            <Route path="music" element={<Music />} />
                             <Route
                               path="admin"
                               element={
@@ -61,10 +63,10 @@ function App() {
                       </Suspense>
                     </BrowserRouter>
                   </LeaderboardProvider>
-                </StatsProvider>
-              </NameProvider>
-            </BhajanProvider>
-          </BgMusicProvider>
+                </NameProvider>
+              </BhajanProvider>
+            </BgMusicProvider>
+          </StatsProvider>
         </ThemeProvider>
       </AuthProvider>
     </ErrorBoundary>

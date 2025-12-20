@@ -1,0 +1,358 @@
+/* Music.module.css */
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    padding-bottom: 2rem;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: var(--space-2);
+}
+
+.subtitle {
+    color: var(--color-text-secondary);
+    font-size: 0.95rem;
+}
+
+.nowPlayingCard {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 1.5rem !important;
+}
+
+.nowPlayingContent {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.albumArt {
+    width: 60px;
+    height: 60px;
+    background: rgba(var(--color-primary-rgb), 0.1);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.trackDetails h3 {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    margin-bottom: 0.25rem;
+}
+
+.trackDetails p {
+    color: var(--color-text-secondary);
+    font-size: 0.9rem;
+}
+
+.controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+}
+
+.playBtn {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    color: var(--color-bg-main);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 20px var(--color-primary-glow);
+    transition: transform 0.2s;
+}
+
+.playBtn:active {
+    transform: scale(0.95);
+}
+
+.iconBtn {
+    color: var(--color-text-secondary);
+    transition: color 0.2s;
+}
+
+.iconBtn:hover {
+    color: var(--color-text-primary);
+}
+
+
+
+.volumeContainer {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+.volumeIcon {
+    color: var(--color-text-tertiary);
+}
+
+.volumeSlider {
+    flex: 1;
+    height: 4px;
+    border-radius: 2px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.volumeSlider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    cursor: pointer;
+}
+
+.tabs {
+    display: flex;
+    gap: 1rem;
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: 0.5rem;
+    overflow-x: auto;
+}
+
+.tab {
+    background: none;
+    border: none;
+    padding: 0.5rem 1rem;
+    color: var(--color-text-tertiary);
+    font-family: var(--font-sans);
+    font-weight: 500;
+    white-space: nowrap;
+    position: relative;
+    cursor: pointer;
+}
+
+.activeTab {
+    color: var(--color-primary);
+}
+
+.activeTab::after {
+    content: '';
+    position: absolute;
+    bottom: -0.5rem;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--color-primary);
+}
+
+.trackList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.trackItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem;
+    border-radius: var(--radius-md);
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.trackItem:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Seek Bar Styles */
+.seekContainer {
+    width: 100%;
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.timeLabels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: var(--color-text-tertiary);
+    font-family: var(--font-mono);
+    padding: 0 4px;
+}
+
+.seekBar {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+}
+
+.seekBar::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px;
+    height: 12px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--color-primary);
+    cursor: pointer;
+    transition: transform 0.1s;
+    margin-top: 0px;
+    /* Adjust if needed */
+}
+
+.seekBar:active::-webkit-slider-thumb {
+    transform: scale(1.3);
+    background: var(--color-primary);
+}
+
+.seekBar::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    background: #fff;
+    border: none;
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--color-primary);
+    cursor: pointer;
+    transition: transform 0.1s;
+}
+
+.seekBar:active::-moz-range-thumb {
+    transform: scale(1.3);
+    background: var(--color-primary);
+}
+
+.activeTrack {
+    border-color: rgba(var(--color-primary-rgb), 0.3);
+    background: rgba(var(--color-primary-rgb), 0.05);
+}
+
+.trackLeft {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.trackIcon {
+    color: var(--color-text-tertiary);
+    width: 24px;
+    display: flex;
+    justify-content: center;
+}
+
+.trackInfo h4 {
+    font-size: 0.95rem;
+    margin-bottom: 0.2rem;
+    color: var(--color-text-primary);
+}
+
+.trackMeta {
+    font-size: 0.8rem;
+    color: var(--color-text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.metaDot {
+    width: 3px;
+    height: 3px;
+    background: var(--color-text-tertiary);
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.trackRight {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.actionBtn {
+    padding: 0.5rem;
+    color: var(--color-text-tertiary);
+    border-radius: 50%;
+}
+
+.actionBtn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--color-text-primary);
+}
+
+.downloadedIcon {
+    color: var(--color-success);
+    margin: 0 0.5rem;
+}
+
+.equalizer {
+    display: flex;
+    gap: 2px;
+    align-items: flex-end;
+    height: 12px;
+}
+
+.bar {
+    width: 3px;
+    background: var(--color-primary);
+    animation: equalize 1s infinite;
+}
+
+.bar:nth-child(1) {
+    animation-delay: 0s;
+    height: 6px;
+}
+
+.bar:nth-child(2) {
+    animation-delay: 0.2s;
+    height: 10px;
+}
+
+.bar:nth-child(3) {
+    animation-delay: 0.4s;
+    height: 8px;
+}
+
+@keyframes equalize {
+
+    0%,
+    100% {
+        height: 4px;
+    }
+
+    50% {
+        height: 12px;
+    }
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 1rem;
+}
+
+.categoryCard {
+    text-align: center;
+    padding: 1.5rem !important;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.categoryCard:active {
+    transform: scale(0.98);
+}

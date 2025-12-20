@@ -2,6 +2,7 @@ import React from 'react';
 import { Outlet } from 'react-router-dom';
 import Header from './Header';
 import Footer from './Footer';
+import BottomNav from './BottomNav';
 import styles from './Layout.module.css';
 import { useTheme } from '../../context/ThemeContext';
 
@@ -17,6 +18,7 @@ const Layout = () => {
                 </div>
             </main>
             {!immersiveMode && <Footer />}
+            {!immersiveMode && <BottomNav />}
         </div>
     );
 };
