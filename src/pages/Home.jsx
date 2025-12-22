@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Volume2, RotateCcw, VolumeX, Target, X, Maximize2, Minimize2, MoreVertical, LogOut } from 'lucide-react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { Volume2, RotateCcw, VolumeX, Target, X, Maximize2, Minimize2, MoreVertical, LogOut, Mic, MicOff } from 'lucide-react';
 import SessionSummary from '../components/chant/SessionSummary';
 import ImageCarousel from '../components/chant/ImageCarousel';
 import { useNavigate } from 'react-router-dom';
@@ -17,6 +17,7 @@ import { useBgMusic } from '../context/BgMusicContext';
 import { useBhajan } from '../context/BhajanContext';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import styles from './Home.module.css';
+import useVoiceCommand from '../hooks/useVoiceCommand';
 
 const Home = () => {
     useDocumentTitle('Divine Name | Japa Counter');
@@ -32,7 +33,7 @@ const Home = () => {
     const [floatingTexts, setFloatingTexts] = useState([]);
     const [showMoreMenu, setShowMoreMenu] = useState(false);
     const [showBhajanModal, setShowBhajanModal] = useState(false);
-    const [showIntention, setShowIntention] = useState(false);
+
 
     // Session State
     const [showSummary, setShowSummary] = useState(false);
@@ -49,6 +50,43 @@ const Home = () => {
     } = useTheme();
     const { play: playBgMusic, stop: stopBgMusic } = useBgMusic();
     const { pause: pauseBhajan, currentSong, isPlaying, playTrack } = useBhajan();
+
+    // Voice Command Integration
+    const [isVoiceMode, setIsVoiceMode] = useState(false);
+
+    // We pass the currently selected name text (first word only as simplified target)
+    const targetWord = selectedName ? selectedName.text.split(' ')[0] : 'Sitaram';
+
+    // Use ref to access latest handleIncrement to prevent dependency cycles
+    const handleIncrementRef = useRef(null);
+    useEffect(() => {
+        handleIncrementRef.current = handleIncrement;
+    });
+
+    const handleVoiceMatch = useCallback((matchCount = 1) => {
+        if (handleIncrementRef.current) {
+            handleIncrementRef.current(matchCount);
+        }
+    }, []);
+
+    const {
+        isListening,
+        matchStatus,
+        transcript,
+        lastDetected,
+        startListening,
+        stopListening,
+        error: voiceError
+    } = useVoiceCommand(targetWord, handleVoiceMatch);
+
+    // Start/Stop listening based on isVoiceMode toggle
+    useEffect(() => {
+        if (isVoiceMode) {
+            startListening();
+        } else {
+            stopListening();
+        }
+    }, [isVoiceMode, startListening, stopListening]);
 
     // Progress Calculation
     const MALA_SIZE = 108;
@@ -82,6 +120,7 @@ const Home = () => {
             toggleImmersiveMode();
             e.preventDefault();
         } else {
+            // In tap-anywhere mode (default), click increments
             if (!e.target.closest(`.${styles.counterCircle}`)) {
                 handleIncrement();
             }
@@ -141,28 +180,19 @@ const Home = () => {
         setSessionStartCount(count);
         setIsJapaActive(true);
 
-        setShowIntention(true);
-        setTimeout(() => setShowIntention(false), 4000);
-
         if (!immersiveMode) {
             toggleImmersiveMode();
         }
-
-        if (!isPlaying) {
-            if (currentSong) {
-                playTrack(currentSong);
-            }
-        }
     };
 
-    const handleIncrement = () => {
+    const handleIncrement = (amount = 1) => {
         if (!sessionStartTime) startSession();
 
         setIsJapaActive(true);
 
-        const nextCount = count + 1;
+        const nextCount = count + amount;
         setCount(nextCount);
-        incrementStats(1);
+        incrementStats(amount);
         playChant();
 
         if (navigator.vibrate) {
@@ -234,11 +264,12 @@ const Home = () => {
         setShowSummary(false);
         setSessionStartTime(Date.now());
         setIsJapaActive(true);
-        if (currentSong) playTrack(currentSong);
     };
 
     const handleEndSession = () => {
         setShowSummary(false);
+        setCount(0);
+        setSessionStartCount(0);
         setSessionStartTime(null);
         setLiveTimer('00:00');
         setIsJapaActive(false);
@@ -258,20 +289,7 @@ const Home = () => {
 
             {showBhajanModal && <BhajanModal onClose={() => setShowBhajanModal(false)} />}
 
-            <AnimatePresence>
-                {showIntention && (
-                    <motion.div
-                        initial={{ opacity: 0, y: -20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0 }}
-                        className={styles.intentionMessage}
-                    >
-                        Chant with focus and surrender 🙏
-                    </motion.div>
-                )}
-            </AnimatePresence>
-
-            {/* Image Carousel - Now Persist in Zen Mode with extra classes */}
+            {/* Image Carousel */}
             <div
                 className={clsx(styles.imageWrapper, immersiveMode && styles.zenImageWrapper)}
                 onClick={(e) => e.stopPropagation()}
@@ -302,6 +320,59 @@ const Home = () => {
                         style={{ strokeDasharray: `${circumference} ${circumference}`, strokeDashoffset, transition: 'stroke-dashoffset 0.1s linear' }}
                     />
                 </svg>
+
+                {/* Voice Mode Indicator - Pill Style */}
+                <AnimatePresence>
+                    {isVoiceMode && isListening && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                            className={styles.voiceIndicator}
+                        >
+                            <div className={styles.micIconWrapper}>
+                                <div className={clsx(styles.micRing, styles.activeRing)} />
+                                <Mic
+                                    size={20}
+                                    className={clsx(
+                                        styles.micIcon,
+                                        matchStatus === 'match' ? styles.successMic : styles.activeMic
+                                    )}
+                                />
+                            </div>
+
+                            <div className={styles.textContent}>
+                                <span className={styles.voiceLabel}>
+                                    {matchStatus === 'match' ? 'Success' : 'Listening'}
+                                </span>
+
+                                <AnimatePresence mode='wait'>
+                                    {lastDetected && matchStatus === 'match' ? (
+                                        <motion.span
+                                            key={lastDetected.timestamp}
+                                            initial={{ opacity: 0, y: 5 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: -5 }}
+                                            className={clsx(styles.voiceStatus, styles.detectedSuccess)}
+                                        >
+                                            {lastDetected.word} (+{lastDetected.count})
+                                        </motion.span>
+                                    ) : (
+                                        <motion.span
+                                            key="listening"
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            exit={{ opacity: 0 }}
+                                            className={styles.voiceStatus}
+                                        >
+                                            Say: "{targetWord}"
+                                        </motion.span>
+                                    )}
+                                </AnimatePresence>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
 
                 <button className={styles.counterCircle} onClick={(e) => { e.stopPropagation(); handleIncrement(); }} aria-label="Increment Counter">
                     <motion.div
@@ -337,6 +408,8 @@ const Home = () => {
 
                     <div className={clsx(styles.tapFeedback, isAnimating && styles.animating)}></div>
 
+                    {!isVoiceMode && <div className={styles.tapInstruction}>Tap to Count</div>}
+
                     <div className={styles.floatingContainer}>
                         <AnimatePresence>
                             {floatingTexts.map((item) => (
@@ -364,37 +437,7 @@ const Home = () => {
                 </div>
             </motion.div>
 
-            {/* ZEN CONTROLS (Floating Pill) */}
-            <AnimatePresence>
-                {immersiveMode && (isGhostVisible || immersiveConfig?.showControls) && (
-                    <motion.div
-                        initial={{ opacity: 0, y: 30, scale: 0.9 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 30, scale: 0.9 }}
-                        className={styles.zenControlsPill}
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <button
-                            onClick={(e) => { e.stopPropagation(); setShowSummary(true); setIsJapaActive(false); }}
-                            className={styles.zenIconButton}
-                            title="Pause Session"
-                        >
-                            <div className={styles.pauseIcon} />
-                        </button>
 
-                        <div className={styles.zenDivider} />
-
-                        <button
-                            onClick={(e) => { e.stopPropagation(); handleSessionComplete(); }}
-                            className={styles.zenIconButton}
-                            title="End Session"
-                            style={{ color: '#ff4444' }}
-                        >
-                            <LogOut size={20} />
-                        </button>
-                    </motion.div>
-                )}
-            </AnimatePresence>
 
             {/* STANDARD CONTROLS */}
             <AnimatePresence>
@@ -423,6 +466,16 @@ const Home = () => {
                                 title={soundEnabled ? "Mute Sound" : "Enable Sound"}
                             >
                                 {soundEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
+                            </Button>
+
+                            <Button
+                                variant={isVoiceMode ? "primary" : "secondary"}
+                                size="icon"
+                                onClick={() => setIsVoiceMode(!isVoiceMode)}
+                                title={isVoiceMode ? "Disable Voice Mode" : "Enable Voice Mode"}
+                                className={isVoiceMode ? styles.activeButton : ''}
+                            >
+                                {isVoiceMode ? <Mic size={20} /> : <MicOff size={20} />}
                             </Button>
 
                             <Button

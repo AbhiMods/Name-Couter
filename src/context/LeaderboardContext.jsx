@@ -5,10 +5,10 @@ import { useAuth } from './AuthContext';
 const LeaderboardContext = createContext(null);
 
 const MOCK_LEADERBOARD = [
-    { id: 'dev_1', name: 'Aarav Sharma', count: 125400, avatar: '🕉️' },
-    { id: 'dev_2', name: 'Ishani Patel', count: 98200, avatar: '✨' },
-    { id: 'dev_3', name: 'Kabir Singh', count: 85000, avatar: '🙏' },
-    { id: 'dev_4', name: 'Ananya Iyer', count: 62100, avatar: '📿' },
+    { id: 'dev_1', name: 'Abhishek Sharma', count: 125400, avatar: '🕉️' },
+    { id: 'dev_2', name: 'Aman Maurya', count: 98200, avatar: '✨' },
+    { id: 'dev_3', name: 'Kajal Singh', count: 85000, avatar: '🙏' },
+    { id: 'dev_4', name: 'Suraj Iyer', count: 62100, avatar: '📿' },
     { id: 'dev_5', name: 'Reyansh Gupta', count: 45000, avatar: '🌟' },
     { id: 'dev_6', name: 'Zoya Khan', count: 32000, avatar: '🌙' },
     { id: 'dev_7', name: 'Arjun Das', count: 21500, avatar: '🔥' },

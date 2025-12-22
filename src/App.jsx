@@ -19,6 +19,7 @@ const Login = lazy(() => import('./pages/Login'));
 const Leaderboard = lazy(() => import('./pages/Leaderboard'));
 const Progress = lazy(() => import('./pages/Progress'));
 const Music = lazy(() => import('./pages/Music'));
+const Profile = lazy(() => import('./pages/Profile'));
 
 const PageLoader = () => (
   <div style={{
@@ -54,10 +55,31 @@ function App() {
                           <Route path="/login" element={<Login />} />
                           <Route path="/" element={<Layout />}>
                             <Route index element={<Home />} />
-                            <Route path="settings" element={<Settings />} />
-                            <Route path="leaderboard" element={<Leaderboard />} />
-                            <Route path="progress" element={<Progress />} />
-                            <Route path="music" element={<Music />} />
+                            <Route path="settings" element={
+                              <ProtectedRoute>
+                                <Settings />
+                              </ProtectedRoute>
+                            } />
+                            <Route path="leaderboard" element={
+                              <ProtectedRoute>
+                                <Leaderboard />
+                              </ProtectedRoute>
+                            } />
+                            <Route path="progress" element={
+                              <ProtectedRoute>
+                                <Progress />
+                              </ProtectedRoute>
+                            } />
+                            <Route path="music" element={
+                              <ProtectedRoute>
+                                <Music />
+                              </ProtectedRoute>
+                            } />
+                            <Route path="profile" element={
+                              <ProtectedRoute>
+                                <Profile />
+                              </ProtectedRoute>
+                            } />
                             <Route
                               path="admin"
                               element={

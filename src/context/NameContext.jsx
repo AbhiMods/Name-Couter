@@ -25,6 +25,12 @@ export const NameProvider = ({ children }) => {
         return saved ? JSON.parse(saved) : {};
     });
 
+    // Custom User Names
+    const [customNames, setCustomNames] = useState(() => {
+        const saved = localStorage.getItem('divine_custom_names');
+        return saved ? JSON.parse(saved) : [];
+    });
+
     // Audio Ref to prevent multiple overlaps
     const audioRef = useRef(null);
 
@@ -40,12 +46,29 @@ export const NameProvider = ({ children }) => {
         localStorage.setItem('divine_custom_audios', JSON.stringify(customAudios));
     }, [customAudios]);
 
-    const selectedName = NAMES.find(n => n.id === selectedNameId) || NAMES[0];
+    useEffect(() => {
+        localStorage.setItem('divine_custom_names', JSON.stringify(customNames));
+    }, [customNames]);
+
+    const allNames = [...NAMES, ...customNames];
+    const selectedName = allNames.find(n => n.id === selectedNameId) || allNames[0];
 
     const updateName = (id) => {
-        if (NAMES.find(n => n.id === id)) {
+        if (allNames.find(n => n.id === id)) {
             setSelectedNameId(id);
         }
+    };
+
+    const addCustomName = (name, subtitle) => {
+        const id = name.toLowerCase().replace(/\s+/g, '_') + '_' + Date.now();
+        const newName = { id, label: name, subtitle: subtitle || 'Custom Chant', text: name };
+        setCustomNames(prev => [...prev, newName]);
+        setSelectedNameId(id); // Auto-select new name
+    };
+
+    const removeCustomName = (id) => {
+        setCustomNames(prev => prev.filter(n => n.id !== id));
+        if (selectedNameId === id) setSelectedNameId(NAMES[0].id);
     };
 
     const toggleSound = () => setSoundEnabled(prev => !prev);
@@ -107,7 +130,11 @@ export const NameProvider = ({ children }) => {
             selectedName,
             selectedNameId,
             updateName,
-            allNames: NAMES,
+            selectedNameId,
+            updateName,
+            allNames,
+            addCustomName,
+            removeCustomName,
             soundEnabled,
             toggleSound,
             volume,

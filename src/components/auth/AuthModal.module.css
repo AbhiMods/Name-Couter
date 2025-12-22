@@ -1,0 +1,81 @@
+/* AuthModal.module.css */
+.tabs {
+    display: flex;
+    border-bottom: 1px solid var(--color-border);
+    margin-bottom: var(--space-6);
+}
+
+.tab {
+    flex: 1;
+    text-align: center;
+    padding: var(--space-3);
+    background: transparent;
+    border: none;
+    color: var(--color-text-secondary);
+    font-size: var(--text-base);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--duration-fast);
+    position: relative;
+}
+
+.tab:hover {
+    color: var(--color-text-primary);
+    background: var(--color-surface);
+}
+
+.activeTab {
+    color: var(--color-primary);
+    font-weight: 600;
+}
+
+.activeTab::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--color-primary);
+    box-shadow: 0 -2px 8px var(--color-primary-glow);
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.forgotPassword {
+    align-self: flex-end;
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    transition: color var(--duration-fast);
+}
+
+.forgotPassword:hover {
+    color: var(--color-primary);
+    text-decoration: underline;
+}
+
+.errorBox {
+    background: rgba(255, 77, 77, 0.1);
+    border: 1px solid rgba(255, 77, 77, 0.2);
+    color: #ff4d4d;
+    padding: var(--space-3);
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    margin-bottom: var(--space-4);
+}
+
+.successBox {
+    background: rgba(0, 255, 127, 0.1);
+    border: 1px solid rgba(0, 255, 127, 0.2);
+    color: #00ff7f;
+    padding: var(--space-3);
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    margin-bottom: var(--space-4);
+    text-align: center;
+}

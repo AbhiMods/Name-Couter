@@ -34,10 +34,10 @@
 }
 
 .selected {
-    background: rgba(255, 215, 0, 0.08);
+    background: rgba(var(--color-primary-rgb), 0.1);
     /* Gold tint */
     border-color: var(--color-primary);
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
 }
 
 .label {
@@ -76,4 +76,49 @@
 .selected .checkIcon {
     opacity: 1;
     transform: scale(1);
+}
+
+.addCard {
+    align-items: center;
+    justify-content: center;
+    border-style: dashed;
+    border-width: 2px;
+    opacity: 0.7;
+    gap: 0.5rem;
+}
+
+.addCard:hover {
+    opacity: 1;
+    border-color: var(--color-primary);
+}
+
+.addCard .label {
+    font-size: 0.95rem;
+    margin: 0;
+    color: var(--color-text-secondary);
+}
+
+.addCard svg {
+    color: var(--color-text-secondary);
+}
+
+.deleteBtn {
+    position: absolute;
+    bottom: var(--space-2);
+    right: var(--space-2);
+    background: rgba(255, 0, 0, 0.2);
+    color: #ff6b6b;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.deleteBtn:hover {
+    background: #ff6b6b;
+    color: white;
+    transform: scale(1.1);
 }

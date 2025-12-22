@@ -99,6 +99,87 @@ app.delete('/api/music/:filename', (req, res) => {
     }
 });
 
+// REELS API
+const reelsFile = path.join(__dirname, 'reels.json');
+
+// Helper to read reels
+const readReels = () => {
+    if (!fs.existsSync(reelsFile)) return [];
+    try {
+        const data = fs.readFileSync(reelsFile, 'utf-8');
+        return JSON.parse(data);
+    } catch (err) {
+        return [];
+    }
+};
+
+// Helper to write reels
+const writeReels = (data) => {
+    fs.writeFileSync(reelsFile, JSON.stringify(data, null, 2));
+};
+
+// GET /api/reels
+app.get('/api/reels', (req, res) => {
+    const reels = readReels();
+    res.json(reels.reverse()); // Show newest first
+});
+
+// POST /api/reels - Add new reel
+app.post('/api/reels', express.json(), (req, res) => {
+    const { url, category, title } = req.body;
+    if (!url) return res.status(400).json({ error: 'URL is required' });
+
+    // Extract YouTube ID (Supports standard watch, shorts, share links)
+    let videoId = '';
+    try {
+        if (url.includes('youtu.be/')) {
+            videoId = url.split('youtu.be/')[1].split('?')[0];
+        } else if (url.includes('youtube.com/shorts/')) {
+            videoId = url.split('shorts/')[1].split('?')[0];
+        } else if (url.includes('v=')) {
+            videoId = url.split('v=')[1].split('&')[0];
+        }
+    } catch (e) { }
+
+    if (!videoId) return res.status(400).json({ error: 'Invalid YouTube URL' });
+
+    const reels = readReels();
+
+    // Check duplicate
+    if (reels.find(r => r.videoId === videoId)) {
+        return res.status(400).json({ error: 'Reel already exists' });
+    }
+
+    const newReel = {
+        id: Date.now().toString(),
+        videoId,
+        url,
+        title: title || 'Divine Moment',
+        category: category || 'Bhakti',
+        likes: 0,
+        createdAt: new Date().toISOString()
+    };
+
+    reels.push(newReel);
+    writeReels(reels);
+
+    res.json(newReel);
+});
+
+// POST /api/reels/:id/like
+app.post('/api/reels/:id/like', (req, res) => {
+    const reels = readReels();
+    const reel = reels.find(r => r.id === req.params.id);
+    if (reel) {
+        // Simple toggle simulation or increment? Let's just increment for global feel
+        reel.likes = (reel.likes || 0) + 1;
+        writeReels(reels);
+        res.json({ success: true, likes: reel.likes });
+    } else {
+        res.status(404).json({ error: 'Reel not found' });
+    }
+});
+
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
     console.log(`Uploads folder: ${uploadDir}`);

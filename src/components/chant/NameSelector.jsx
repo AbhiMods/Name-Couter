@@ -1,11 +1,28 @@
 import React from 'react';
-import { Check } from 'lucide-react';
+import { Check, Plus, Trash2 } from 'lucide-react';
 import clsx from 'clsx';
-import { useName } from '../../context/NameContext';
+import { useName, NAMES } from '../../context/NameContext';
 import styles from './NameSelector.module.css';
 
 const NameSelector = ({ className, onSelect }) => {
-    const { allNames, selectedNameId, updateName } = useName();
+    const { allNames, selectedNameId, updateName, addCustomName, removeCustomName } = useName();
+
+    const handleAdd = () => {
+        const name = prompt("Enter divine name to chant:");
+        if (name && name.trim()) {
+            addCustomName(name.trim());
+            if (onSelect) onSelect();
+        }
+    };
+
+    const handleDelete = (e, id) => {
+        e.stopPropagation();
+        if (window.confirm("Remove this custom name?")) {
+            removeCustomName(id);
+        }
+    };
+
+    const isCustom = (id) => !NAMES.find(n => n.id === id);
 
     return (
         <div className={clsx(styles.grid, className)}>
@@ -26,9 +43,24 @@ const NameSelector = ({ className, onSelect }) => {
                     <span className={styles.label}>{name.label}</span>
                     <span className={styles.subtitle}>{name.subtitle}</span>
 
-                    <Check size={16} className={styles.checkIcon} />
+                    {selectedNameId === name.id && <Check size={16} className={styles.checkIcon} />}
+
+                    {isCustom(name.id) && (
+                        <div
+                            className={styles.deleteBtn}
+                            onClick={(e) => handleDelete(e, name.id)}
+                            title="Remove"
+                        >
+                            <Trash2 size={14} />
+                        </div>
+                    )}
                 </button>
             ))}
+
+            <button className={clsx(styles.selectorCard, styles.addCard)} onClick={handleAdd}>
+                <Plus size={20} />
+                <span className={styles.label}>Add Custom</span>
+            </button>
         </div>
     );
 };

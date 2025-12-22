@@ -15,6 +15,9 @@ const Profile = () => {
             <header className={styles.header}>
                 <div className={styles.welcome}>Om Shanti,</div>
                 <h1 className={styles.username}>{user?.name || 'Seeker'}</h1>
+                <div className={styles.email} style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-2)' }}>
+                    {user?.email}
+                </div>
                 <div className={styles.activeName}>
                     Currently Chanting: <strong>{selectedName.label}</strong>
                 </div>
@@ -65,6 +68,28 @@ const Profile = () => {
                         );
                     })}
                 </div>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'center', marginTop: 'auto' }}>
+                <button
+                    onClick={useAuth().logout}
+                    style={{
+                        background: 'rgba(255, 77, 77, 0.1)',
+                        color: '#ff4d4d',
+                        border: '1px solid rgba(255, 77, 77, 0.2)',
+                        padding: '12px 24px',
+                        borderRadius: '12px',
+                        cursor: 'pointer',
+                        fontSize: '1rem',
+                        fontWeight: '600',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        transition: 'all 0.2s'
+                    }}
+                >
+                    Sign Out
+                </button>
             </div>
         </div>
     );

@@ -11,7 +11,8 @@ const ProtectedRoute = ({ children }) => {
     }
 
     if (!user) {
-        return <Navigate to="/login" state={{ from: location }} replace />;
+        // Redirect to home with auth=login query param to trigger the modal
+        return <Navigate to="/?auth=login" state={{ from: location }} replace />;
     }
 
     return children;

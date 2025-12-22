@@ -1,0 +1,243 @@
+/* Main Feed Container */
+.reelsContainer {
+    width: 100%;
+    height: 100%;
+    overflow-y: scroll;
+    scroll-snap-type: y mandatory;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    background: #000;
+    position: relative;
+    /* Removed border-radius to be immersive */
+}
+
+.reelsContainer::-webkit-scrollbar {
+    display: none;
+}
+
+/* Individual Reel Item */
+.reelItem {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #000;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.videoWrapper {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.iframeContainer {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    /* Zoom Hack: Scale up to cover YouTube controls */
+    transform: scale(1.35);
+    transform-origin: center center;
+    pointer-events: none;
+    /* Let clicks pass through to clickBlocker or just block YouTube interactions */
+}
+
+/* This blocks direct interaction with YouTube iframe but allows us to capture clicks on parent */
+.clickBlocker {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    background: transparent;
+    /* Ensure this is above iframe but below controls */
+}
+
+.iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    object-fit: cover;
+    pointer-events: all;
+    /* Needed for iframe to receive internal events if we allowed it, but container has pointer-events: none so... */
+}
+
+/* Re-enable pointer events for iframe if we want to allow scrubbing? 
+   No, user wants "Remove all controls". So blocking interaction is correct.
+   The user can only Play/Pause via our overlay.
+*/
+
+.placeholder {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #121212;
+}
+
+.thumbnail {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.6;
+}
+
+/* Play/Pause Icon Overlay */
+.playIconOverlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 50%;
+    padding: 1.5rem;
+    backdrop-filter: blur(4px);
+    z-index: 20;
+    animation: fadeOut 0.8s forwards;
+    pointer-events: none;
+}
+
+@keyframes fadeOut {
+    0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(0.8);
+    }
+
+    10% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.1);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(1.5);
+    }
+}
+
+.overlayGradient {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 40%;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+    z-index: 2;
+    pointer-events: none;
+}
+
+/* Actions Bar (Right Side) */
+.actionsBar {
+    position: absolute;
+    right: 1rem;
+    bottom: 8rem;
+    /* Moved up slightly */
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    z-index: 30;
+    align-items: center;
+}
+
+.actionBtn {
+    background: transparent;
+    border: none;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    cursor: pointer;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+    transition: transform 0.2s;
+    pointer-events: auto;
+    /* Ensure clicks work */
+}
+
+.actionBtn:active {
+    transform: scale(0.9);
+}
+
+.actionLabel {
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.liked svg {
+    fill: #ef4444;
+    stroke: #ef4444;
+    animation: likePop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes likePop {
+    0% {
+        transform: scale(0.8);
+    }
+
+    50% {
+        transform: scale(1.4);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Bottom Info Area */
+.bottomInfo {
+    position: absolute;
+    left: 1rem;
+    bottom: 2.5rem;
+    right: 4rem;
+    z-index: 30;
+    pointer-events: none;
+    text-align: left;
+}
+
+.tagsRow {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.categoryBadge {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(8px);
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #fff;
+}
+
+.reelTitle {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: white;
+    margin: 0 0 0.25rem 0;
+    line-height: 1.3;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.reelDescription {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}

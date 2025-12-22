@@ -177,7 +177,6 @@
 
 .menuItem svg {
     color: var(--color-primary);
-    opacity: 0.8;
 }
 
 .counterCircle {
@@ -317,24 +316,7 @@
     margin-top: 0.5rem;
 }
 
-.intentionMessage {
-    position: fixed;
-    top: 15%;
-    left: 50%;
-    transform: translateX(-50%);
-    font-family: var(--font-display);
-    font-size: 1.1rem;
-    color: var(--color-text-secondary);
-    background: rgba(255, 255, 255, 0.05);
-    padding: 0.5rem 1.5rem;
-    border-radius: 2rem;
-    backdrop-filter: blur(4px);
-    z-index: 50;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    white-space: nowrap;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-    pointer-events: none;
-}
+
 
 
 .floatingContainer {
@@ -469,53 +451,132 @@
     }
 }
 
-/* ZEN CONTROLS PILL */
-.zenControlsPill {
-    position: fixed;
-    bottom: 2rem;
+
+/* NEW VOICE MODE INDICATOR - PILL STYLE */
+.voiceIndicator {
+    position: absolute;
+    top: 68%;
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(20, 20, 25, 0.6);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 2rem;
-    padding: 0.5rem 1.5rem;
     display: flex;
     align-items: center;
-    gap: 1.5rem;
-    z-index: 1000;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    gap: 0.75rem;
+    z-index: 20;
+    pointer-events: none;
+
+    background: rgba(10, 10, 15, 0.85);
+    backdrop-filter: blur(12px);
+    padding: 0.5rem 1rem;
+    border-radius: 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+
+    width: max-content;
+    max-width: 90%;
+    min-width: 180px;
+    justify-content: center;
 }
 
-.zenIconButton {
-    background: none;
-    border: none;
-    padding: 0.5rem;
-    border-radius: 50%;
-    color: white;
-    cursor: pointer;
+.micIconWrapper {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s;
+    width: 32px;
+    height: 32px;
 }
 
-.zenIconButton:hover {
-    background: rgba(255, 255, 255, 0.1);
-    transform: scale(1.1);
+.micIcon {
+    color: var(--color-text-secondary);
+    z-index: 3;
+    transition: all 0.3s ease;
 }
 
-.zenDivider {
-    width: 1px;
-    height: 1.5rem;
-    background: rgba(255, 255, 255, 0.1);
+.activeMic {
+    color: var(--color-primary);
 }
 
-.pauseIcon {
-    width: 14px;
-    height: 14px;
-    background: white;
-    border-radius: 2px;
+.successMic {
+    color: #4ade80;
+}
+
+/* Glowing Ring Animation */
+.micRing {
+    position: absolute;
+    inset: -6px;
+    border: 2px solid transparent;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.activeRing {
+    border-color: rgba(var(--color-primary-rgb), 0.4);
+    box-shadow: 0 0 15px rgba(var(--color-primary-rgb), 0.3);
+    animation: ringPulse 2s infinite;
+}
+
+@keyframes ringPulse {
+    0% {
+        transform: scale(0.9);
+        opacity: 0.5;
+        box-shadow: 0 0 0 0 rgba(var(--color-primary-rgb), 0.4);
+    }
+
+    70% {
+        transform: scale(1.1);
+        opacity: 0;
+        box-shadow: 0 0 10px 10px rgba(var(--color-primary-rgb), 0);
+    }
+
+    100% {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+}
+
+.textContent {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.voiceLabel {
+    font-size: 0.7rem;
+    color: var(--color-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    line-height: 1;
+    margin-bottom: 2px;
+}
+
+.voiceStatus {
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    color: var(--color-text-primary);
+    font-weight: 500;
+}
+
+.detectedSuccess {
+    color: #4ade80;
+    font-weight: 600;
+}
+
+/* Success Pop Animation */
+.popIn {
+    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popIn {
+    0% {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
 }
 
 /* PRINT STYLES */
@@ -524,7 +585,6 @@
     .print-hidden,
     .controls,
     .controlsWrapper,
-    .zenControlsPill,
     .immersiveContainer button,
     .menuBackdrop,
     .moreMenu {

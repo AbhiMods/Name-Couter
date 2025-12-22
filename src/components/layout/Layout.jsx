@@ -22,11 +22,23 @@ const Layout = () => {
     const isHome = location.pathname === '/';
     const shouldShowPlayer = isPlaying && !isHome && !immersiveMode;
 
+    const isMusicInfo = location.pathname.startsWith('/music');
+
     return (
         <div className={styles.layout}>
             {!immersiveMode && <Header />}
-            <main className={clsx(styles.main, shouldShowPlayer && styles.mainWithPlayer)}>
-                <div className="container" style={immersiveMode ? { height: '100vh', padding: 0, maxWidth: '100%' } : {}}>
+            <main
+                className={clsx(styles.main, shouldShowPlayer && styles.mainWithPlayer)}
+                style={isMusicInfo ? { padding: 0 } : {}}
+            >
+                <div
+                    className="container"
+                    style={
+                        immersiveMode
+                            ? { height: '100vh', padding: 0, maxWidth: '100%' }
+                            : (isMusicInfo ? { padding: 0, maxWidth: '100%' } : {})
+                    }
+                >
                     <Outlet />
                 </div>
             </main>
