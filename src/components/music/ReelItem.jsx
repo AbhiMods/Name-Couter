@@ -9,11 +9,14 @@ const ReelItem = ({ reel, isActive, shouldPreload, onLike }) => {
     const [isPlaying, setIsPlaying] = useState(true); // Internal play state
     const [showPlayIcon, setShowPlayIcon] = useState(false); // For animation
 
-    // Sanitize ID
+    // Sanitize ID with robust Regex
     let videoId = reel.videoId;
     try {
-        if (videoId.includes('shorts/')) videoId = videoId.split('shorts/')[1].split('?')[0];
-        if (videoId.includes('v=')) videoId = videoId.split('v=')[1].split('&')[0];
+        // Handle youtu.be, standard watch, shorts, and raw IDs
+        const match = videoId.match(/^(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+        if (match && match[1]) {
+            videoId = match[1];
+        }
     } catch (e) { }
 
     // Effect: Reset state when active changes
@@ -21,17 +24,18 @@ const ReelItem = ({ reel, isActive, shouldPreload, onLike }) => {
         if (isActive) {
             setIsPlaying(true);
             // On mobile, we MUST stay muted on mount unless global state says otherwise.
-            // For now, let's keep it robust: Muted on mount -> Autoplay works.
         } else {
             setIsPlaying(false);
         }
     }, [isActive]);
 
+    // ... Play/Like/Share handlers ...
+
     const handleLike = (e) => {
         e.stopPropagation();
         if (!liked) {
             setLiked(true);
-            onLike(reel.id); // Note: parent expects uniqueId if updated logic used
+            onLike(reel.id);
         }
     };
 
@@ -42,7 +46,6 @@ const ReelItem = ({ reel, isActive, shouldPreload, onLike }) => {
             navigator.share({ title: reel.title, url }).catch(() => { });
         } else {
             // navigator.clipboard.writeText(url);
-            // Alert or toast could go here
         }
     };
 
@@ -59,12 +62,11 @@ const ReelItem = ({ reel, isActive, shouldPreload, onLike }) => {
     };
 
     // YouTube Iframe Config
-    // Scale: 1.35 to zoom in and hide controls/branding
-    // Controls=0, ModestBranding=1, Loop=1
-    // Autoplay logic: Active && isPlaying
+    // Added 'origin' to satisfy some mobile embedding policies
+    // Added 'enablejsapi=1' for better control availability
 
     const shouldRenderIframe = isActive || shouldPreload;
-    const iFrameSrc = `https://www.youtube.com/embed/${videoId}?autoplay=${isActive && isPlaying ? 1 : 0}&controls=0&disablekb=1&fs=0&loop=1&modestbranding=1&playsinline=1&rel=0&iv_load_policy=3&playlist=${videoId}&mute=${isMuted ? 1 : 0}`;
+    const iFrameSrc = `https://www.youtube.com/embed/${videoId}?autoplay=${isActive && isPlaying ? 1 : 0}&controls=0&disablekb=1&fs=0&loop=1&modestbranding=1&playsinline=1&rel=0&iv_load_policy=3&playlist=${videoId}&mute=${isMuted ? 1 : 0}&enablejsapi=1&origin=${window.location.origin}&widget_referrer=${window.location.href}`;
 
     return (
         <div className={styles.reelItem} onClick={togglePlay}>
