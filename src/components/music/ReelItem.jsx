@@ -4,7 +4,8 @@ import styles from './Reels.module.css';
 
 const ReelItem = ({ reel, isActive, shouldPreload, onLike }) => {
     const [liked, setLiked] = useState(false);
-    const [isMuted, setIsMuted] = useState(false);
+    // Start MUTED by default to satisfy mobile autoplay policies
+    const [isMuted, setIsMuted] = useState(true);
     const [isPlaying, setIsPlaying] = useState(true); // Internal play state
     const [showPlayIcon, setShowPlayIcon] = useState(false); // For animation
 
@@ -19,9 +20,8 @@ const ReelItem = ({ reel, isActive, shouldPreload, onLike }) => {
     useEffect(() => {
         if (isActive) {
             setIsPlaying(true);
-            // Reset mute only if needed, or keep global preference? Keeping per-video for now or global?
-            // User requirement: "Instantly play... instantly pause prev".
-            // We'll let `isActive` control the mounting/autoplay mostly.
+            // On mobile, we MUST stay muted on mount unless global state says otherwise.
+            // For now, let's keep it robust: Muted on mount -> Autoplay works.
         } else {
             setIsPlaying(false);
         }
@@ -48,7 +48,7 @@ const ReelItem = ({ reel, isActive, shouldPreload, onLike }) => {
 
     const toggleMute = (e) => {
         e.stopPropagation();
-        setIsMuted(!isMuted);
+        setIsMuted(prev => !prev);
     };
 
     const togglePlay = () => {
