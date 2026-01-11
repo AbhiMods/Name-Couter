@@ -1,12 +1,13 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Flower, Settings, WifiOff, CloudUpload, User, Shield } from 'lucide-react';
+import { Flower, WifiOff, CloudUpload, Sun, Moon } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { useStats } from '../../context/StatsContext';
 import styles from './Header.module.css';
 
 const Header = () => {
     const { isOnline, pendingSync } = useStats();
+    const { isDarkMode, toggleTheme } = useTheme();
 
     return (
         <header className={styles.header}>
@@ -65,19 +66,15 @@ const Header = () => {
                         </div>
                     )}
 
-                    <NavLink
-                        to="/settings"
-                        className={({ isActive }) => isActive ? `${styles.navLink} ${styles.navLinkActive}` : styles.navLink}
-                        title="Settings"
+                    {/* Theme Toggle */}
+                    <button
+                        onClick={toggleTheme}
+                        className={styles.navLink}
+                        title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+                        style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}
                     >
-                        <Settings size={24} />
-                    </NavLink>
-
-                    {/* Temporary Admin Link for direct access if needed, or remove completely. 
-                        User asked to remove login system. Usually admin is protected. 
-                        If they want to remove everything, I'll remove the admin link too for now 
-                        or leave it hidden/accessible only via URL. 
-                        I will remove the button from UI to be clean. */}
+                        {isDarkMode ? <Sun size={24} /> : <Moon size={24} />}
+                    </button>
                 </nav>
             </div>
         </header>

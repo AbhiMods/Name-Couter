@@ -179,7 +179,7 @@ const ReelItem = ({ reel, isActive, shouldPreload, onLike, isMuted, toggleMute }
                     onClick={handleLike}
                 >
                     <Heart size={28} fill={liked ? "#ef4444" : "rgba(0,0,0,0.5)"} strokeWidth={liked ? 0 : 2} />
-                    <span className={styles.actionLabel}>{reel.likes + (liked ? 1 : 0)}</span>
+                    <span className={styles.actionLabel}>{reel.likes}</span>
                 </button>
 
                 <button className={styles.actionBtn} onClick={handleShare}>

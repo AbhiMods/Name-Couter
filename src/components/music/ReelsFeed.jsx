@@ -3,88 +3,125 @@ import ReelItem from './ReelItem';
 import { DIVINE_REELS } from '../../data/divineReels';
 import styles from './Reels.module.css';
 
+
+
 const ReelsFeed = () => {
     const [displayedReels, setDisplayedReels] = useState([]);
     const [activeReelIndex, setActiveReelIndex] = useState(0);
-    const [isGlobalMuted, setIsGlobalMuted] = useState(false); // Default Unmuted per user request
+    const [isGlobalMuted, setIsGlobalMuted] = useState(false);
+
+    // Smart Randomization State
+    const [availableIds, setAvailableIds] = useState([]); // Pool of IDs yet to be shown in this cycle
+
+    // Dynamic Stats State
+    const [sessionLikes, setSessionLikes] = useState({}); // Map of uniqueId -> addedLikes
+
     const containerRef = useRef(null);
 
-    // Helper to shuffle array
-    const shuffleArray = (array) => {
-        let currentIndex = array.length, randomIndex;
-        const newArray = [...array];
-        while (currentIndex !== 0) {
-            randomIndex = Math.floor(Math.random() * currentIndex);
-            currentIndex--;
-            [newArray[currentIndex], newArray[randomIndex]] = [newArray[randomIndex], newArray[currentIndex]];
-        }
-        return newArray;
+    // Initial Setup: Create first batch
+    useEffect(() => {
+        initializeFeed();
+    }, []);
+
+    const shuffle = (array) => {
+        return [...array].sort(() => Math.random() - 0.5);
     };
 
-    // Load initial batch
-    useEffect(() => {
-        const shuffled = shuffleArray(DIVINE_REELS);
-        // Ensure we have enough duplicates to scroll if list is short
-        let initialList = [...shuffled];
-        if (initialList.length < 5) {
-            initialList = [...initialList, ...initialList, ...initialList]; // Triple it if very short
-        }
-        setDisplayedReels(initialList);
-    }, []);
+    const initializeFeed = () => {
+        // Start fresh: Shuffle all IDs
+        const allReels = shuffle([...DIVINE_REELS]);
 
-    // Load more when reaching end (Infinite Loop Logic)
+        // Take first batch (e.g., 5) to display
+        const initialBatchSize = Math.min(5, allReels.length);
+        const firstBatch = allReels.slice(0, initialBatchSize);
+        const remaining = allReels.slice(initialBatchSize);
+
+        const reelsWithKeys = firstBatch.map(createReelWithKey);
+
+        setDisplayedReels(reelsWithKeys);
+        setAvailableIds(remaining);
+
+        // Initialize dynamic likes for first batch
+        updateDynamicStats(reelsWithKeys);
+    };
+
+    const createReelWithKey = (reel) => ({
+        ...reel,
+        originalId: reel.id,
+        uniqueId: `${reel.id}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    });
+
+    const updateDynamicStats = (reels) => {
+        setSessionLikes(prev => {
+            const next = { ...prev };
+            reels.forEach(r => {
+                if (!next[r.uniqueId]) {
+                    // Random boost between 5 and 50 to simulate "live" activity
+                    next[r.uniqueId] = Math.floor(Math.random() * 45) + 5;
+                }
+            });
+            return next;
+        });
+    };
+
     const loadMoreReels = useCallback(() => {
         setDisplayedReels(prev => {
-            const shuffled = shuffleArray(DIVINE_REELS);
-            // Ensure no immediate repeat of the very last item
-            if (prev.length > 0 && shuffled[0].id === prev[prev.length - 1].originalId) {
-                shuffled.push(shuffled.shift());
+            let nextReel;
+            let newAvailable = [...availableIds];
+
+            // Strategy: Exhaust the 'available' pool first (Guarantee no repeats in cycle)
+            if (newAvailable.length > 0) {
+                nextReel = newAvailable.shift();
+                setAvailableIds(newAvailable);
+            } else {
+                // Cycle Complete! Reshuffle everything
+                // Ensure the NEW first item isn't the same as the OLD last item
+                const lastReelId = prev[prev.length - 1].originalId;
+                let fullPool = shuffle([...DIVINE_REELS]);
+
+                if (fullPool[0].id === lastReelId) {
+                    // Swap first with second to avoid direct duplicate
+                    [fullPool[0], fullPool[1]] = [fullPool[1], fullPool[0]];
+                }
+
+                nextReel = fullPool.shift();
+                setAvailableIds(fullPool); // Reset pool with remainder
             }
 
-            // Generate unique keys for the new batch to avoid React key collisions
-            const newBatch = shuffled.map(reel => ({
-                ...reel,
-                originalId: reel.id,
-                uniqueId: `${reel.id}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-            }));
-
-            // Keep list size manageable? 
-            // For now, just append. If it gets too huge (100+), we might need to slice from top, 
-            // but that messes up scroll position. Virtualization is better but complex.
-            // Let's stick to appending for now, user unlikely to scroll 1000s in one session.
-            return [...prev, ...newBatch];
+            const newReelObj = createReelWithKey(nextReel);
+            updateDynamicStats([newReelObj]);
+            return [...prev, newReelObj];
         });
-    }, []);
+    }, [availableIds]);
 
-    // Handle Scroll & Active Detection
+    // Scroll Handler
     const handleScroll = () => {
         if (!containerRef.current) return;
-
         const container = containerRef.current;
-        const scrollPosition = container.scrollTop;
-        const itemHeight = container.clientHeight;
 
-        // Find which index is most visible
-        const index = Math.round(scrollPosition / itemHeight);
+        // Use rounding to find nearest slide
+        const index = Math.round(container.scrollTop / container.clientHeight);
 
         if (index !== activeReelIndex) {
             setActiveReelIndex(index);
+
+            // "Viewer Effect": When user lands on a reel, maybe bump likes slightly again?
+            // Let's keep it simple: Just initial random boost is enough for "fake realism"
         }
 
-        // Infinite Scroll Trigger
-        // If we are within 2 items of the end, load more
-        if (displayedReels.length > 0 && index >= displayedReels.length - 2) {
+        // Infinite Scroll Threshold: Load more when close to end
+        if (index >= displayedReels.length - 2) {
             loadMoreReels();
         }
     };
 
     const handleLike = (uniqueId) => {
-        setDisplayedReels(prev => prev.map(r =>
-            r.uniqueId === uniqueId ? { ...r, likes: (r.likes || 0) + 1 } : r
-        ));
+        setSessionLikes(prev => ({
+            ...prev,
+            [uniqueId]: (prev[uniqueId] || 0) + 1
+        }));
     };
 
-    // Toggle Global Mute
     const toggleGlobalMute = () => {
         setIsGlobalMuted(prev => !prev);
     };
@@ -97,22 +134,25 @@ const ReelsFeed = () => {
             ref={containerRef}
             onScroll={handleScroll}
         >
-            {displayedReels.map((reel, index) => (
-                <ReelItem
-                    key={reel.uniqueId || reel.id} // Support both for safety
-                    reel={reel}
+            {displayedReels.map((reel, index) => {
+                // Calculate Total Likes: Base + Session Random Boost + User Likes
+                const dynamicLikeCount = (reel.likes || 0) + (sessionLikes[reel.uniqueId] || 0);
 
-                    // Logic Props
-                    isActive={index === activeReelIndex}
-                    shouldPreload={index === activeReelIndex + 1}
+                return (
+                    <ReelItem
+                        key={reel.uniqueId}
+                        reel={{ ...reel, likes: dynamicLikeCount }} // Pass computed likes
 
-                    // State Props
-                    isMuted={isGlobalMuted}
-                    toggleMute={toggleGlobalMute}
+                        isActive={index === activeReelIndex}
+                        shouldPreload={index === activeReelIndex + 1}
 
-                    onLike={() => handleLike(reel.uniqueId)}
-                />
-            ))}
+                        isMuted={isGlobalMuted}
+                        toggleMute={toggleGlobalMute}
+
+                        onLike={() => handleLike(reel.uniqueId)}
+                    />
+                );
+            })}
         </div>
     );
 };

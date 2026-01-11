@@ -11,7 +11,7 @@ import ErrorBoundary from './components/common/ErrorBoundary';
 
 // Lazy Load Pages
 const Home = lazy(() => import('./pages/Home'));
-const Settings = lazy(() => import('./pages/Settings'));
+// const Settings = lazy(() => import('./pages/Settings')); // Removed
 const Leaderboard = lazy(() => import('./pages/Leaderboard'));
 const Progress = lazy(() => import('./pages/Progress'));
 const Music = lazy(() => import('./pages/Music'));
@@ -51,7 +51,7 @@ function App() {
                         <Route path="/" element={<Layout />}>
                           <Route index element={<Home />} />
                           <Route path="counters" element={<Counters />} />
-                          <Route path="settings" element={<Settings />} />
+                          {/* <Route path="settings" element={<Settings />} /> REMOVED */}
                           <Route path="leaderboard" element={<Leaderboard />} />
                           <Route path="progress" element={<Progress />} />
                           <Route path="music" element={<Music />} />
