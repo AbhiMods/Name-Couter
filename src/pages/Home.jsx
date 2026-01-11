@@ -10,6 +10,7 @@ import Button from '../components/ui/Button';
 import NameSelector from '../components/chant/NameSelector';
 import BhajanModal from '../components/chant/BhajanModal';
 import TargetSettings from '../components/chant/TargetSettings';
+import FeatureGuideModal from '../components/common/FeatureGuideModal';
 import { useName } from '../context/NameContext';
 import { useStats } from '../context/StatsContext';
 import { useTheme } from '../context/ThemeContext';
@@ -34,6 +35,36 @@ const Home = () => {
     const [showMoreMenu, setShowMoreMenu] = useState(false);
     const [showBhajanModal, setShowBhajanModal] = useState(false);
 
+    // Onboarding Logic
+    const [seenFeatures, setSeenFeatures] = useState(() => {
+        const saved = localStorage.getItem('divine_onboarding_seen');
+        return saved ? JSON.parse(saved) : {};
+    });
+    const [activeGuide, setActiveGuide] = useState(null); // { key, title, desc, action }
+
+    const tryFeatureAction = (key, title, description, action) => {
+        if (seenFeatures[key]) {
+            action();
+        } else {
+            setActiveGuide({ key, title, description, action });
+        }
+    };
+
+    const confirmFeatureGuide = () => {
+        if (activeGuide) {
+            const newSeen = { ...seenFeatures, [activeGuide.key]: true };
+            setSeenFeatures(newSeen);
+            localStorage.setItem('divine_onboarding_seen', JSON.stringify(newSeen));
+
+            const actionToRun = activeGuide.action;
+            setActiveGuide(null);
+
+            // Small delay to allow modal to close before action triggers (smoother UX)
+            setTimeout(() => {
+                actionToRun();
+            }, 100);
+        }
+    };
 
     // Session State
     const [showSummary, setShowSummary] = useState(false);
@@ -54,7 +85,7 @@ const Home = () => {
     const prevVolumeRef = useRef(0.5);
 
     const toggleBgMute = (e) => {
-        e.stopPropagation();
+        if (e) e.stopPropagation();
         if (isBgMuted) {
             setBgMusicVolume(prevVolumeRef.current || 0.5);
             setIsBgMuted(false);
@@ -134,7 +165,7 @@ const Home = () => {
         }
     };
 
-    const handleIncrement = (amount = 1, silent = false) => {
+    const handleIncrement = (amount = 1, silent = false, clientX = null, clientY = null) => {
         if (!sessionStartTime) startSession();
 
         setIsJapaActive(true);
@@ -165,16 +196,27 @@ const Home = () => {
         setTimeout(() => setIsAnimating(false), 400);
 
         if (floatingAnimations) {
-            // ... (floating animation logic)
             const id = Date.now() + Math.random();
-            const xOffset = (Math.random() - 0.5) * 100;
-            const yOffset = -50 - Math.random() * 50;
+            let x, y;
+
+            if (clientX !== null && clientY !== null) {
+                // Use exact click coordinates relative to viewport
+                // We'll use fixed positioning for these texts to be safe across containers
+                x = clientX;
+                y = clientY;
+            } else {
+                // Fallback for keyboard/auto: Center of screen approx
+                const centerX = window.innerWidth / 2;
+                const centerY = window.innerHeight / 2;
+                x = centerX + (Math.random() - 0.5) * 100;
+                y = centerY - 50 - Math.random() * 50;
+            }
 
             setFloatingTexts(prev => [...prev.slice(-15), {
                 id,
-                text: selectedName.text.split(' ')[0],
-                x: xOffset,
-                y: yOffset
+                text: selectedName.hindiText || selectedName.text.split(' ')[0], // Use Hindi if available
+                x,
+                y
             }]);
 
             setTimeout(() => {
@@ -182,8 +224,6 @@ const Home = () => {
             }, 2000);
         }
     };
-
-
 
     // Start/Stop listening based on isVoiceMode toggle
     useEffect(() => {
@@ -221,8 +261,9 @@ const Home = () => {
         }
 
         // In tap-anywhere mode (default), click increments
+        // We pass the coordinates to spawn text there
         if (!e.target.closest(`.${styles.counterCircle}`)) {
-            handleIncrement();
+            handleIncrement(1, false, e.clientX, e.clientY);
         }
 
         lastTapTime.current = new Date().getTime();
@@ -321,6 +362,14 @@ const Home = () => {
             style={immersiveMode ? { justifyContent: 'center', height: '100%', padding: '0' } : {}}
             onClick={handleContainerClick}
         >
+            <FeatureGuideModal
+                isOpen={!!activeGuide}
+                title={activeGuide?.title}
+                description={activeGuide?.description}
+                onConfirm={confirmFeatureGuide}
+                onClose={() => setActiveGuide(null)}
+            />
+
             {showTargetModal && (
                 <TargetSettings currentTarget={target} onSetTarget={setTarget} onClose={() => setShowTargetModal(false)} />
             )}
@@ -412,7 +461,7 @@ const Home = () => {
                     )}
                 </AnimatePresence>
 
-                <button className={styles.counterCircle} onClick={(e) => { e.stopPropagation(); handleIncrement(); }} aria-label="Increment Counter">
+                <button className={styles.counterCircle} onClick={(e) => { e.stopPropagation(); handleIncrement(1, false, e.clientX, e.clientY); }} aria-label="Increment Counter">
                     <motion.div
                         className={styles.breathingCircle}
                         animate={{
@@ -448,23 +497,7 @@ const Home = () => {
 
                     {!isVoiceMode && <div className={styles.tapInstruction}>Tap to Count</div>}
 
-                    <div className={styles.floatingContainer}>
-                        <AnimatePresence>
-                            {floatingTexts.map((item) => (
-                                <motion.span
-                                    key={item.id}
-                                    initial={{ opacity: 0, scale: 0.5, y: 0, x: item.x }}
-                                    animate={{ opacity: 1, scale: 1.2, y: item.y }}
-                                    exit={{ opacity: 0, scale: 0.8, y: item.y - 100 }}
-                                    transition={{ duration: 1.5, ease: "easeOut" }}
-                                    className={styles.floatingText}
-                                    style={{ color: floatingTextColor || 'var(--color-primary)' }}
-                                >
-                                    {item.text}
-                                </motion.span>
-                            ))}
-                        </AnimatePresence>
-                    </div>
+
                 </button>
 
                 {/* Combined Session Stats (Timer + Progress) */}
@@ -500,7 +533,12 @@ const Home = () => {
                             <Button
                                 variant={isVoiceMode ? "primary" : "secondary"}
                                 size="icon"
-                                onClick={toggleVoiceMode}
+                                onClick={() => tryFeatureAction(
+                                    'voice_mode',
+                                    'Voice Chanting',
+                                    'Enable hands-free chanting! The app will listen for your voice and count automatically when you say "Radha" or "Ram".',
+                                    toggleVoiceMode
+                                )}
                                 title={isVoiceMode ? "Disable Voice Mode" : "Enable Voice Mode"}
                                 className={isVoiceMode ? styles.activeButton : ''}
                             >
@@ -510,7 +548,12 @@ const Home = () => {
                             <Button
                                 variant={!isBgMuted ? "primary" : "secondary"}
                                 size="icon"
-                                onClick={toggleBgMute}
+                                onClick={(e) => tryFeatureAction(
+                                    'music_control',
+                                    'Background Ambience',
+                                    'Immerse yourself in devotion. Tap this button to Mute or Unmute the background music.',
+                                    () => toggleBgMute(e)
+                                )}
                                 title={!isBgMuted ? "Mute Background Music" : "Unmute Music"}
                             >
                                 {!isBgMuted ? <Volume2 size={20} /> : <VolumeX size={20} />}
@@ -521,7 +564,12 @@ const Home = () => {
                             <Button
                                 variant="secondary"
                                 size="icon"
-                                onClick={toggleImmersiveMode}
+                                onClick={() => tryFeatureAction(
+                                    'zen_mode',
+                                    'Zen Mode',
+                                    'Enter a focused, full-screen view for deep meditation. Tap the minimize icon to exit.',
+                                    toggleImmersiveMode
+                                )}
                                 title="Enter Zen Mode"
                             >
                                 <Maximize2 size={20} />
@@ -532,7 +580,12 @@ const Home = () => {
                             <Button
                                 variant="secondary"
                                 size="icon"
-                                onClick={() => setShowMoreMenu(!showMoreMenu)}
+                                onClick={() => tryFeatureAction(
+                                    'more_menu',
+                                    'More Options',
+                                    'Access additional settings here: Reset your counter, End your session, or Change the divine name you are chanting.',
+                                    () => setShowMoreMenu(!showMoreMenu)
+                                )}
                                 title="More Options"
                                 className={showMoreMenu ? styles.activeButton : ''}
                             >
@@ -612,6 +665,32 @@ const Home = () => {
                     </motion.button>
                 )}
             </AnimatePresence>
+
+            {/* Global Floating Text Overlay */}
+            <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 9999, overflow: 'hidden' }}>
+                <AnimatePresence>
+                    {floatingTexts.map((item) => (
+                        <motion.span
+                            key={item.id}
+                            initial={{ opacity: 0, scale: 0.5, y: 0, x: "-50%" }}
+                            animate={{ opacity: 1, scale: 1.5, y: -100 }}
+                            exit={{ opacity: 0, scale: 0.8, y: -150 }}
+                            transition={{ duration: 1.5, ease: "easeOut" }}
+                            className={styles.floatingText}
+                            style={{
+                                position: 'absolute',
+                                left: item.x,
+                                top: item.y,
+                                color: floatingTextColor || 'var(--color-primary)',
+                                textShadow: '0 0 10px rgba(var(--color-primary-rgb), 0.5)',
+                                fontWeight: 'bold'
+                            }}
+                        >
+                            {item.text}
+                        </motion.span>
+                    ))}
+                </AnimatePresence>
+            </div>
         </div>
     );
 };

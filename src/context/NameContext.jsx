@@ -3,10 +3,10 @@ import React, { createContext, useContext, useState, useEffect, useRef } from 'r
 const NameContext = createContext();
 
 export const NAMES = [
-    { id: 'ram', label: 'Ram Ram', subtitle: 'Peace & Virtue', text: 'Ram Ram' },
-    { id: 'radha', label: 'Radha Radha', subtitle: 'Divine Love', text: 'Radha Radha' },
-    { id: 'jai_shri_ram', label: 'Jai Shri Ram', subtitle: 'Strength & Devotion', text: 'Jai Shri Ram' },
-    { id: 'krishna', label: 'Hare Krishna', subtitle: 'Joy & Wisdom', text: 'Hare Krishna' },
+    { id: 'ram', label: 'Ram Ram', subtitle: 'Peace & Virtue', text: 'Ram Ram', hindiText: 'राम' },
+    { id: 'radha', label: 'Radha Radha', subtitle: 'Divine Love', text: 'Radha Radha', hindiText: 'राधा' },
+    { id: 'jai_shri_ram', label: 'Jai Shri Ram', subtitle: 'Strength & Devotion', text: 'Jai Shri Ram', hindiText: 'जय श्री राम' },
+    { id: 'krishna', label: 'Hare Krishna', subtitle: 'Joy & Wisdom', text: 'Hare Krishna', hindiText: 'हरे कृष्ण' },
 ];
 
 export const NameProvider = ({ children }) => {

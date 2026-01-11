@@ -8,6 +8,7 @@ import { LeaderboardProvider } from './context/LeaderboardContext';
 import { BgMusicProvider } from './context/BgMusicContext';
 import { BhajanProvider } from './context/BhajanContext';
 import ErrorBoundary from './components/common/ErrorBoundary';
+import OfflineIndicator from './components/common/OfflineIndicator';
 
 // Lazy Load Pages
 const Home = lazy(() => import('./pages/Home'));
@@ -45,6 +46,7 @@ function App() {
               <NameProvider>
                 <LeaderboardProvider>
                   <BrowserRouter>
+                    <OfflineIndicator />
                     <ScrollToTop />
                     <Suspense fallback={<PageLoader />}>
                       <Routes>
