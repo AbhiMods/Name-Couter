@@ -1,6 +1,5 @@
-import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
+import React, { createContext, useContext, useMemo } from 'react';
 import { useStats } from './StatsContext';
-import { useAuth } from './AuthContext';
 
 const LeaderboardContext = createContext(null);
 
@@ -18,12 +17,11 @@ const MOCK_LEADERBOARD = [
 
 export const LeaderboardProvider = ({ children }) => {
     const { totalCount } = useStats();
-    const { user } = useAuth();
 
     const leaderboardData = useMemo(() => {
         const currentUser = {
-            id: user?.id || 'me',
-            name: user?.name || 'You',
+            id: 'me',
+            name: 'You',
             count: totalCount,
             avatar: '🧘',
             isMe: true
@@ -32,7 +30,7 @@ export const LeaderboardProvider = ({ children }) => {
         const combined = [...MOCK_LEADERBOARD, currentUser];
         // Sort descending
         return combined.sort((a, b) => b.count - a.count);
-    }, [totalCount, user]);
+    }, [totalCount]);
 
     const myRank = useMemo(() => {
         return leaderboardData.findIndex(item => item.isMe) + 1;

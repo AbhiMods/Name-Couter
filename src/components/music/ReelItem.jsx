@@ -2,9 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Heart, Share2, Volume2, VolumeX, Bookmark, Play, Pause, AlertCircle } from 'lucide-react';
 import styles from './Reels.module.css';
 
-const ReelItem = ({ reel, isActive, shouldPreload, onLike }) => {
+const ReelItem = ({ reel, isActive, shouldPreload, onLike, isMuted, toggleMute }) => {
     const [liked, setLiked] = useState(false);
-    const [isMuted, setIsMuted] = useState(true); // Default muted for mobile autoplay
+    // const [isMuted, setIsMuted] = useState(true); // REMOVED: Managed by Parent
     const [isPlaying, setIsPlaying] = useState(false); // Tracks desired state
     const [showPlayIcon, setShowPlayIcon] = useState(false); // Animation trigger
     const iframeRef = useRef(null);
@@ -32,33 +32,42 @@ const ReelItem = ({ reel, isActive, shouldPreload, onLike }) => {
     // Control Logic Effect
     useEffect(() => {
         if (isActive) {
-            // When active, try to play
+            // Autoplay Strategy:
+            // We moved away from "Autoplay Muted" because user dislikes it.
+            // We now request "Autoplay with Sound" (mute=0).
+            // If browser blocks this (due to no interaction), video will simply NOT play (paused state).
+            // This is preferred over playing silently.
             setIsPlaying(true);
-            setTimeout(() => {
-                sendCommand('playVideo');
-                // Ensure mute state matches our state (redundancy for race conditions)
-                if (isMuted) sendCommand('mute');
-                else sendCommand('unMute');
-            }, 100); // Slight delay for iframe ready
+
+            // Try to play immediately
+            // If previous interaction occurred, this might work with sound.
+            // If not, it might fail/block, waiting for user tap.
+            sendCommand('playVideo');
+
+            // Ensure volume is up
+            sendCommand('unMute');
+            sendCommand('setVolume', [100]);
         } else {
-            // When inactive
             setIsPlaying(false);
             if (shouldPreload) {
-                // If preloading, pause it but keep it loaded
+                // Buffer but pause
+                // sendCommand('mute'); // No need to mute explicitly if we want sound ready
                 sendCommand('pauseVideo');
-                sendCommand('mute'); // Preload muted just in case
             } else {
-                // Otherwise pauses/stops (unmount handled by parent usually, but good to be safe)
                 sendCommand('pauseVideo');
             }
         }
     }, [isActive, shouldPreload]);
 
-    // Update Mute State on Iframe when isMuted changes
+    // Update Mute State on Iframe when global isMuted changes
     useEffect(() => {
-        if (isMuted) sendCommand('mute');
-        else sendCommand('unMute');
-    }, [isMuted]);
+        if (isActive) {
+            // If parent says mute (e.g. via toggle), we respect it.
+            // But default start is now unmuted.
+            if (isMuted) sendCommand('mute');
+            else sendCommand('unMute');
+        }
+    }, [isMuted, isActive]);
 
 
     const handleLike = (e) => {
@@ -77,32 +86,24 @@ const ReelItem = ({ reel, isActive, shouldPreload, onLike }) => {
         }
     };
 
-    const toggleMute = (e) => {
-        e.stopPropagation();
-        setIsMuted(prev => !prev);
-    };
-
-    // Main Toggle (Play/Pause)
-    // On mobile, first tap often needs to enable sound AND ensure play if autoplay failed
+    // Main Interaction Handler
     const handleMainClick = () => {
-        // If it was muted, first tap should just Unmute (User friendly)
-        if (isPlaying && isMuted) {
-            setIsMuted(false);
-            setShowPlayIcon(true); // Feedback
-            // No need to toggle play state, just unmute
-            setTimeout(() => setShowPlayIcon(false), 800);
-            return;
-        }
-
-        // Otherwise toggle play/pause
+        // Toggle Play/Pause
         if (isPlaying) {
             setIsPlaying(false);
             sendCommand('pauseVideo');
             setShowPlayIcon(true);
         } else {
             setIsPlaying(true);
+            // Explicit user play -> Force Sound
+            sendCommand('unMute');
+            sendCommand('setVolume', [100]);
             sendCommand('playVideo');
             setShowPlayIcon(true);
+
+            // Sync global mute state if needed? 
+            // If we force play, we assume unmuted.
+            if (isMuted && toggleMute) toggleMute();
         }
         setTimeout(() => setShowPlayIcon(false), 800);
     };
@@ -111,9 +112,10 @@ const ReelItem = ({ reel, isActive, shouldPreload, onLike }) => {
     const shouldRender = isActive || shouldPreload;
 
     // Iframe Src Construction
-    // Note: We use autoplay=1 still, but rely on postMessage for fine control.
-    // mute=1 is critical for mobile initial load.
-    const iFrameSrc = `https://www.youtube.com/embed/${videoId}?enablejsapi=1&autoplay=${isActive ? 1 : 0}&mute=1&controls=0&disablekb=1&fs=0&loop=1&playlist=${videoId}&modestbranding=1&playsinline=1&rel=0&iv_load_policy=3&origin=${window.location.origin}`;
+    // mute=0: Request sound on start. 
+    // autoplay=1: Try to autoplay.
+    // If browser blocks (sound+autoplay), video stays paused. User taps -> plays with sound.
+    const iFrameSrc = `https://www.youtube.com/embed/${videoId}?enablejsapi=1&autoplay=${isActive ? 1 : 0}&mute=0&controls=0&disablekb=1&fs=0&loop=1&playlist=${videoId}&modestbranding=1&playsinline=1&rel=0&iv_load_policy=3&origin=${window.location.origin}`;
 
     return (
         <div className={styles.reelItem} onClick={handleMainClick}>
@@ -145,13 +147,21 @@ const ReelItem = ({ reel, isActive, shouldPreload, onLike }) => {
             {/* Play/Pause/Unmute Feedback Animation */}
             {showPlayIcon && (
                 <div className={styles.playIconOverlay}>
-                    {/* Different icon logic could be added here, e.g. Volume/Play */}
-                    {isPlaying && !isMuted ? <Volume2 size={40} fill="white" /> : (isPlaying ? <Play size={50} fill="white" /> : <Pause size={50} fill="white" />)}
+                    {/* Visual Feedback for state change */}
+                    {!isPlaying ? <Pause size={50} fill="white" /> : (isMuted ? <VolumeX size={50} fill="white" /> : <Volume2 size={40} fill="white" />)}
                 </div>
             )}
 
             {/* Static Overlay Gradient */}
             <div className={styles.overlayGradient} />
+
+            {/* Tap for Sound Hint (Only if Muted and Playing) */}
+            {isMuted && isPlaying && !showPlayIcon && (
+                <div className={styles.tapOverlay}>
+                    <VolumeX size={32} />
+                    <span className={styles.tapText}>Tap for Sound</span>
+                </div>
+            )}
 
             {/* Info Section */}
             <div className={styles.bottomInfo}>
@@ -177,17 +187,14 @@ const ReelItem = ({ reel, isActive, shouldPreload, onLike }) => {
                     <span className={styles.actionLabel}>Share</span>
                 </button>
 
-                {/* Mute/Unmute Indicator Button */}
-                <button className={styles.actionBtn} onClick={toggleMute}>
-                    {isMuted ? <VolumeX size={26} /> : <Volume2 size={26} />}
-                    <span className={styles.actionLabel}>{isMuted ? 'Mute' : 'Audio'}</span>
-                </button>
+                {/* Mute/Unmute Indicator Button - Only show when Muted to prompt user */}
+                {isMuted && (
+                    <button className={styles.actionBtn} onClick={(e) => { e.stopPropagation(); toggleMute(); }}>
+                        <VolumeX size={26} />
+                        <span className={styles.actionLabel}>Unmute</span>
+                    </button>
+                )}
             </div>
-
-            {/* "Tap to Unmute" Hint (Only show if playing, muted, and very shortly after load?) 
-                 Or just permanent small indicator? Staying clean for now as per "Minimal controls".
-                 The Volume icon on the right serves as status.
-             */}
         </div>
     );
 };

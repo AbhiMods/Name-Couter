@@ -48,11 +48,44 @@ const Home = () => {
         immersiveMode, toggleImmersiveMode, immersiveConfig,
         floatingAnimations, floatingTextColor
     } = useTheme();
-    const { play: playBgMusic, stop: stopBgMusic } = useBgMusic();
+
+    const { play: playBgMusic, stop: stopBgMusic, isPlaying: isBgMusicPlaying, volume: bgMusicVolume, setVolume: setBgMusicVolume } = useBgMusic();
+    const [isBgMuted, setIsBgMuted] = useState(false);
+    const prevVolumeRef = useRef(0.5);
+
+    const toggleBgMute = (e) => {
+        e.stopPropagation();
+        if (isBgMuted) {
+            setBgMusicVolume(prevVolumeRef.current || 0.5);
+            setIsBgMuted(false);
+        } else {
+            prevVolumeRef.current = bgMusicVolume;
+            setBgMusicVolume(0);
+            setIsBgMuted(true);
+        }
+    };
+
     const { pause: pauseBhajan, currentSong, isPlaying, playTrack } = useBhajan();
 
     // Voice Command Integration
     const [isVoiceMode, setIsVoiceMode] = useState(false);
+
+    const toggleVoiceMode = () => {
+        setIsVoiceMode(prev => {
+            const nextMode = !prev;
+            if (nextMode) {
+                // Entering Voice Mode -> Mute Music
+                prevVolumeRef.current = bgMusicVolume > 0 ? bgMusicVolume : (prevVolumeRef.current || 0.5);
+                setBgMusicVolume(0);
+                setIsBgMuted(true);
+            } else {
+                // Exiting Voice Mode -> Unmute Music (Restore volume)
+                setIsBgMuted(false);
+                setBgMusicVolume(prevVolumeRef.current || 0.5);
+            }
+            return nextMode;
+        });
+    };
 
     // We pass the currently selected name text (first word only as simplified target)
     const targetWord = selectedName ? selectedName.text.split(' ')[0] : 'Sitaram';
@@ -65,7 +98,8 @@ const Home = () => {
 
     const handleVoiceMatch = useCallback((matchCount = 1) => {
         if (handleIncrementRef.current) {
-            handleIncrementRef.current(matchCount);
+            // Pass silent: true to prevent sound on voice match
+            handleIncrementRef.current(matchCount, true);
         }
     }, []);
 
@@ -78,6 +112,78 @@ const Home = () => {
         stopListening,
         error: voiceError
     } = useVoiceCommand(targetWord, handleVoiceMatch);
+
+    // ... (useEffect for isVoiceMode stays same)
+
+    // ... (handleContainerClick and handleKeyDown stay same)
+
+    // ... (localStorage effects stay same)
+
+    const startSession = () => {
+        setSessionStartTime(Date.now());
+        setSessionStartCount(count);
+        setIsJapaActive(true);
+
+        // Auto-play music if not already playing and not muted
+        if (!isBgMusicPlaying && !isBgMuted) {
+            playBgMusic();
+        }
+
+        if (!immersiveMode) {
+            toggleImmersiveMode();
+        }
+    };
+
+    const handleIncrement = (amount = 1, silent = false) => {
+        if (!sessionStartTime) startSession();
+
+        setIsJapaActive(true);
+
+        const nextCount = count + amount;
+        setCount(nextCount);
+        incrementStats(amount);
+
+        // Removed playChant() call here to stop "Radha Radha" text-to-speech
+        // Only custom audio would play if configured, but default is silent now.
+
+        if (navigator.vibrate) {
+            const isMalaComplete = nextCount % 108 === 0;
+            const isTargetComplete = isTargetMode && nextCount === target;
+
+            if (isTargetComplete || isMalaComplete) {
+                try { navigator.vibrate([100, 50, 100]); } catch (e) { }
+            } else {
+                try { navigator.vibrate(10); } catch (e) { }
+            }
+        }
+
+        if (isTargetMode && nextCount === target) {
+            handleSessionComplete();
+        }
+
+        setIsAnimating(true);
+        setTimeout(() => setIsAnimating(false), 400);
+
+        if (floatingAnimations) {
+            // ... (floating animation logic)
+            const id = Date.now() + Math.random();
+            const xOffset = (Math.random() - 0.5) * 100;
+            const yOffset = -50 - Math.random() * 50;
+
+            setFloatingTexts(prev => [...prev.slice(-15), {
+                id,
+                text: selectedName.text.split(' ')[0],
+                x: xOffset,
+                y: yOffset
+            }]);
+
+            setTimeout(() => {
+                setFloatingTexts(prev => prev.filter(t => t.id !== id));
+            }, 2000);
+        }
+    };
+
+
 
     // Start/Stop listening based on isVoiceMode toggle
     useEffect(() => {
@@ -114,24 +220,12 @@ const Home = () => {
             startSession();
         }
 
-        const currentTime = new Date().getTime();
-        const tapLength = currentTime - lastTapTime.current;
-        if (tapLength < 300 && tapLength > 0) {
-            toggleImmersiveMode();
-            e.preventDefault();
-        } else {
-            // In tap-anywhere mode (default), click increments
-            if (!e.target.closest(`.${styles.counterCircle}`)) {
-                handleIncrement();
-            }
-
-            if (immersiveMode) {
-                setIsGhostVisible(true);
-                if (controlTimeoutRef.current) clearTimeout(controlTimeoutRef.current);
-                controlTimeoutRef.current = setTimeout(() => setIsGhostVisible(false), 2000);
-            }
+        // In tap-anywhere mode (default), click increments
+        if (!e.target.closest(`.${styles.counterCircle}`)) {
+            handleIncrement();
         }
-        lastTapTime.current = currentTime;
+
+        lastTapTime.current = new Date().getTime();
     };
 
     useEffect(() => {
@@ -174,62 +268,6 @@ const Home = () => {
         }
         return () => clearInterval(interval);
     }, [sessionStartTime, showSummary]);
-
-    const startSession = () => {
-        setSessionStartTime(Date.now());
-        setSessionStartCount(count);
-        setIsJapaActive(true);
-
-        if (!immersiveMode) {
-            toggleImmersiveMode();
-        }
-    };
-
-    const handleIncrement = (amount = 1) => {
-        if (!sessionStartTime) startSession();
-
-        setIsJapaActive(true);
-
-        const nextCount = count + amount;
-        setCount(nextCount);
-        incrementStats(amount);
-        playChant();
-
-        if (navigator.vibrate) {
-            const isMalaComplete = nextCount % 108 === 0;
-            const isTargetComplete = isTargetMode && nextCount === target;
-
-            if (isTargetComplete || isMalaComplete) {
-                try { navigator.vibrate([100, 50, 100]); } catch (e) { }
-            } else {
-                try { navigator.vibrate(10); } catch (e) { }
-            }
-        }
-
-        if (isTargetMode && nextCount === target) {
-            handleSessionComplete();
-        }
-
-        setIsAnimating(true);
-        setTimeout(() => setIsAnimating(false), 400);
-
-        if (floatingAnimations) {
-            const id = Date.now() + Math.random();
-            const xOffset = (Math.random() - 0.5) * 100;
-            const yOffset = -50 - Math.random() * 50;
-
-            setFloatingTexts(prev => [...prev.slice(-15), {
-                id,
-                text: selectedName.text.split(' ')[0],
-                x: xOffset,
-                y: yOffset
-            }]);
-
-            setTimeout(() => {
-                setFloatingTexts(prev => prev.filter(t => t.id !== id));
-            }, 2000);
-        }
-    };
 
     const handleReset = (e) => {
         if (e) e.stopPropagation();
@@ -460,23 +498,25 @@ const Home = () => {
                             </Button>
 
                             <Button
-                                variant={soundEnabled ? "primary" : "secondary"}
-                                size="icon"
-                                onClick={toggleSound}
-                                title={soundEnabled ? "Mute Sound" : "Enable Sound"}
-                            >
-                                {soundEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
-                            </Button>
-
-                            <Button
                                 variant={isVoiceMode ? "primary" : "secondary"}
                                 size="icon"
-                                onClick={() => setIsVoiceMode(!isVoiceMode)}
+                                onClick={toggleVoiceMode}
                                 title={isVoiceMode ? "Disable Voice Mode" : "Enable Voice Mode"}
                                 className={isVoiceMode ? styles.activeButton : ''}
                             >
                                 {isVoiceMode ? <Mic size={20} /> : <MicOff size={20} />}
                             </Button>
+
+                            <Button
+                                variant={!isBgMuted ? "primary" : "secondary"}
+                                size="icon"
+                                onClick={toggleBgMute}
+                                title={!isBgMuted ? "Mute Background Music" : "Unmute Music"}
+                            >
+                                {!isBgMuted ? <Volume2 size={20} /> : <VolumeX size={20} />}
+                            </Button>
+
+
 
                             <Button
                                 variant="secondary"
@@ -551,6 +591,25 @@ const Home = () => {
                             )}
                         </AnimatePresence>
                     </div>
+                )}
+            </AnimatePresence>
+
+            {/* Exit Zen Mode Button */}
+            <AnimatePresence>
+                {immersiveMode && (
+                    <motion.button
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 20 }}
+                        className={styles.exitZenButton}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            toggleImmersiveMode();
+                        }}
+                    >
+                        <Minimize2 size={18} />
+                        <span>Exit Screen</span>
+                    </motion.button>
                 )}
             </AnimatePresence>
         </div>

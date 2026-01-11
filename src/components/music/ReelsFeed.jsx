@@ -6,6 +6,7 @@ import styles from './Reels.module.css';
 const ReelsFeed = () => {
     const [displayedReels, setDisplayedReels] = useState([]);
     const [activeReelIndex, setActiveReelIndex] = useState(0);
+    const [isGlobalMuted, setIsGlobalMuted] = useState(false); // Default Unmuted per user request
     const containerRef = useRef(null);
 
     // Helper to shuffle array
@@ -83,6 +84,11 @@ const ReelsFeed = () => {
         ));
     };
 
+    // Toggle Global Mute
+    const toggleGlobalMute = () => {
+        setIsGlobalMuted(prev => !prev);
+    };
+
     if (displayedReels.length === 0) return null;
 
     return (
@@ -95,9 +101,15 @@ const ReelsFeed = () => {
                 <ReelItem
                     key={reel.uniqueId || reel.id} // Support both for safety
                     reel={reel}
+
+                    // Logic Props
                     isActive={index === activeReelIndex}
-                    // Preload next 1 reel (render but maybe paused)
                     shouldPreload={index === activeReelIndex + 1}
+
+                    // State Props
+                    isMuted={isGlobalMuted}
+                    toggleMute={toggleGlobalMute}
+
                     onLike={() => handleLike(reel.uniqueId)}
                 />
             ))}

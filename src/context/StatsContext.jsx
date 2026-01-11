@@ -236,52 +236,10 @@ export const StatsProvider = ({ children }) => {
         });
     };
 
-    // --- NOTIFICATION LOGIC ---
-    const [milestoneAlerts, setMilestoneAlerts] = useState(true);
-    const [reminderTime, setReminderTime] = useState(''); // "HH:MM" format
-
-    useEffect(() => {
-        dbRequest.getSetting('divine_notification_config', { milestone: true, time: '' })
-            .then(config => {
-                setMilestoneAlerts(config.milestone);
-                setReminderTime(config.time || '');
-            });
-    }, []);
-
-    useEffect(() => {
-        if (!isLoading) {
-            dbRequest.setSetting('divine_notification_config', { milestone: milestoneAlerts, time: reminderTime });
-        }
-    }, [milestoneAlerts, reminderTime, isLoading]);
-
-    const sendNotification = (title, body) => {
-        if (!("Notification" in window)) return;
-
-        if (Notification.permission === "granted") {
-            new Notification(title, { body, icon: '/vite.svg' });
-        } else if (Notification.permission !== "denied") {
-            Notification.requestPermission().then(permission => {
-                if (permission === "granted") {
-                    new Notification(title, { body, icon: '/vite.svg' });
-                }
-            });
-        }
-    };
-
     // Central Timer Interval
     useEffect(() => {
         const interval = setInterval(() => {
             const now = Date.now();
-            const dateObj = new Date();
-
-            // Daily Reminder Check (Approximate minute match)
-            if (reminderTime && reminderTime !== '') {
-                const currentHM = `${String(dateObj.getHours()).padStart(2, '0')}:${String(dateObj.getMinutes()).padStart(2, '0')}`;
-                // Trigger only at 00 seconds to avoid multiple alerts
-                if (currentHM === reminderTime && dateObj.getSeconds() === 0) {
-                    sendNotification("Daily Chant Reminder", "It's time for your daily spiritual practice. 🙏");
-                }
-            }
 
             // Safe fallback: If last interaction > 60s, assume paused?
             if (isJapaActive && (now - lastInteractionTime.current > 60000)) {
@@ -304,7 +262,7 @@ export const StatsProvider = ({ children }) => {
         }, 1000);
 
         return () => clearInterval(interval);
-    }, [isJapaActive, isMusicActive, reminderTime]); // dependent on reminderTime now
+    }, [isJapaActive, isMusicActive]);
 
 
     const getSpiritualTime = (range = 'today') => {
@@ -369,14 +327,10 @@ export const StatsProvider = ({ children }) => {
         setIsJapaActive, // Exported setter
         setIsMusicActive, // Exported setter
         isJapaActive,
-        isMusicActive,
-        // Notifications
-        milestoneAlerts, setMilestoneAlerts,
-        reminderTime, setReminderTime
+        isMusicActive
     }), [
         totalCount, dailyCounts, unlockedAchievements, isOnline, pendingSync,
-        isLoading, timeStats, isJapaActive, isMusicActive,
-        milestoneAlerts, reminderTime
+        isLoading, timeStats, isJapaActive, isMusicActive
     ]);
 
     return (

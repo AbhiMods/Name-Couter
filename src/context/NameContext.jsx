@@ -6,6 +6,7 @@ export const NAMES = [
     { id: 'ram', label: 'Ram Ram', subtitle: 'Peace & Virtue', text: 'Ram Ram' },
     { id: 'radha', label: 'Radha Radha', subtitle: 'Divine Love', text: 'Radha Radha' },
     { id: 'jai_shri_ram', label: 'Jai Shri Ram', subtitle: 'Strength & Devotion', text: 'Jai Shri Ram' },
+    { id: 'krishna', label: 'Hare Krishna', subtitle: 'Joy & Wisdom', text: 'Hare Krishna' },
 ];
 
 export const NameProvider = ({ children }) => {
@@ -103,23 +104,8 @@ export const NameProvider = ({ children }) => {
                 return;
             }
 
-            // Priority 2: Fallback to SpeechSynthesis (TTS)
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
-
-                const utterance = new SpeechSynthesisUtterance(selectedName.text);
-                utterance.rate = 1.1;
-                utterance.pitch = 0.9;
-                utterance.volume = volume;
-
-                utterance.onerror = (e) => console.warn('Speech synthesis error:', e);
-
-                const voices = window.speechSynthesis.getVoices();
-                const hindiVoice = voices.find(v => v.lang.includes('hi'));
-                if (hindiVoice) utterance.voice = hindiVoice;
-
-                window.speechSynthesis.speak(utterance);
-            }
+            // Priority 2: Fallback to SpeechSynthesis (TTS) - REMOVED per user request
+            // if ('speechSynthesis' in window) { ... }
         } catch (e) {
             console.error('Audio playback failed', e);
         }
@@ -128,8 +114,6 @@ export const NameProvider = ({ children }) => {
     return (
         <NameContext.Provider value={{
             selectedName,
-            selectedNameId,
-            updateName,
             selectedNameId,
             updateName,
             allNames,

@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
 import { useTheme } from '../context/ThemeContext';
-import { useBgMusic } from '../context/BgMusicContext';
-import { useBhajan } from '../context/BhajanContext';
 import { useStats } from '../context/StatsContext';
 import {
     Palette, Type, MousePointerClick, Moon, Sun,
-    Music, Volume2, Maximize2, Coffee, Zap,
+    Maximize2, Coffee, Zap,
     Eye, Activity, Download, Trash2, Smartphone,
     Youtube, Instagram, Send, Globe,
-    Bell, Clock, Award, MessageSquare
+    MessageSquare, Clock, Award
 } from 'lucide-react';
 import styles from './Settings.module.css';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
@@ -55,14 +53,8 @@ const Settings = () => {
         floatingTextColor, setFloatingTextColor
     } = useTheme();
 
-    // Contexts
-    const { tracks, selectedTrackId, setSelectedTrackId, volume: bgVolume, setVolume: setBgVolume } = useBgMusic();
-    const { volume: chantVolume, setVolume: setChantVolume } = useBhajan();
-    const { milestoneAlerts, setMilestoneAlerts, reminderTime, setReminderTime } = useStats();
-
     // Local States for new features (Mocking for now as per prompt "Add features without cluttering")
     const [zenPreset, setZenPreset] = useState('custom');
-    const [fadeDuration, setFadeDuration] = useState(3);
     const [hapticStrength, setHapticStrength] = useState('medium');
     const [showFeedback, setShowFeedback] = useState(false);
 
@@ -82,16 +74,6 @@ const Settings = () => {
         } else if (preset === 'relaxed') {
             if (!immersiveConfig.showName) updateImmersiveConfig('showName');
             if (!immersiveConfig.showControls) updateImmersiveConfig('showControls');
-        }
-    };
-
-    // Request permissions when enabling features
-    const requestNotificationPermission = async () => {
-        if ("Notification" in window && Notification.permission !== "granted") {
-            const permission = await Notification.requestPermission();
-            if (permission !== "granted") {
-                alert("Please enable notifications in your browser settings to receive alerts.");
-            }
         }
     };
 
@@ -146,103 +128,7 @@ const Settings = () => {
                 </div>
             </section>
 
-            {/* 2. NOTIFICATIONS (NEW) */}
-            <section className={styles.section}>
-                <h2 className={styles.sectionTitle}>Notifications</h2>
-                <div className={styles.card}>
-                    {/* Daily Reminder */}
-                    <div className={styles.row}>
-                        <div className={styles.rowContent}>
-                            <div className={styles.rowIcon}><Clock size={20} /></div>
-                            <div className={styles.rowText}>
-                                <span className={styles.label}>Daily Reminder</span>
-                                <span className={styles.description}>Set a time to practice</span>
-                            </div>
-                        </div>
-                        <input
-                            type="time"
-                            className={styles.select}
-                            value={reminderTime}
-                            onChange={(e) => {
-                                setReminderTime(e.target.value);
-                                requestNotificationPermission();
-                            }}
-                            style={{ padding: '0.4rem', borderRadius: '8px', border: '1px solid var(--color-border)', color: 'var(--color-text-primary)', background: 'var(--color-bg-tertiary)' }}
-                        />
-                    </div>
-
-                    {/* Milestone Alerts */}
-                    <div className={styles.row}>
-                        <div className={styles.rowContent}>
-                            <div className={styles.rowIcon}><Award size={20} /></div>
-                            <div className={styles.rowText}>
-                                <span className={styles.label}>Milestone Alerts</span>
-                                <span className={styles.description}>Cheer on every 100 counts</span>
-                            </div>
-                        </div>
-                        <Toggle
-                            active={milestoneAlerts}
-                            onToggle={() => {
-                                setMilestoneAlerts(!milestoneAlerts);
-                                if (!milestoneAlerts) requestNotificationPermission();
-                            }}
-                        />
-                    </div>
-                </div>
-            </section>
-
-            {/* 3. SOUND & AMBIENCE */}
-            <section className={styles.section}>
-                <h2 className={styles.sectionTitle}>Sound & Ambience</h2>
-                <div className={styles.card}>
-                    {/* Bg Music Selector */}
-                    <div className={styles.row}>
-                        <div className={styles.rowContent}>
-                            <div className={styles.rowIcon}><Music size={20} /></div>
-                            <div className={styles.rowText}>
-                                <span className={styles.label}>Background Music</span>
-                            </div>
-                        </div>
-                        <select
-                            className={styles.select}
-                            value={selectedTrackId}
-                            onChange={(e) => setSelectedTrackId(e.target.value)}
-                        >
-                            {tracks.map(t => <option key={t.id} value={t.id}>{t.label}</option>)}
-                        </select>
-                    </div>
-
-                    {/* Chant Volume */}
-                    <div className={styles.row} style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '0.5rem' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', marginBottom: '0.5rem' }}>
-                            <span className={styles.label}>Chant Volume</span>
-                            <span className={styles.description}>{Math.round(chantVolume * 100)}%</span>
-                        </div>
-                        <input
-                            type="range" min="0" max="1" step="0.05"
-                            value={chantVolume} onChange={(e) => setChantVolume(parseFloat(e.target.value))}
-                            className={styles.slider}
-                        />
-                    </div>
-
-                    {/* Bg Volume */}
-                    {selectedTrackId !== 'none' && (
-                        <div className={styles.row} style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '0.5rem' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', marginBottom: '0.5rem' }}>
-                                <span className={styles.label}>Ambience Volume</span>
-                                <span className={styles.description}>{Math.round(bgVolume * 100)}%</span>
-                            </div>
-                            <input
-                                type="range" min="0" max="1" step="0.05"
-                                value={bgVolume} onChange={(e) => setBgVolume(parseFloat(e.target.value))}
-                                className={styles.slider}
-                            />
-                        </div>
-                    )}
-                </div>
-            </section>
-
-            {/* 4. ZEN MODE */}
+            {/* 2. ZEN MODE */}
             <section className={styles.section}>
                 <h2 className={styles.sectionTitle}>Zen Mode</h2>
                 <div className={styles.card}>
@@ -304,7 +190,7 @@ const Settings = () => {
                 </div>
             </section>
 
-            {/* 5. ACCESSIBILITY */}
+            {/* 3. ACCESSIBILITY */}
             <section className={styles.section}>
                 <h2 className={styles.sectionTitle}>Accessibility</h2>
                 <div className={styles.card}>
@@ -343,7 +229,7 @@ const Settings = () => {
                 </div>
             </section>
 
-            {/* 6. PRIVACY & DATA */}
+            {/* 4. PRIVACY & DATA */}
             <section className={styles.section}>
                 <h2 className={styles.sectionTitle}>Privacy & Data</h2>
                 <div className={styles.card}>
@@ -370,7 +256,7 @@ const Settings = () => {
                 </div>
             </section>
 
-            {/* 7. FEEDBACK */}
+            {/* 5. FEEDBACK */}
             <section className={styles.section}>
                 <h2 className={styles.sectionTitle}>Feedback</h2>
                 <div className={styles.card} onClick={() => setShowFeedback(true)} style={{ cursor: 'pointer' }}>
@@ -386,7 +272,7 @@ const Settings = () => {
                 </div>
             </section>
 
-            {/* 8. ABOUT & SOCIAL */}
+            {/* 6. ABOUT & SOCIAL */}
             <section className={styles.section}>
                 <h2 className={styles.sectionTitle}>About</h2>
                 <div className={styles.aboutCard}>
@@ -400,7 +286,7 @@ const Settings = () => {
                 </div>
             </section>
 
-            {/* 9. DEVELOPER INFO */}
+            {/* 7. DEVELOPER INFO */}
             <section className={styles.section} style={{ marginTop: '2rem', textAlign: 'center', paddingBottom: '2rem' }}>
                 <h3 style={{
                     fontSize: '0.75rem',

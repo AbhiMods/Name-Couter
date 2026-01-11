@@ -79,3 +79,48 @@
     background: rgba(255, 215, 0, 0.08);
     /* Gold tint */
 }
+
+/* Desktop Navigation */
+.desktopNav {
+    display: flex;
+    align-items: center;
+    gap: var(--space-6);
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.desktopNavLink {
+    color: var(--color-text-secondary);
+    font-weight: 500;
+    font-size: var(--text-sm);
+    text-decoration: none;
+    transition: all var(--duration-fast);
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-full);
+}
+
+.desktopNavLink:hover {
+    color: var(--color-text-primary);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.desktopNavLinkActive {
+    color: var(--color-primary);
+    background: rgba(255, 215, 0, 0.08);
+    font-weight: 600;
+}
+
+@media (max-width: 768px) {
+
+    /* Hide Settings link in Header on mobile as it's in BottomNav */
+    /* We target the anchor tag with specific href */
+    .nav a[href="/settings"] {
+        display: none;
+    }
+
+    /* Hide Desktop Nav on Mobile */
+    .desktopNav {
+        display: none;
+    }
+}

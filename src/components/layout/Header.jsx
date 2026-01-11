@@ -1,28 +1,12 @@
 import React from 'react';
-import { NavLink, useNavigate, useLocation } from 'react-router-dom';
-import { Flower, Settings, Sun, Moon, WifiOff, CloudUpload, Shield, User, LogOut } from 'lucide-react';
+import { NavLink } from 'react-router-dom';
+import { Flower, Settings, WifiOff, CloudUpload, User, Shield } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { useStats } from '../../context/StatsContext';
-import { useAuth } from '../../context/AuthContext';
-import AuthModal from '../auth/AuthModal';
 import styles from './Header.module.css';
 
 const Header = () => {
-    const { theme, toggleTheme } = useTheme();
     const { isOnline, pendingSync } = useStats();
-    const { user, logout } = useAuth();
-    const [isAuthModalOpen, setIsAuthModalOpen] = React.useState(false);
-
-    const location = useLocation();
-    const navigate = useNavigate();
-
-    React.useEffect(() => {
-        const params = new URLSearchParams(location.search);
-        const authAction = params.get('auth');
-        if (authAction === 'login' || authAction === 'register') {
-            setIsAuthModalOpen(true);
-        }
-    }, [location.search]);
 
     return (
         <header className={styles.header}>
@@ -31,6 +15,43 @@ const Header = () => {
                     <Flower className={styles.logoIcon} size={28} />
                     <span className="text-gradient">Name Couter</span>
                 </NavLink>
+
+                {/* Desktop Navigation */}
+                <nav className={styles.desktopNav}>
+                    <NavLink
+                        to="/"
+                        className={({ isActive }) =>
+                            isActive ? `${styles.desktopNavLink} ${styles.desktopNavLinkActive}` : styles.desktopNavLink
+                        }
+                        end
+                    >
+                        Home
+                    </NavLink>
+                    <NavLink
+                        to="/counters"
+                        className={({ isActive }) =>
+                            isActive ? `${styles.desktopNavLink} ${styles.desktopNavLinkActive}` : styles.desktopNavLink
+                        }
+                    >
+                        Name Counter
+                    </NavLink>
+                    <NavLink
+                        to="/music"
+                        className={({ isActive }) =>
+                            isActive ? `${styles.desktopNavLink} ${styles.desktopNavLinkActive}` : styles.desktopNavLink
+                        }
+                    >
+                        Music
+                    </NavLink>
+                    <NavLink
+                        to="/progress"
+                        className={({ isActive }) =>
+                            isActive ? `${styles.desktopNavLink} ${styles.desktopNavLinkActive}` : styles.desktopNavLink
+                        }
+                    >
+                        Progress
+                    </NavLink>
+                </nav>
 
                 <nav className={styles.nav}>
                     {!isOnline && (
@@ -44,40 +65,6 @@ const Header = () => {
                         </div>
                     )}
 
-
-
-                    {user ? (
-                        <div style={{ display: 'flex', gap: '0.5rem' }}>
-                            <NavLink
-                                to="/profile"
-                                className={({ isActive }) => isActive ? `${styles.navLink} ${styles.navLinkActive}` : styles.navLink}
-                                title="My Profile"
-                            >
-                                <User size={24} />
-                            </NavLink>
-
-                        </div>
-                    ) : (
-                        <button
-                            onClick={() => setIsAuthModalOpen(true)}
-                            className={styles.navLink}
-                            title="Login / Register"
-                            style={{ background: 'none', border: 'none', cursor: 'pointer' }}
-                        >
-                            <User size={24} />
-                        </button>
-                    )}
-
-                    {user?.role === 'admin' && (
-                        <NavLink
-                            to="/admin"
-                            className={({ isActive }) => isActive ? `${styles.navLink} ${styles.navLinkActive}` : styles.navLink}
-                            title="Admin Panel"
-                        >
-                            <Shield size={24} />
-                        </NavLink>
-                    )}
-
                     <NavLink
                         to="/settings"
                         className={({ isActive }) => isActive ? `${styles.navLink} ${styles.navLinkActive}` : styles.navLink}
@@ -85,12 +72,14 @@ const Header = () => {
                     >
                         <Settings size={24} />
                     </NavLink>
+
+                    {/* Temporary Admin Link for direct access if needed, or remove completely. 
+                        User asked to remove login system. Usually admin is protected. 
+                        If they want to remove everything, I'll remove the admin link too for now 
+                        or leave it hidden/accessible only via URL. 
+                        I will remove the button from UI to be clean. */}
                 </nav>
             </div>
-            <AuthModal
-                isOpen={isAuthModalOpen}
-                onClose={() => setIsAuthModalOpen(false)}
-            />
         </header>
     );
 };

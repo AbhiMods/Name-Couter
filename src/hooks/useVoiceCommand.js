@@ -10,7 +10,6 @@ const useVoiceCommand = (targetWord, onMatch) => {
     const recognitionRef = useRef(null);
     const onMatchRef = useRef(onMatch);
     const isListeningRef = useRef(isListening); // Track effective state for auto-restart
-    const silenceTimerRef = useRef(null);
 
     // Keep onMatch fresh without re-triggering effects
     useEffect(() => {
@@ -21,31 +20,17 @@ const useVoiceCommand = (targetWord, onMatch) => {
         isListeningRef.current = isListening;
     }, [isListening]);
 
-    const stopSilenceTimer = () => {
-        if (silenceTimerRef.current) {
-            clearTimeout(silenceTimerRef.current);
-            silenceTimerRef.current = null;
-        }
-    };
-
-    // Use callback so we can pass it to dependencies if needed, 
-    // though really we just access the ref inside effects.
-    const startSilenceTimer = useCallback(() => {
-        stopSilenceTimer();
-        silenceTimerRef.current = setTimeout(() => {
-            console.log("Auto-pausing due to silence");
-            stopListening();
-        }, 5000); // 5 seconds silence timeout
-    }, []);
-
     const stopListening = useCallback(() => {
         if (recognitionRef.current) {
             setIsListening(false); // This triggers the ref update, so onend won't restart
-            recognitionRef.current.stop();
+            try {
+                recognitionRef.current.stop();
+            } catch (e) {
+                // Ignore stop errors
+            }
             setMatchStatus('idle');
-            stopSilenceTimer();
         }
-    }, [startSilenceTimer]); // Added startSilenceTimer to dep though strictly not needed as it's stable
+    }, []);
 
     // Initialize Recognition
     useEffect(() => {
@@ -59,31 +44,31 @@ const useVoiceCommand = (targetWord, onMatch) => {
 
         recognition.continuous = true;
         recognition.interimResults = true;
-        recognition.lang = 'en-US'; // Ideally match this to user preference in future
+        recognition.lang = 'en-US';
 
         recognition.onstart = () => {
             setError(null);
             setMatchStatus('listening');
-            startSilenceTimer();
         };
 
         recognition.onend = () => {
             // If the user wants to be listening (isListening state is true),
-            // and we didn't stop it on purpose (e.g. silence timer), then restart.
-            // However, if the silence timer killed it, isListening would be set to false already.
-
+            // and we didn't stop it on purpose, then restart.
             if (isListeningRef.current) {
-                // Engine stopped but we want to keep going. Restart.
+                console.log("Recognition ended, restarting...");
                 try {
                     recognition.start();
                 } catch (e) {
                     console.warn("Failed to restart recognition:", e);
-                    setIsListening(false);
-                    setMatchStatus('idle');
+                    // Minimal delay retry if instant restart fails
+                    setTimeout(() => {
+                        if (isListeningRef.current) {
+                            try { recognition.start(); } catch (e2) { }
+                        }
+                    }, 1000);
                 }
             } else {
                 setMatchStatus('idle');
-                stopSilenceTimer();
             }
         };
 
@@ -91,19 +76,14 @@ const useVoiceCommand = (targetWord, onMatch) => {
             console.error('Speech recognition error', event.error);
             if (event.error === 'not-allowed') {
                 setError('Microphone access denied.');
-                setIsListening(false); // Force stop on permission error
+                setIsListening(false);
             } else if (event.error === 'no-speech') {
-                // Ignore no-speech errors in continuous mode usually, 
-                // but if it triggers, we might want to restart or let the auto-restart handle it.
-            } else {
-                // Other errors
+                // Ignore no-speech errors in continuous mode
+                // Just let it restart via onend
             }
         };
 
         recognition.onresult = (event) => {
-            // Activity detected, reset silence timer
-            startSilenceTimer();
-
             let finalTranscript = '';
             let newMatches = 0;
 
@@ -115,7 +95,6 @@ const useVoiceCommand = (targetWord, onMatch) => {
                     finalTranscript += chunk;
 
                     // Normalize: Lowercase, remove common punctuation, trim
-                    // Keeping it simple but effective for chanting
                     const normalizedChunk = chunk.toLowerCase()
                         .replace(/[.,!?;:()]/g, '')
                         .replace(/\s+/g, ' ')
@@ -130,8 +109,6 @@ const useVoiceCommand = (targetWord, onMatch) => {
                     if (chunkCount > 0) {
                         newMatches += chunkCount;
                     }
-                } else {
-                    // Interim... we can show this in UI
                 }
             }
 
@@ -151,9 +128,6 @@ const useVoiceCommand = (targetWord, onMatch) => {
                 }, 800);
             }
 
-            // Update transcript for UI (showing only last few words ideally, or full buffer?)
-            // For chanting, seeing the last thing you said is most helpful.
-            // Let's just show the latest interim or final chunk to keep UI clean.
             const lastResult = event.results[event.results.length - 1];
             if (lastResult) {
                 setTranscript(lastResult[0].transcript);
@@ -164,9 +138,8 @@ const useVoiceCommand = (targetWord, onMatch) => {
 
         return () => {
             if (recognitionRef.current) recognitionRef.current.abort();
-            stopSilenceTimer();
         };
-    }, [targetWord, startSilenceTimer, stopListening]);
+    }, [targetWord, stopListening]);
 
     const startListening = useCallback(() => {
         if (recognitionRef.current && !isListeningRef.current) {
@@ -178,6 +151,10 @@ const useVoiceCommand = (targetWord, onMatch) => {
                 recognitionRef.current.start();
             } catch (e) {
                 console.warn("Speech start warning:", e);
+                // If already started, ensure state is synced
+                if (e.message.indexOf('started') !== -1) {
+                    setIsListening(true);
+                }
             }
         }
     }, []);

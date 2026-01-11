@@ -145,8 +145,8 @@ const Music = () => {
                         </button>
                     </div>
 
-                    {/* List */}
-                    <div className={styles.trackList}>
+                    {/* Grid Layout */}
+                    <div className={styles.trackGrid}>
                         {displayList.length > 0 ? (
                             displayList.map((track) => {
                                 const isCurrent = currentSong?.id === track.id;
@@ -156,48 +156,55 @@ const Music = () => {
                                 return (
                                     <div
                                         key={track.id}
-                                        className={`${styles.trackItem} ${isCurrent ? styles.activeTrack : ''}`}
-                                        onClick={() => playTrack(track)}
+                                        className={`${styles.trackCard} ${isCurrent ? styles.activeCard : ''}`}
+                                        onClick={() => isCurrent && isPlaying ? pause() : playTrack(track)}
                                     >
-                                        <div className={styles.trackLeft}>
-                                            <div className={styles.trackIcon}>
-                                                {isCurrent && isPlaying ? (
-                                                    <div className={styles.equalizer}>
-                                                        <span className={styles.bar}></span>
-                                                        <span className={styles.bar}></span>
-                                                        <span className={styles.bar}></span>
-                                                    </div>
-                                                ) : (
-                                                    <MusicIcon size={18} />
-                                                )}
-                                            </div>
-                                            <div className={styles.trackInfo}>
-                                                <h4>{track.title}</h4>
-                                                <p className={styles.trackMeta}>
-                                                    {track.artist}
-                                                    <span className={styles.metaDot}>•</span>
-                                                    {track.category}
-                                                </p>
+                                        <div className={`${styles.cardThumbnail} ${isCurrent && isPlaying ? styles.playingThumbnail : ''}`}>
+                                            {track.thumbnail ? (
+                                                <img src={track.thumbnail} alt={track.title} className={styles.cardCustomThumb} />
+                                            ) : (
+                                                <MusicIcon size={32} />
+                                            )}
+
+                                            {/* Hover/Active Overlay */}
+                                            <div className={styles.playOverlay}>
+                                                <div className={styles.cardPlayBtn}>
+                                                    {isCurrent && isPlaying ? (
+                                                        <div className={styles.equalizer}>
+                                                            <span className={styles.bar} style={{ animationDelay: '0s' }}></span>
+                                                            <span className={styles.bar} style={{ animationDelay: '0.2s' }}></span>
+                                                            <span className={styles.bar} style={{ animationDelay: '0.4s' }}></span>
+                                                        </div>
+                                                    ) : (
+                                                        <Play size={20} fill="white" />
+                                                    )}
+                                                </div>
                                             </div>
                                         </div>
 
-                                        <div className={styles.trackRight}>
-                                            <button
-                                                onClick={(e) => { e.stopPropagation(); toggleFavorite(track.id); }}
-                                                className={styles.actionBtn}
-                                            >
-                                                <Heart size={18} fill={isFav ? "var(--color-primary)" : "none"} color="var(--color-text-tertiary)" />
-                                            </button>
-                                            {isDownloaded ? (
-                                                <CheckCircle size={16} className={styles.downloadedIcon} />
-                                            ) : (
+                                        <div className={styles.cardInfo}>
+                                            <h4 className={styles.cardTitle}>{track.title}</h4>
+                                            <p className={styles.cardArtist}>{track.artist}</p>
+
+                                            <div className={styles.cardActions}>
                                                 <button
-                                                    onClick={(e) => { e.stopPropagation(); downloadTrack(track.id); }}
+                                                    onClick={(e) => { e.stopPropagation(); toggleFavorite(track.id); }}
                                                     className={styles.actionBtn}
                                                 >
-                                                    <Download size={18} />
+                                                    <Heart size={18} fill={isFav ? "#ef4444" : "none"} color={isFav ? "#ef4444" : "currentColor"} />
                                                 </button>
-                                            )}
+
+                                                {isDownloaded ? (
+                                                    <CheckCircle size={18} className={styles.downloadedIcon} />
+                                                ) : (
+                                                    <button
+                                                        onClick={(e) => { e.stopPropagation(); downloadTrack(track.id); }}
+                                                        className={styles.actionBtn}
+                                                    >
+                                                        <Download size={18} />
+                                                    </button>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
                                 );

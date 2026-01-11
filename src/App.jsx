@@ -4,22 +4,19 @@ import Layout from './components/layout/Layout';
 import { NameProvider } from './context/NameContext';
 import { StatsProvider } from './context/StatsContext';
 import { ThemeProvider } from './context/ThemeContext';
-import { AuthProvider } from './context/AuthContext';
 import { LeaderboardProvider } from './context/LeaderboardContext';
 import { BgMusicProvider } from './context/BgMusicContext';
 import { BhajanProvider } from './context/BhajanContext';
 import ErrorBoundary from './components/common/ErrorBoundary';
-import ProtectedRoute from './components/auth/ProtectedRoute';
 
 // Lazy Load Pages
 const Home = lazy(() => import('./pages/Home'));
 const Settings = lazy(() => import('./pages/Settings'));
-const AdminPanel = lazy(() => import('./pages/AdminPanel'));
-const Login = lazy(() => import('./pages/Login'));
 const Leaderboard = lazy(() => import('./pages/Leaderboard'));
 const Progress = lazy(() => import('./pages/Progress'));
 const Music = lazy(() => import('./pages/Music'));
 const Profile = lazy(() => import('./pages/Profile'));
+const Counters = lazy(() => import('./pages/Counters'));
 
 const PageLoader = () => (
   <div style={{
@@ -41,65 +38,35 @@ const ScrollToTop = () => {
 function App() {
   return (
     <ErrorBoundary>
-      <AuthProvider>
-        <ThemeProvider>
-          <StatsProvider>
-            <BgMusicProvider>
-              <BhajanProvider>
-                <NameProvider>
-                  <LeaderboardProvider>
-                    <BrowserRouter>
-                      <ScrollToTop />
-                      <Suspense fallback={<PageLoader />}>
-                        <Routes>
-                          <Route path="/login" element={<Login />} />
-                          <Route path="/" element={<Layout />}>
-                            <Route index element={<Home />} />
-                            <Route path="settings" element={
-                              <ProtectedRoute>
-                                <Settings />
-                              </ProtectedRoute>
-                            } />
-                            <Route path="leaderboard" element={
-                              <ProtectedRoute>
-                                <Leaderboard />
-                              </ProtectedRoute>
-                            } />
-                            <Route path="progress" element={
-                              <ProtectedRoute>
-                                <Progress />
-                              </ProtectedRoute>
-                            } />
-                            <Route path="music" element={
-                              <ProtectedRoute>
-                                <Music />
-                              </ProtectedRoute>
-                            } />
-                            <Route path="profile" element={
-                              <ProtectedRoute>
-                                <Profile />
-                              </ProtectedRoute>
-                            } />
-                            <Route
-                              path="admin"
-                              element={
-                                <ProtectedRoute>
-                                  <AdminPanel />
-                                </ProtectedRoute>
-                              }
-                            />
-                            <Route path="*" element={<Navigate to="/" replace />} />
-                          </Route>
-                        </Routes>
-                      </Suspense>
-                    </BrowserRouter>
-                  </LeaderboardProvider>
-                </NameProvider>
-              </BhajanProvider>
-            </BgMusicProvider>
-          </StatsProvider>
-        </ThemeProvider>
-      </AuthProvider>
+      <ThemeProvider>
+        <StatsProvider>
+          <BgMusicProvider>
+            <BhajanProvider>
+              <NameProvider>
+                <LeaderboardProvider>
+                  <BrowserRouter>
+                    <ScrollToTop />
+                    <Suspense fallback={<PageLoader />}>
+                      <Routes>
+                        <Route path="/" element={<Layout />}>
+                          <Route index element={<Home />} />
+                          <Route path="counters" element={<Counters />} />
+                          <Route path="settings" element={<Settings />} />
+                          <Route path="leaderboard" element={<Leaderboard />} />
+                          <Route path="progress" element={<Progress />} />
+                          <Route path="music" element={<Music />} />
+                          <Route path="profile" element={<Profile />} />
+                          <Route path="*" element={<Navigate to="/" replace />} />
+                        </Route>
+                      </Routes>
+                    </Suspense>
+                  </BrowserRouter>
+                </LeaderboardProvider>
+              </NameProvider>
+            </BhajanProvider>
+          </BgMusicProvider>
+        </StatsProvider>
+      </ThemeProvider>
     </ErrorBoundary>
   );
 }
