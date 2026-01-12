@@ -14,7 +14,8 @@
     align-items: center;
     justify-content: flex-start;
     padding-top: 1rem;
-    gap: var(--space-4);
+    gap: 0;
+    /* Removed gap: var(--space-4) to allow manual tight utility spacing */
     min-height: 70vh;
     text-align: center;
 }
@@ -23,7 +24,8 @@
 .imageWrapper {
     width: min(85vw, 400px);
     z-index: 5;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0;
+    /* Reduced to 0 for tighter spacing with sessionLine */
     margin-top: 0;
     transition: all 0.5s ease;
     position: relative;
@@ -38,8 +40,10 @@
     justify-content: center;
     width: min(85vw, 400px);
     aspect-ratio: 1 / 1;
+    aspect-ratio: 1 / 1;
     height: auto;
-    margin: 0.5rem 0 6rem 0;
+    margin: 0 0 6rem 0;
+    /* Removed top margin */
     flex-shrink: 0;
     transition: all 0.5s ease;
 }
@@ -106,17 +110,19 @@
 
 .moreMenu {
     position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    transform: none;
-    background: rgba(var(--color-bg-secondary-rgb), 0.85);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    /* Start centered */
+    width: 90%;
+    max-width: 350px;
+    background: rgba(var(--color-bg-secondary-rgb), 0.95);
     backdrop-filter: blur(30px);
-    border: none;
-    border-top: 1px solid var(--color-border);
-    border-radius: 2rem 2rem 0 0;
+    border: 1px solid var(--color-border);
+    border-radius: 2rem;
     padding: 1.5rem;
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--shadow-xl);
+    /* Increased shadow for floating depth */
     z-index: 105;
     display: flex;
     flex-direction: column;
@@ -259,21 +265,25 @@
 
 /* Combined Session Info Line */
 .sessionLine {
-    position: absolute;
-    bottom: -60px;
-    left: 50%;
-    transform: translateX(-50%);
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 0.6rem;
     white-space: nowrap;
 
+    /* Removed absolute positioning */
+    margin-top: 0.25rem;
+    /* ~4px from image above */
+    margin-bottom: 0.25rem;
+    /* ~4px from counter below */
+    z-index: 10;
+
     font-family: var(--font-mono);
     font-size: 1.1rem;
     color: var(--color-text-secondary);
     background: rgba(255, 255, 255, 0.05);
-    padding: 0.6rem 1.2rem;
+    padding: 0.5rem 1rem;
+    /* Slightly reduced padding */
     border-radius: 2rem;
     border: 1px solid rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(4px);
@@ -454,22 +464,25 @@
 
 /* NEW VOICE MODE INDICATOR - PILL STYLE */
 .voiceIndicator {
-    position: absolute;
-    top: 68%;
-    left: 50%;
-    transform: translateX(-50%);
+    position: relative;
+    /* Was absolute */
+    margin-top: -4rem;
+    /* Pull it up into the gap */
+    margin-bottom: 2rem;
+    /* Push controls down slightly */
     display: flex;
     align-items: center;
     gap: 0.75rem;
     z-index: 20;
     pointer-events: none;
 
-    background: rgba(10, 10, 15, 0.85);
-    backdrop-filter: blur(12px);
+    background: rgba(10, 10, 15, 0.95);
+    /* More opaque for visibility */
+    backdrop-filter: blur(16px);
     padding: 0.5rem 1rem;
     border-radius: 2rem;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
 
     width: max-content;
     max-width: 90%;

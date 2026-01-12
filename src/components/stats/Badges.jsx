@@ -131,9 +131,10 @@ const Badges = () => {
                         <motion.div
                             className={`${styles.popupContent} ${selectedBadge.isUnlocked ? styles.unlocked : ''}`}
                             onClick={e => e.stopPropagation()}
-                            initial={{ y: "100%" }}
-                            animate={{ y: 0 }}
-                            exit={{ y: "100%" }}
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.9, opacity: 0 }}
+                            transition={{ type: "spring", stiffness: 300, damping: 25 }}
                         >
                             <button className={styles.closeBtn} onClick={() => setSelectedBadge(null)}>
                                 <X size={24} />

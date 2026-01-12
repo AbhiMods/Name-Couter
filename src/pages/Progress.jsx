@@ -6,6 +6,7 @@ import Card from '../components/ui/Card';
 import Leaderboard from './Leaderboard';
 import Badges from '../components/stats/Badges';
 import TimeAnalytics from '../components/stats/TimeAnalytics';
+import AnimatedCounter from '../components/ui/AnimatedCounter';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import styles from './Progress.module.css';
 
@@ -39,21 +40,27 @@ const Progress = () => {
                         <div className={styles.statIcon}><TrendingUp size={20} /></div>
                         <div className={styles.statInfo}>
                             <span className={styles.statLabel}>Total Chants</span>
-                            <span className={styles.statValue}>{totalCount.toLocaleString()}</span>
+                            <span className={styles.statValue}>
+                                <AnimatedCounter value={totalCount} />
+                            </span>
                         </div>
                     </Card>
                     <Card className={styles.statCard}>
                         <div className={styles.statIcon}><Calendar size={20} /></div>
                         <div className={styles.statInfo}>
                             <span className={styles.statLabel}>Daily Average</span>
-                            <span className={styles.statValue}>{averageChants}</span>
+                            <span className={styles.statValue}>
+                                <AnimatedCounter value={averageChants} />
+                            </span>
                         </div>
                     </Card>
                     <Card className={styles.statCard}>
                         <div className={styles.statIcon}><Award size={20} color="var(--color-primary)" /></div>
                         <div className={styles.statInfo}>
                             <span className={styles.statLabel}>Current Streak</span>
-                            <span className={styles.statValue}>{getStreak()} Days</span>
+                            <span className={styles.statValue}>
+                                <AnimatedCounter value={getStreak()} suffix=" Days" />
+                            </span>
                         </div>
                     </Card>
                 </div>

@@ -346,7 +346,8 @@ const Home = () => {
     };
 
     const handleEndSession = () => {
-        setShowSummary(false);
+        if (immersiveMode) toggleImmersiveMode(); // Force exit Zen Mode
+        setShowSummary(false); // Do not show summary
         setCount(0);
         setSessionStartCount(0);
         setSessionStartTime(null);
@@ -354,6 +355,7 @@ const Home = () => {
         setIsJapaActive(false);
         stopBgMusic();
         pauseBhajan();
+        setShowMoreMenu(false); // Close the menu
     };
 
     return (
@@ -385,6 +387,13 @@ const Home = () => {
                 {immersiveMode && <div className={styles.imageOverlay} />}
             </div>
 
+            {/* Combined Session Stats (Timer + Progress) - Relocated */}
+            <div className={styles.sessionLine}>
+                <span>{liveTimer}</span>
+                <span className={styles.statDivider}>•</span>
+                <span>{isTargetMode ? `${Math.round(progressRatio * 100)}% Goal` : `${malasCompleted} Malas`}</span>
+            </div>
+
             <AnimatePresence>
                 {showSummary && (
                     <SessionSummary
@@ -407,59 +416,6 @@ const Home = () => {
                         style={{ strokeDasharray: `${circumference} ${circumference}`, strokeDashoffset, transition: 'stroke-dashoffset 0.1s linear' }}
                     />
                 </svg>
-
-                {/* Voice Mode Indicator - Pill Style */}
-                <AnimatePresence>
-                    {isVoiceMode && isListening && (
-                        <motion.div
-                            initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                            className={styles.voiceIndicator}
-                        >
-                            <div className={styles.micIconWrapper}>
-                                <div className={clsx(styles.micRing, styles.activeRing)} />
-                                <Mic
-                                    size={20}
-                                    className={clsx(
-                                        styles.micIcon,
-                                        matchStatus === 'match' ? styles.successMic : styles.activeMic
-                                    )}
-                                />
-                            </div>
-
-                            <div className={styles.textContent}>
-                                <span className={styles.voiceLabel}>
-                                    {matchStatus === 'match' ? 'Success' : 'Listening'}
-                                </span>
-
-                                <AnimatePresence mode='wait'>
-                                    {lastDetected && matchStatus === 'match' ? (
-                                        <motion.span
-                                            key={lastDetected.timestamp}
-                                            initial={{ opacity: 0, y: 5 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            exit={{ opacity: 0, y: -5 }}
-                                            className={clsx(styles.voiceStatus, styles.detectedSuccess)}
-                                        >
-                                            {lastDetected.word} (+{lastDetected.count})
-                                        </motion.span>
-                                    ) : (
-                                        <motion.span
-                                            key="listening"
-                                            initial={{ opacity: 0 }}
-                                            animate={{ opacity: 1 }}
-                                            exit={{ opacity: 0 }}
-                                            className={styles.voiceStatus}
-                                        >
-                                            Say: "{targetWord}"
-                                        </motion.span>
-                                    )}
-                                </AnimatePresence>
-                            </div>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
 
                 <button className={styles.counterCircle} onClick={(e) => { e.stopPropagation(); handleIncrement(1, false, e.clientX, e.clientY); }} aria-label="Increment Counter">
                     <motion.div
@@ -496,17 +452,63 @@ const Home = () => {
                     <div className={clsx(styles.tapFeedback, isAnimating && styles.animating)}></div>
 
                     {!isVoiceMode && <div className={styles.tapInstruction}>Tap to Count</div>}
-
-
                 </button>
 
-                {/* Combined Session Stats (Timer + Progress) */}
-                <div className={styles.sessionLine}>
-                    <span>{liveTimer}</span>
-                    <span className={styles.statDivider}>•</span>
-                    <span>{isTargetMode ? `${Math.round(progressRatio * 100)}% Goal` : `${malasCompleted} Malas`}</span>
-                </div>
             </motion.div>
+
+            {/* Voice Mode Indicator - Pill Style (Relocated) */}
+            <AnimatePresence>
+                {isVoiceMode && isListening && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 50, scale: 0.8 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 50, scale: 0.8 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                        className={styles.voiceIndicator}
+                    >
+                        <div className={styles.micIconWrapper}>
+                            <div className={clsx(styles.micRing, styles.activeRing)} />
+                            <Mic
+                                size={20}
+                                className={clsx(
+                                    styles.micIcon,
+                                    matchStatus === 'match' ? styles.successMic : styles.activeMic
+                                )}
+                            />
+                        </div>
+
+                        <div className={styles.textContent}>
+                            <span className={styles.voiceLabel}>
+                                {matchStatus === 'match' ? 'Success' : 'Listening'}
+                            </span>
+
+                            <AnimatePresence mode='wait'>
+                                {lastDetected && matchStatus === 'match' ? (
+                                    <motion.span
+                                        key={lastDetected.timestamp}
+                                        initial={{ opacity: 0, y: 5 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -5 }}
+                                        className={clsx(styles.voiceStatus, styles.detectedSuccess)}
+                                    >
+                                        {lastDetected.word} (+{lastDetected.count})
+                                    </motion.span>
+                                ) : (
+                                    <motion.span
+                                        key="listening"
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        exit={{ opacity: 0 }}
+                                        className={styles.voiceStatus}
+                                    >
+                                        Say: "{targetWord}"
+                                    </motion.span>
+                                )}
+                            </AnimatePresence>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
 
 
@@ -604,10 +606,10 @@ const Home = () => {
                                         onClick={() => setShowMoreMenu(false)}
                                     />
                                     <motion.div
-                                        initial={{ y: "100%", opacity: 0 }}
-                                        animate={{ y: 0, opacity: 1 }}
-                                        exit={{ y: "100%", opacity: 0 }}
-                                        transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
+                                        initial={{ opacity: 0, scale: 0.9, x: "-50%", y: "-50%" }}
+                                        animate={{ opacity: 1, scale: 1, x: "-50%", y: "-50%" }}
+                                        exit={{ opacity: 0, scale: 0.9, x: "-50%", y: "-50%" }}
+                                        transition={{ duration: 0.2, ease: "easeOut" }}
                                         className={styles.moreMenu}
                                     >
                                         <div className={styles.menuHeader}>

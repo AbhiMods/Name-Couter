@@ -82,52 +82,7 @@ const Music = () => {
             {mainTab === 'bhajans' ? (
                 <div className={styles.contentArea}>
 
-                    {/* Now Playing Widget */}
-                    {currentSong && (
-                        <Card className={styles.nowPlayingCard}>
-                            <div className={styles.nowPlayingContent}>
-                                <div className={styles.albumArt}>
-                                    <MusicIcon size={32} color="var(--color-primary)" />
-                                </div>
-                                <div className={styles.trackDetails}>
-                                    <h3>{currentSong.title}</h3>
-                                    <p>{currentSong.artist}</p>
-                                </div>
-                            </div>
 
-                            <div className={styles.controls}>
-                                <button onClick={() => toggleFavorite(currentSong.id)} className={styles.iconBtn}>
-                                    <Heart size={20} fill={favorites.has(currentSong.id) ? "var(--color-primary)" : "none"} color="var(--color-primary)" />
-                                </button>
-                                <button onClick={prev} className={styles.iconBtn}><SkipBack size={24} /></button>
-                                <button onClick={() => isPlaying ? pause() : playTrack(currentSong)} className={styles.playBtn}>
-                                    {isPlaying ? <Pause size={28} /> : <Play size={28} />}
-                                </button>
-                                <button onClick={next} className={styles.iconBtn}><SkipForward size={24} /></button>
-                            </div>
-
-                            {/* Seek Bar */}
-                            <div className={styles.seekContainer}>
-                                <div className={styles.timeLabels}>
-                                    <span>{formatTime(displayTime)}</span>
-                                    <span>{formatTime(duration)}</span>
-                                </div>
-                                <input
-                                    type="range"
-                                    min="0"
-                                    max={duration || 100}
-                                    value={displayTime}
-                                    onChange={handleSeekChange}
-                                    onMouseUp={handleSeekCommit}
-                                    onTouchEnd={handleSeekCommit}
-                                    className={styles.seekBar}
-                                    style={{
-                                        background: `linear-gradient(to right, var(--color-primary) ${progressPercent}%, rgba(255,255,255,0.1) ${progressPercent}%)`
-                                    }}
-                                />
-                            </div>
-                        </Card>
-                    )}
 
                     {/* Filter Tabs for Bhajans */}
                     <div className={styles.filterTabs}>
