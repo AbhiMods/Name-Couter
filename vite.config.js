@@ -29,7 +29,7 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,json,mp3,wav}'],
-        maximumFileSizeToCacheInBytes: 5000000, // Increase limit for audio files
+        maximumFileSizeToCacheInBytes: 30000000, // Increased to 30MB for large audio files
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
