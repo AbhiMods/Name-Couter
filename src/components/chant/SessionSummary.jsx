@@ -54,7 +54,7 @@ const SessionSummary = ({ count, duration, onContinue, onEnd }) => {
                         <Play size={20} fill="currentColor" />
                         Continue Chanting
                     </button>
-                    <button onClick={onEnd} className={`${styles.actionButton} ${styles.secondaryAction}`}>
+                    <button onClick={onEnd} className={styles.destructiveAction}>
                         <LogOut size={20} />
                         End Session
                     </button>

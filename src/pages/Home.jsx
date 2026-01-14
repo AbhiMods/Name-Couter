@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Volume2, RotateCcw, VolumeX, Target, X, Maximize2, Minimize2, MoreVertical, LogOut, Mic, MicOff } from 'lucide-react';
+import { Volume2, VolumeX, Target, X, Maximize2, Minimize2, LogOut, Mic, MicOff, Play, Pause, Zap } from 'lucide-react';
 import SessionSummary from '../components/chant/SessionSummary';
 import ImageCarousel from '../components/chant/ImageCarousel';
 import { useNavigate } from 'react-router-dom';
@@ -7,7 +7,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import clsx from 'clsx';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
-import NameSelector from '../components/chant/NameSelector';
+
 import BhajanModal from '../components/chant/BhajanModal';
 import TargetSettings from '../components/chant/TargetSettings';
 import FeatureGuideModal from '../components/common/FeatureGuideModal';
@@ -23,7 +23,9 @@ import useVoiceCommand from '../hooks/useVoiceCommand';
 const Home = () => {
     useDocumentTitle('Divine Name | Japa Counter');
     const navigate = useNavigate();
-    const [count, setCount] = useState(0);
+    const [count, setCount] = useState(() => {
+        return parseInt(localStorage.getItem('divine_count'), 10) || 0;
+    });
 
     const [showTargetModal, setShowTargetModal] = useState(false);
 
@@ -32,8 +34,10 @@ const Home = () => {
         return parseInt(localStorage.getItem('divine_target'), 10) || 0;
     });
     const [floatingTexts, setFloatingTexts] = useState([]);
-    const [showMoreMenu, setShowMoreMenu] = useState(false);
     const [showBhajanModal, setShowBhajanModal] = useState(false);
+
+    // Auto Count State
+    const [isAutoCounting, setIsAutoCounting] = useState(false);
 
     // Onboarding Logic
     const [seenFeatures, setSeenFeatures] = useState(() => {
@@ -165,6 +169,14 @@ const Home = () => {
         }
     };
 
+    // Cleanup: Stop music when leaving the page
+    useEffect(() => {
+        return () => {
+            stopBgMusic();
+            pauseBhajan();
+        };
+    }, []);
+
     const handleIncrement = (amount = 1, silent = false, clientX = null, clientY = null) => {
         if (!sessionStartTime) startSession();
 
@@ -225,6 +237,25 @@ const Home = () => {
         }
     };
 
+    // Auto Count Effect
+    useEffect(() => {
+        let interval;
+        if (isAutoCounting && immersiveMode) {
+            interval = setInterval(() => {
+                const centerX = window.innerWidth / 2;
+                const centerY = window.innerHeight / 2;
+                const randomX = centerX + (Math.random() - 0.5) * 50;
+                const randomY = centerY + (Math.random() - 0.5) * 50;
+
+                if (handleIncrementRef.current) {
+                    handleIncrementRef.current(1, false, randomX, randomY);
+                }
+            }, 1000);
+        }
+        return () => clearInterval(interval);
+    }, [isAutoCounting, immersiveMode]);
+
+
     // Start/Stop listening based on isVoiceMode toggle
     useEffect(() => {
         if (isVoiceMode) {
@@ -284,7 +315,13 @@ const Home = () => {
         const savedCount = localStorage.getItem('divine_count');
         if (savedCount) {
             const parsed = parseInt(savedCount, 10);
-            setCount(parsed);
+            if (count === 0 && parsed > 0) {
+                // We only sync if local state is 0 to avoid overwriting current session?
+                // Actually this logic was flawed in original code if it was running.
+                // But since we initialize state lazy, this effect is redundant or just a failsafe.
+                // We'll leave it but trust the lazy init more.
+                setCount(parsed);
+            }
         }
     }, []);
 
@@ -310,18 +347,7 @@ const Home = () => {
         return () => clearInterval(interval);
     }, [sessionStartTime, showSummary]);
 
-    const handleReset = (e) => {
-        if (e) e.stopPropagation();
-        if (window.confirm('Reset counter to zero?')) {
-            setCount(0);
-            setSessionStartCount(0);
-            setSessionStartTime(null);
-            setLiveTimer('00:00');
-            setIsJapaActive(false);
-            stopBgMusic();
-            pauseBhajan();
-        }
-    };
+
 
     const formatDuration = (ms) => {
         const totalSeconds = Math.floor(ms / 1000);
@@ -335,6 +361,7 @@ const Home = () => {
         setSessionDuration(formatDuration(durationMs));
         setShowSummary(true);
         setIsJapaActive(false);
+        setIsAutoCounting(false); // Stop Auto Count
         stopBgMusic();
         pauseBhajan();
     };
@@ -353,9 +380,9 @@ const Home = () => {
         setSessionStartTime(null);
         setLiveTimer('00:00');
         setIsJapaActive(false);
+        setIsAutoCounting(false);
         stopBgMusic();
         pauseBhajan();
-        setShowMoreMenu(false); // Close the menu
     };
 
     return (
@@ -576,95 +603,42 @@ const Home = () => {
                             >
                                 <Maximize2 size={20} />
                             </Button>
-
-
-
-                            <Button
-                                variant="secondary"
-                                size="icon"
-                                onClick={() => tryFeatureAction(
-                                    'more_menu',
-                                    'More Options',
-                                    'Access additional settings here: Reset your counter, End your session, or Change the divine name you are chanting.',
-                                    () => setShowMoreMenu(!showMoreMenu)
-                                )}
-                                title="More Options"
-                                className={showMoreMenu ? styles.activeButton : ''}
-                            >
-                                <MoreVertical size={20} />
-                            </Button>
                         </motion.div>
-
-                        <AnimatePresence>
-                            {showMoreMenu && (
-                                <>
-                                    <motion.div
-                                        initial={{ opacity: 0 }}
-                                        animate={{ opacity: 1 }}
-                                        exit={{ opacity: 0 }}
-                                        className={styles.menuBackdrop}
-                                        onClick={() => setShowMoreMenu(false)}
-                                    />
-                                    <motion.div
-                                        initial={{ opacity: 0, scale: 0.9, x: "-50%", y: "-50%" }}
-                                        animate={{ opacity: 1, scale: 1, x: "-50%", y: "-50%" }}
-                                        exit={{ opacity: 0, scale: 0.9, x: "-50%", y: "-50%" }}
-                                        transition={{ duration: 0.2, ease: "easeOut" }}
-                                        className={styles.moreMenu}
-                                    >
-                                        <div className={styles.menuHeader}>
-                                            <div className={styles.menuIndicator} />
-                                            <h4>Quick Options</h4>
-                                        </div>
-
-                                        <div style={{ marginBottom: '1.5rem', width: '100%' }}>
-                                            <h4 style={{
-                                                fontSize: '0.8rem',
-                                                textTransform: 'uppercase',
-                                                letterSpacing: '0.1em',
-                                                color: 'var(--color-text-tertiary)',
-                                                marginBottom: '0.75rem',
-                                                textAlign: 'center'
-                                            }}>
-                                                Select Divine Name
-                                            </h4>
-                                            <NameSelector onSelect={() => setShowMoreMenu(false)} />
-                                        </div>
-
-                                        <div className={styles.menuGrid}>
-                                            <button onClick={() => { handleSessionComplete(); setShowMoreMenu(false); }} className={styles.menuItem}>
-                                                <LogOut size={18} />
-                                                <span>End Session</span>
-                                            </button>
-                                            <button onClick={(e) => { handleReset(e); setShowMoreMenu(false); }} className={styles.menuItem}>
-                                                <RotateCcw size={18} />
-                                                <span>Reset Counter</span>
-                                            </button>
-                                        </div>
-                                    </motion.div>
-                                </>
-                            )}
-                        </AnimatePresence>
                     </div>
                 )}
             </AnimatePresence>
 
-            {/* Exit Zen Mode Button */}
+            {/* Zen Mode Controls (Bottom) */}
             <AnimatePresence>
                 {immersiveMode && (
-                    <motion.button
+                    <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 20 }}
-                        className={styles.exitZenButton}
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            toggleImmersiveMode();
-                        }}
+                        className={styles.zenControls}
                     >
-                        <Minimize2 size={18} />
-                        <span>Exit Screen</span>
-                    </motion.button>
+                        <button
+                            className={clsx(styles.zenButton, isAutoCounting && styles.activeZenButton)}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setIsAutoCounting(!isAutoCounting);
+                            }}
+                        >
+                            {isAutoCounting ? <Pause size={18} fill="currentColor" /> : <Play size={18} fill="currentColor" />}
+                            <span>{isAutoCounting ? 'Stop Auto' : 'Auto Count'}</span>
+                        </button>
+
+                        <button
+                            className={styles.zenButton}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                handleSessionComplete();
+                            }}
+                        >
+                            <LogOut size={18} />
+                            <span>End Session</span>
+                        </button>
+                    </motion.div>
                 )}
             </AnimatePresence>
 
