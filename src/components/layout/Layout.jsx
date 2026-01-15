@@ -20,7 +20,29 @@ const Layout = () => {
     // 2. Only if playing (or paused with active song? User said "Hidden instantly when music stops or pauses" -> strictly isPlaying)
     // 3. Never in Immersive Mode
     const isHome = location.pathname === '/';
-    const shouldShowPlayer = isPlaying && !isHome && !immersiveMode;
+    const isMusicPage = location.pathname.startsWith('/music');
+    // Hide global player on Music page (because it has its own premium player)
+    // We show it on Home now so playback is visible and controllable
+    const shouldShowPlayer = isPlaying && !isMusicPage && !immersiveMode;
+
+    // Delayed hiding logic
+    const [delayedShowPlayer, setDelayedShowPlayer] = React.useState(shouldShowPlayer);
+    const [isExiting, setIsExiting] = React.useState(false);
+
+    React.useEffect(() => {
+        if (shouldShowPlayer) {
+            setDelayedShowPlayer(true);
+            setIsExiting(false);
+        } else {
+            // Start exit animation
+            setIsExiting(true);
+            const timer = setTimeout(() => {
+                setDelayedShowPlayer(false);
+                setIsExiting(false);
+            }, 4000); // 4 seconds delay as requested
+            return () => clearTimeout(timer);
+        }
+    }, [shouldShowPlayer]);
 
     const isMusicInfo = location.pathname.startsWith('/music');
 
@@ -42,7 +64,7 @@ const Layout = () => {
                     <Outlet />
                 </div>
             </main>
-            {shouldShowPlayer && <MiniPlayer onExpand={() => navigate('/music')} />}
+            {delayedShowPlayer && <MiniPlayer onExpand={() => navigate('/music')} isExiting={isExiting} />}
             {!immersiveMode && <Footer />}
             {!immersiveMode && <BottomNav />}
         </div>

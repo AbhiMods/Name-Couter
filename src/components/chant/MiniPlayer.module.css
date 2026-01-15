@@ -1,6 +1,6 @@
 .container {
     position: fixed;
-    bottom: 84px;
+    bottom: 130px;
     /* Sits above BottomNav (approx 60-70px + spacing) */
     left: 0;
     width: 100%;

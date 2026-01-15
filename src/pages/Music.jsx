@@ -8,6 +8,8 @@ import { useBhajan } from '../context/BhajanContext';
 import { useTheme } from '../context/ThemeContext';
 import Card from '../components/ui/Card';
 import ReelsFeed from '../components/music/ReelsFeed';
+import MusicPlayerModal from '../components/music/MusicPlayerModal';
+import BottomPlayerBar from '../components/music/BottomPlayerBar';
 import styles from './Music.module.css';
 
 const Music = () => {
@@ -21,10 +23,30 @@ const Music = () => {
 
     const [mainTab, setMainTab] = useState('bhajans'); // 'bhajans' | 'reels'
     const [bhajanFilter, setBhajanFilter] = useState('all'); // 'all' | 'favorites' | 'playlists'
+    const [isPlayerOpen, setIsPlayerOpen] = useState(false);
 
-    const [isDragging, setIsDragging] = useState(false);
-    const [dragTime, setDragTime] = useState(0);
     const [refreshKey, setRefreshKey] = useState(0); // Hack to re-mount/refresh feed
+
+    // Delayed Show Logic for BottomPlayerBar
+    const [delayedShow, setDelayedShow] = useState(isPlaying);
+    const [isExiting, setIsExiting] = useState(false);
+
+    React.useEffect(() => {
+        if (isPlaying) {
+            setDelayedShow(true);
+            setIsExiting(false);
+        } else {
+            // Start exit sequence
+            if (delayedShow) {
+                setIsExiting(true);
+                const timer = setTimeout(() => {
+                    setDelayedShow(false);
+                    setIsExiting(false);
+                }, 5000); // 5 seconds delay before hiding
+                return () => clearTimeout(timer);
+            }
+        }
+    }, [isPlaying, delayedShow]);
 
     const getDisplayList = () => {
         if (bhajanFilter === 'favorites') return favoriteTracks;
@@ -32,31 +54,6 @@ const Music = () => {
     };
 
     const displayList = getDisplayList();
-
-    // Time formatting helper
-    const formatTime = (time) => {
-        if (!time || isNaN(time)) return '0:00';
-        const minutes = Math.floor(time / 60);
-        const seconds = Math.floor(time % 60);
-        return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-    };
-
-    // Seek Handlers
-    const handleSeekChange = (e) => {
-        setDragTime(Number(e.target.value));
-        setIsDragging(true);
-    };
-
-    const handleSeekCommit = () => {
-        seek(dragTime);
-        setIsDragging(false);
-    };
-
-    // Effective time to show (drag time if dragging, else current playback time)
-    // Note: useBhajan needs to export `currentTime` if not already
-    const currentTime = useBhajan().currentTime || 0;
-    const displayTime = isDragging ? dragTime : currentTime;
-    const progressPercent = duration > 0 ? (displayTime / duration) * 100 : 0;
 
     return (
         <div className={`${styles.container} ${mainTab === 'reels' ? styles.reelsMode : ''}`}>
@@ -81,8 +78,6 @@ const Music = () => {
             {/* Content Area */}
             {mainTab === 'bhajans' ? (
                 <div className={styles.contentArea}>
-
-
 
                     {/* Filter Tabs for Bhajans */}
                     <div className={styles.filterTabs}>
@@ -112,7 +107,7 @@ const Music = () => {
                                     <div
                                         key={track.id}
                                         className={`${styles.trackCard} ${isCurrent ? styles.activeCard : ''}`}
-                                        onClick={() => isCurrent && isPlaying ? pause() : playTrack(track)}
+                                        onClick={() => playTrack(track)}
                                     >
                                         <div className={`${styles.cardThumbnail} ${isCurrent && isPlaying ? styles.playingThumbnail : ''}`}>
                                             {track.thumbnail ? (
@@ -177,6 +172,17 @@ const Music = () => {
                     <ReelsFeed key={refreshKey} />
                 </div>
             )}
+
+            {/* NEW MUSIC PLAYERS */}
+            {/* Only render if we have a song AND (it's playing OR it's in the delayed exit phase) */}
+            {currentSong && delayedShow && (
+                <BottomPlayerBar
+                    onExpand={() => setIsPlayerOpen(true)}
+                    isExiting={isExiting}
+                />
+            )}
+            <MusicPlayerModal isOpen={isPlayerOpen} onClose={() => setIsPlayerOpen(false)} />
+
         </div>
     );
 };

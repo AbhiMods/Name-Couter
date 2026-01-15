@@ -1,0 +1,183 @@
+.playerBar {
+    position: fixed;
+    /* Increased spacing to prevent overlap with BottomNav (which is approx ~90px area) */
+    bottom: 110px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 94%;
+    max-width: 500px;
+    height: 76px;
+    background: rgba(10, 10, 16, 0.96);
+    /* Very dark, almost solid */
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    /* Subtle white border instead of gold */
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1rem;
+    z-index: 90;
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    overflow: hidden;
+}
+
+/* Morphing Exit Animation - Advanced */
+.playerBarExiting {
+    /* Target Geometry: A small circle at the Music Icon position */
+    width: 40px !important;
+    height: 40px !important;
+    padding: 0 !important;
+    border-radius: 50% !important;
+
+    /* 
+       Target Position: 
+       X: +55px (approx Music icon offset - safer for mobile)
+       Y: +100px (Drop into nav)
+    */
+    transform: translate(calc(-50% + 55px), 100px);
+
+    /* Effects */
+    opacity: 0;
+    box-shadow: 0 0 15px var(--color-primary);
+    /* Flash energy */
+    border-color: transparent;
+    pointer-events: none;
+
+    /* Transition: Smooth Physics */
+    transition:
+        width 0.7s cubic-bezier(0.34, 1.56, 0.64, 1),
+        /* Slight bounce? No, smooth stick */
+        height 0.7s cubic-bezier(0.34, 1.56, 0.64, 1),
+        border-radius 0.7s ease,
+        transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1),
+        opacity 0.6s 0.2s ease,
+        /* Fade out near end */
+        box-shadow 0.6s ease;
+}
+
+/* Instant hide children for clean morph */
+.playerBarExiting .trackInfo,
+.playerBarExiting .controls,
+.playerBarExiting .progressBar,
+.playerBarExiting .thumbnail {
+    opacity: 0 !important;
+    transition: opacity 0.05s linear !important;
+    /* Instant vanish */
+    width: 0 !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden;
+}
+
+/* Hover effect */
+.playerBar:active {
+    transform: translateX(-50%) scale(0.98);
+}
+
+.trackInfo {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    overflow: hidden;
+    gap: 14px;
+}
+
+.thumbnail {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    /* Slightly more rounded */
+    background: #222;
+    object-fit: cover;
+}
+
+.textContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: hidden;
+    gap: 3px;
+}
+
+.title {
+    color: #fff;
+    font-size: 0.95rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.2;
+}
+
+.artist {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.75rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.controlBtn {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.8);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    transition: color 0.2s;
+}
+
+.controlBtn:hover {
+    color: #fff;
+}
+
+/* Special Filled Play Button */
+.playBtn {
+    width: 42px;
+    height: 42px;
+    background: var(--color-primary, #FFD700);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #000;
+    /* Black icon on Yellow bg */
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+    transition: transform 0.2s, background 0.2s;
+}
+
+.playBtn:hover {
+    transform: scale(1.05);
+    background: var(--color-primary-glow, #FFD700);
+    color: #000;
+}
+
+.playBtn svg {
+    fill: currentColor;
+    /* Ensure icon is filled */
+}
+
+.progressBar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 2px;
+    /* Thin line */
+    background: var(--color-primary, #FFD700);
+    transition: width 0.2s linear;
+}

@@ -169,11 +169,13 @@ const Home = () => {
         }
     };
 
-    // Cleanup: Stop music when leaving the page
+    // Cleanup: Stop music when leaving the page - REMOVED for persistence
+    // We want music to continue playing across tabs
     useEffect(() => {
         return () => {
-            stopBgMusic();
-            pauseBhajan();
+            // stopBgMusic(); // Allow auto-play ambience to continue? Maybe stop ambience but keep Bhajan?
+            // Actually user wants persistence. Let's start by NOT stopping anything.
+            // If they want to stop, they can pause.
         };
     }, []);
 

@@ -5,13 +5,15 @@ import { useBhajan } from '../../context/BhajanContext';
 import { useTheme } from '../../context/ThemeContext';
 import styles from './MiniPlayer.module.css';
 
-const MiniPlayer = ({ onExpand }) => {
+const MiniPlayer = ({ onExpand, isExiting }) => {
     const { currentSong, isPlaying, playTrack, pause, next, currentTime, duration, seek } = useBhajan();
     const { immersiveMode } = useTheme();
     const [isDragging, setIsDragging] = useState(false);
     const [dragTime, setDragTime] = useState(0);
 
     // Hide in Zen Mode (Immersive Mode)
+    // Note: Layout handles mounting/unmounting based on delayedShowPlayer, 
+    // so we just focus on rendering. However, if standard checks fail, return null.
     if (!currentSong || immersiveMode) return null;
 
     const handleSeekChange = (e) => {
@@ -29,10 +31,29 @@ const MiniPlayer = ({ onExpand }) => {
 
     return (
         <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 20, opacity: 0 }}
-            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            initial={{ y: 100, opacity: 0, width: '100%', left: 0 }}
+            animate={{
+                y: isExiting ? 100 : 0,
+                x: 0, // No x translation needed if we animate left
+                left: isExiting ? 'calc(50% + 40px)' : 0,
+                width: isExiting ? 50 : '100%',
+                height: isExiting ? 50 : 64,
+                borderRadius: isExiting ? 25 : 0,
+                opacity: isExiting ? 0 : 1
+            }}
+            exit={{
+                y: 100,
+                left: 'calc(50% + 40px)',
+                width: 50,
+                height: 50,
+                borderRadius: 25,
+                opacity: 0
+            }}
+            transition={{
+                duration: 0.8,
+                ease: [0.2, 0.8, 0.2, 1] // Advanced smooth bezier
+            }}
+            style={{ overflow: 'hidden' }} // Clip content during shrink
             className={styles.container}
             onClick={onExpand}
         >

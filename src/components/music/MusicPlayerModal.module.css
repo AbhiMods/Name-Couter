@@ -1,0 +1,173 @@
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2000;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(10px);
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    /* Slide up from bottom */
+}
+
+.modalContent {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    display: flex;
+    flex-direction: column;
+    padding: 2rem;
+    position: relative;
+    overflow-y: auto;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-top: 1rem;
+}
+
+.headerTitle {
+    color: white;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    opacity: 0.8;
+}
+
+.closeBtn {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: background 0.2s;
+}
+
+.closeBtn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.albumArtContainer {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 3rem;
+}
+
+.albumArt {
+    width: 300px;
+    height: 300px;
+    border-radius: 20px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.albumArt.playing {
+    transform: scale(1.05);
+    box-shadow: 0 25px 60px rgba(var(--color-primary-rgb), 0.3);
+}
+
+.trackInfo {
+    margin-bottom: 2rem;
+}
+
+.trackTitle {
+    color: white;
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.trackArtist {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 1.1rem;
+}
+
+.progressBarContainer {
+    width: 100%;
+    margin-bottom: 2rem;
+}
+
+.progressBar {
+    width: 100%;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+    outline: none;
+    cursor: pointer;
+}
+
+.progressBar::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    background: white;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.progressBar::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+}
+
+.timeInfo {
+    display: flex;
+    justify-content: space-between;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.8rem;
+    margin-top: 0.5rem;
+}
+
+.controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 1rem;
+    margin-bottom: 2rem;
+}
+
+.controlBtn {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    transition: transform 0.2s, color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.controlBtn:hover {
+    color: var(--color-primary);
+    transform: scale(1.1);
+}
+
+.playPauseBtn {
+    width: 70px;
+    height: 70px;
+    background: white;
+    border-radius: 50%;
+    color: #1a1a2e;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.playPauseBtn:hover {
+    transform: scale(1.05);
+    color: black;
+    background: white;
+    /* Keep white */
+}
+
+/* Animations included in component */
