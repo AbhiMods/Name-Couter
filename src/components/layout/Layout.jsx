@@ -4,6 +4,9 @@ import Header from './Header';
 import Footer from './Footer';
 import BottomNav from './BottomNav';
 import MiniPlayer from '../chant/MiniPlayer';
+import PromoPopup from '../common/PromoPopup';
+import FeaturePopup from '../common/FeaturePopup';
+import FeedbackPopup from '../common/FeedbackPopup';
 import styles from './Layout.module.css';
 import { useTheme } from '../../context/ThemeContext';
 import { useBhajan } from '../../context/BhajanContext';
@@ -75,6 +78,9 @@ const Layout = () => {
                 </div>
             </main>
             {delayedShowPlayer && <MiniPlayer onExpand={() => navigate('/music')} isExiting={isExiting} />}
+            <PromoPopup />
+            <FeaturePopup />
+            <FeedbackPopup />
             {!immersiveMode && !isMusicPage && <Footer />}
             {!immersiveMode && <BottomNav />}
         </div>

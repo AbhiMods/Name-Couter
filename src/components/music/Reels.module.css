@@ -8,6 +8,9 @@
     -ms-overflow-style: none;
     background: #000;
     position: relative;
+    touch-action: pan-y;
+    overscroll-behavior-y: contain;
+    /* Prevents pull-to-refresh or chaining */
     /* Removed border-radius to be immersive */
 }
 

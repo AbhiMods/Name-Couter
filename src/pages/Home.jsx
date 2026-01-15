@@ -10,6 +10,7 @@ import Button from '../components/ui/Button';
 
 import BhajanModal from '../components/chant/BhajanModal';
 import TargetSettings from '../components/chant/TargetSettings';
+import CelebrationModal from '../components/chant/CelebrationModal';
 import FeatureGuideModal from '../components/common/FeatureGuideModal';
 import { useName } from '../context/NameContext';
 import { useStats } from '../context/StatsContext';
@@ -31,10 +32,15 @@ const Home = () => {
 
     const [isAnimating, setIsAnimating] = useState(false);
     const [target, setTarget] = useState(() => {
-        return parseInt(localStorage.getItem('divine_target'), 10) || 0;
+        // Default to 108 if not set (User Request)
+        const saved = localStorage.getItem('divine_target');
+        return saved ? parseInt(saved, 10) : 108;
     });
     const [floatingTexts, setFloatingTexts] = useState([]);
     const [showBhajanModal, setShowBhajanModal] = useState(false);
+    const [showCelebration, setShowCelebration] = useState(false);
+    // Track if we should show ending summary after celebration
+    const [pendingEndSession, setPendingEndSession] = useState(false);
 
     // Auto Count State
     const [isAutoCounting, setIsAutoCounting] = useState(false);
@@ -192,18 +198,35 @@ const Home = () => {
         // Only custom audio would play if configured, but default is silent now.
 
         if (navigator.vibrate) {
-            const isMalaComplete = nextCount % 108 === 0;
-            const isTargetComplete = isTargetMode && nextCount === target;
+            const isMalaComplete = isTargetMode && nextCount > 0 && nextCount % target === 0;
+            // Standard small vibration for every count
+            try { navigator.vibrate(10); } catch (e) { }
 
-            if (isTargetComplete || isMalaComplete) {
-                try { navigator.vibrate([100, 50, 100]); } catch (e) { }
-            } else {
-                try { navigator.vibrate(10); } catch (e) { }
+            if (isMalaComplete) {
+                // Long vibration for goal reached
+                try { navigator.vibrate([200, 100, 200]); } catch (e) { }
+                handleCycleComplete();
             }
+        } else if (isTargetMode && nextCount > 0 && nextCount % target === 0) {
+            handleCycleComplete();
         }
 
-        if (isTargetMode && nextCount === target) {
-            handleSessionComplete();
+        // Celebration Check: Every 5 Malas (5 * target)
+        // Ensure target is valid to avoid division by zero (default 108)
+        const currentTarget = target > 0 ? target : 108;
+        const MALAS_FOR_CELEBRATION = 5;
+        const celebrationCount = currentTarget * MALAS_FOR_CELEBRATION;
+
+        if (nextCount > 0 && nextCount % celebrationCount === 0) {
+            setShowCelebration(true);
+            setPendingEndSession(false); // It's a milestone celebration, not end session
+            pauseBhajan(); // Optional: pause music for celebration? Or keep playing? User didn't specify, but maybe pause for effect? 
+            // Actually, keep bhajan playing might be better flow, but let's pause if we want full attention on celebration modal?
+            // Re-reading usage: "celebration ... should come ... when 5 mil complete". 
+            // Celebration usually plays its own sound or is visual. 
+            // Let's keep bhajan playing for flow, unless modal handles audio. 
+            // Existing code didn't auto-stop bhajan in logic before, only on End Session.
+            // So we will NOT stop bhajan here.
         }
 
         setIsAnimating(true);
@@ -228,7 +251,10 @@ const Home = () => {
 
             setFloatingTexts(prev => [...prev.slice(-15), {
                 id,
-                text: selectedName.hindiText || selectedName.text.split(' ')[0], // Use Hindi if available
+                text: selectedName.hindiText || selectedName.text, // Use full text if Hindi missing, or just Radha
+                // User wants "Radha". If selected is Radha, hindi is "राधा".
+                // If they see "Ram Ram", they might be on Ram.
+                // I'll ensure we use correct text.
                 x,
                 y
             }]);
@@ -252,7 +278,7 @@ const Home = () => {
                 if (handleIncrementRef.current) {
                     handleIncrementRef.current(1, false, randomX, randomY);
                 }
-            }, 1000);
+            }, 1500); // 1.5 seconds per count
         }
         return () => clearInterval(interval);
     }, [isAutoCounting, immersiveMode]);
@@ -270,16 +296,30 @@ const Home = () => {
     // Progress Calculation
     const MALA_SIZE = 108;
     const isTargetMode = target > 0;
+
+    // Calculate progress based on current cycle
+    const currentCycleCount = isTargetMode ? (count % target) : (count % MALA_SIZE);
+    // Be careful with 0: if count > 0 and mod is 0, it means we just finished a cycle (FULL), 
+    // unless we just reset, but for display purposes if we haven't reset count, we want to show full ring?
+    // Actually, usually 0 means empty. Let's stick to 0=empty, so after 108 it resets visually.
+
     const progressMax = isTargetMode ? target : MALA_SIZE;
-    const progressCurrent = isTargetMode ? Math.min(count, target) : count % MALA_SIZE;
-    const progressRatio = progressCurrent / progressMax;
+    const progressValue = currentCycleCount;
+    const progressRatio = progressValue / progressMax;
 
     const radius = 150;
     const circumference = 2 * Math.PI * radius;
-    const strokeDashoffset = circumference - progressRatio * circumference;
-    const malasCompleted = Math.floor(count / MALA_SIZE);
+    // Fix: Ensure strokeDashoffset is not NaN and clamps correctly
+    const strokeDashoffset = circumference - (progressRatio * circumference);
 
-    const remainingCount = isTargetMode ? (target - count) : (MALA_SIZE - (count % MALA_SIZE));
+    // Rounds calculation
+    const roundsCompleted = isTargetMode ? Math.floor(count / target) : Math.floor(count / MALA_SIZE);
+
+    // Remaining Logic for CURRENT cycle
+    // If target is 108, count is 0 -> 108 remaining
+    // Count is 1 -> 107 remaining
+    // Count is 108 -> 0 remaining (then resets to 108 next tap)
+    const remainingInCycle = isTargetMode ? (target - currentCycleCount) : (MALA_SIZE - (count % MALA_SIZE));
 
     // Double Tap & Zen Logic
     const lastTapTime = useRef(0);
@@ -358,31 +398,58 @@ const Home = () => {
         return `${minutes}:${seconds.toString().padStart(2, '0')}`;
     };
 
+    const handleCycleComplete = () => {
+        // Seamless: Do NOT stop session, do NOT show modal.
+        // The user requested to REMOVE the "Malas Complete" floating text.
+        // Logic removed.
+    };
+
     const handleSessionComplete = () => {
-        const durationMs = sessionStartTime ? Date.now() - sessionStartTime : 0;
-        setSessionDuration(formatDuration(durationMs));
+        // This is called when "End Session" is clicked (or "Log Out" button)
+        // WE NO LONGER SHOW CELEBRATION HERE.
+        // Directly confirm end session (Logic moved from confirmEndSession to here basically, or just call it)
+
+        // Actually, let's just show the Summary immediately.
+        // But wait, existing flow had "confirmEndSession" which showed summary.
+
+        if (immersiveMode) toggleImmersiveMode();
         setShowSummary(true);
+
         setIsJapaActive(false);
-        setIsAutoCounting(false); // Stop Auto Count
+        setIsAutoCounting(false);
         stopBgMusic();
         pauseBhajan();
     };
 
+    const confirmEndSession = () => {
+        // Actual reset logic after celebration
+        if (immersiveMode) toggleImmersiveMode();
+        setShowCelebration(false);
+        setShowSummary(true); // OPTIONAL: Show summary after popup? Or just reset?
+        // User said: "prop up ... should come when I end session"
+        // Let's show summary after.
+    };
+
+    // The "End Session" button in Zen Mode calls handleSessionComplete
+    // The "Close" button in CelebrationModal should call confirmEndSession
+
     const handleContinue = () => {
         setShowSummary(false);
-        setSessionStartTime(Date.now());
+        // Do not reset session start time, just continue
         setIsJapaActive(true);
     };
 
     const handleEndSession = () => {
-        if (immersiveMode) toggleImmersiveMode(); // Force exit Zen Mode
-        setShowSummary(false); // Do not show summary
+        // This is the "Clear/Reset" logic from Summary or elsewhere
+        if (immersiveMode) toggleImmersiveMode();
+        setShowSummary(false);
         setCount(0);
         setSessionStartCount(0);
         setSessionStartTime(null);
         setLiveTimer('00:00');
         setIsJapaActive(false);
         setIsAutoCounting(false);
+        setPendingEndSession(false);
         stopBgMusic();
         pauseBhajan();
     };
@@ -399,6 +466,24 @@ const Home = () => {
                 description={activeGuide?.description}
                 onConfirm={confirmFeatureGuide}
                 onClose={() => setActiveGuide(null)}
+            />
+
+            <CelebrationModal
+                isOpen={showCelebration}
+                count={count}
+                target={target}
+                onContinue={() => {
+                    setShowCelebration(false); // Just close
+                    setPendingEndSession(false);
+                    setIsJapaActive(true); // Resume if they clicked continue? 
+                    // Actually if this popped up at END session, "Continue" might mean "Oops I didn't mean to stop"
+                }}
+                onClose={() => {
+                    // Just close without ending session
+                    setShowCelebration(false);
+                    setPendingEndSession(false);
+                }}
+                isEndSession={pendingEndSession}
             />
 
             {showTargetModal && (
@@ -420,7 +505,7 @@ const Home = () => {
             <div className={styles.sessionLine}>
                 <span>{liveTimer}</span>
                 <span className={styles.statDivider}>•</span>
-                <span>{isTargetMode ? `${Math.round(progressRatio * 100)}% Goal` : `${malasCompleted} Malas`}</span>
+                <span>{roundsCompleted > 0 ? `${roundsCompleted} Cycles Done` : (isTargetMode ? `${Math.round(progressRatio * 100)}%` : 'Invincible')}</span>
             </div>
 
             <AnimatePresence>
@@ -475,7 +560,7 @@ const Home = () => {
                     <div className={styles.countValue}>{count}</div>
 
                     <div className={styles.remainingLabel}>
-                        <span style={{ opacity: 0.8 }}>{remainingCount}</span> chants remaining
+                        <span style={{ opacity: 0.8 }}>{isTargetMode ? remainingInCycle : count}</span> {isTargetMode ? 'remaining' : 'chants'}
                     </div>
 
                     <div className={clsx(styles.tapFeedback, isAnimating && styles.animating)}></div>
@@ -651,7 +736,7 @@ const Home = () => {
                         <motion.span
                             key={item.id}
                             initial={{ opacity: 0, scale: 0.5, y: 0, x: "-50%" }}
-                            animate={{ opacity: 1, scale: 1.5, y: -100 }}
+                            animate={{ opacity: 1, scale: item.special ? 2 : 1.5, y: -100 }}
                             exit={{ opacity: 0, scale: 0.8, y: -150 }}
                             transition={{ duration: 1.5, ease: "easeOut" }}
                             className={styles.floatingText}
@@ -659,13 +744,16 @@ const Home = () => {
                                 position: 'absolute',
                                 left: item.x,
                                 top: item.y,
-                                color: floatingTextColor || 'var(--color-primary)',
-                                textShadow: '0 0 10px rgba(var(--color-primary-rgb), 0.5)',
-                                fontWeight: 'bold'
+                                color: item.special ? '#FFD700' : (floatingTextColor || 'var(--color-primary)'),
+                                textShadow: item.special ? '0 0 20px rgba(255, 215, 0, 0.8)' : '0 0 10px rgba(var(--color-primary-rgb), 0.5)',
+                                fontWeight: 'bold',
+                                zIndex: item.special ? 10001 : 9999,
+                                whiteSpace: 'nowrap'
                             }}
                         >
                             {item.text}
                         </motion.span>
+
                     ))}
                 </AnimatePresence>
             </div>

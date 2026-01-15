@@ -1,0 +1,10 @@
+{
+     "show": true,
+     "id": "promo_launch_hq_2",
+     "text": "Join our official Telegram channel for daily spiritual updates and community events!",
+     "buttonText": "Join",
+     "url": "https://t.me/your_channel_link",
+     "secondaryText": "Later",
+     "image": "https://img.freepik.com/free-vector/abstract-comin-soon-promo-template-with-brush-stroke-effect_1017-53237.jpg?semt=ais_hybrid&w=740&q=80",
+     "maxImpressions": 10
+}

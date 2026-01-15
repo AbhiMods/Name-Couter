@@ -11,7 +11,7 @@ export const NAMES = [
 
 export const NameProvider = ({ children }) => {
     const [selectedNameId, setSelectedNameId] = useState(() => {
-        return localStorage.getItem('divine_selected_name') || 'ram';
+        return localStorage.getItem('divine_selected_name') || 'radha';
     });
 
     // Audio Settings

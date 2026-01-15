@@ -7,6 +7,9 @@ import { ThemeProvider } from './context/ThemeContext';
 import { LeaderboardProvider } from './context/LeaderboardContext';
 import { BgMusicProvider } from './context/BgMusicContext';
 import { BhajanProvider } from './context/BhajanContext';
+import { PromoProvider } from './context/PromoContext';
+import { FeatureProvider } from './context/FeatureContext';
+import { FeedbackProvider } from './context/FeedbackContext';
 import ErrorBoundary from './components/common/ErrorBoundary';
 import OfflineIndicator from './components/common/OfflineIndicator';
 
@@ -45,24 +48,30 @@ function App() {
             <BhajanProvider>
               <NameProvider>
                 <LeaderboardProvider>
-                  <BrowserRouter>
-                    <OfflineIndicator />
-                    <ScrollToTop />
-                    <Suspense fallback={<PageLoader />}>
-                      <Routes>
-                        <Route path="/" element={<Layout />}>
-                          <Route index element={<Home />} />
-                          <Route path="counters" element={<Counters />} />
-                          {/* <Route path="settings" element={<Settings />} /> REMOVED */}
-                          <Route path="leaderboard" element={<Leaderboard />} />
-                          <Route path="progress" element={<Progress />} />
-                          <Route path="music" element={<Music />} />
-                          <Route path="profile" element={<Profile />} />
-                          <Route path="*" element={<Navigate to="/" replace />} />
-                        </Route>
-                      </Routes>
-                    </Suspense>
-                  </BrowserRouter>
+                  <PromoProvider>
+                    <FeatureProvider>
+                      <FeedbackProvider>
+                        <BrowserRouter>
+                          <OfflineIndicator />
+                          <ScrollToTop />
+                          <Suspense fallback={<PageLoader />}>
+                            <Routes>
+                              <Route path="/" element={<Layout />}>
+                                <Route index element={<Home />} />
+                                <Route path="counters" element={<Counters />} />
+                                {/* <Route path="settings" element={<Settings />} /> REMOVED */}
+                                <Route path="leaderboard" element={<Leaderboard />} />
+                                <Route path="progress" element={<Progress />} />
+                                <Route path="music" element={<Music />} />
+                                <Route path="profile" element={<Profile />} />
+                                <Route path="*" element={<Navigate to="/" replace />} />
+                              </Route>
+                            </Routes>
+                          </Suspense>
+                        </BrowserRouter>
+                      </FeedbackProvider>
+                    </FeatureProvider>
+                  </PromoProvider>
                 </LeaderboardProvider>
               </NameProvider>
             </BhajanProvider>
