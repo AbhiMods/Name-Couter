@@ -7,6 +7,7 @@ import Leaderboard from './Leaderboard';
 import Badges from '../components/stats/Badges';
 import TimeAnalytics from '../components/stats/TimeAnalytics';
 import AnimatedCounter from '../components/ui/AnimatedCounter';
+import FeedbackModal from '../components/stats/FeedbackModal';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import styles from './Progress.module.css';
 
@@ -14,6 +15,7 @@ const Progress = () => {
     useDocumentTitle('Progress | Divine Name');
     const { getHistory, totalCount, getStreak } = useStats();
     const [viewRange, setViewRange] = useState(7); // 7 for weekly, 30 for monthly
+    const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
 
     const historyData = useMemo(() => getHistory(viewRange), [getHistory, viewRange]);
     const maxCount = useMemo(() => Math.max(...historyData.map(d => d.count), 1), [historyData]);
@@ -160,6 +162,23 @@ const Progress = () => {
                 </div>
                 <Leaderboard />
             </section>
+
+            {/* SECTION 4: FEEDBACK */}
+            <section className={styles.section}>
+                <Card className={styles.feedbackCard}>
+                    <button
+                        className={styles.feedbackButton}
+                        onClick={() => setIsFeedbackOpen(true)}
+                    >
+                        Give Feedback
+                    </button>
+                </Card>
+            </section>
+
+            <FeedbackModal
+                isOpen={isFeedbackOpen}
+                onClose={() => setIsFeedbackOpen(false)}
+            />
         </div>
     );
 };

@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, BarChart2, Layers, Music2 } from 'lucide-react';
+import { Home, BarChart2, Sparkles, Music2 } from 'lucide-react';
 import styles from './BottomNav.module.css';
 import { useBhajan } from '../../context/BhajanContext';
 
@@ -30,9 +30,9 @@ const BottomNav = () => {
                     }
                 >
                     <div className={styles.iconWrapper}>
-                        <Layers size={24} className={styles.icon} />
+                        <Sparkles size={24} className={styles.icon} />
                     </div>
-                    <span className={styles.label}>Category</span>
+                    <span className={styles.label}>Spiritual</span>
                 </NavLink>
 
                 <NavLink

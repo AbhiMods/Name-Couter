@@ -13,16 +13,16 @@ export const BhajanProvider = ({ children }) => {
     const { setIsMusicActive } = useStats(); // Use the new setter
 
     const initialPlaylist = [
-        { id: '1', title: 'Shri Ram Chandra Kripalu', artist: 'Traditional', duration: '5:32', src: '/audio/bhajans/ram_chandra.mp3', category: 'Bhajan', deity: 'Ram', mood: 'Devotional' },
-        { id: '2', title: 'Achyutam Keshavam', artist: 'Devotional', duration: '4:45', src: '/audio/bhajans/achyutam.mp3', category: 'Bhajan', deity: 'Krishna', mood: 'Peaceful' },
-        { id: '3', title: 'Radhe Radhe Govinda', artist: 'Kirtan', duration: '6:12', src: '/audio/bhajans/radhe_govinda.mp3', category: 'Kirtan', deity: 'Krishna', mood: 'Joyful' },
-        { id: '4', title: 'Hanuman Chalisa', artist: 'M.S. Subbulakshmi', duration: '9:55', src: '/audio/bhajans/hanuman_chalisa.mp3', category: 'Stotram', deity: 'Hanuman', mood: 'Powerful' },
-        { id: '5', title: 'Hey Ram Hey Ram', artist: 'Jagjit Singh', duration: '5:10', src: '/audio/bhajans/hey_ram.mp3', category: 'Bhajan', deity: 'Ram', mood: 'Melancholic' },
-        { id: '6', title: 'Raghupati Raghav Raja Ram', artist: 'Traditional', duration: '4:20', src: '/audio/bhajans/raghupati.mp3', category: 'Dhun', deity: 'Ram', mood: 'Calm' },
-        { id: '7', title: 'Vaishnav Jan To', artist: 'Instrumental', duration: '3:50', src: '/audio/bhajans/vaishnav_jan.mp3', category: 'Instrumental', deity: 'General', mood: 'Peaceful' },
-        { id: '8', title: 'Hare Krishna Mahamantra', artist: 'Spiritual', duration: '7:30', src: '/audio/bhajans/hare_krishna.mp3', category: 'Mantra', deity: 'Krishna', mood: 'Meditative' },
-        { id: '9', title: 'Shiv Tandav Stotram', artist: 'Powerful', duration: '8:15', src: '/audio/bhajans/shiv_tandav.mp3', category: 'Stotram', deity: 'Shiva', mood: 'Energetic' },
-        { id: '10', title: 'Om Jai Jagdish Hare', artist: 'Aarti', duration: '5:45', src: '/audio/bhajans/om_jai.mp3', category: 'Aarti', deity: 'Vishnu', mood: 'Devotional' },
+        { id: '1', title: 'Shri Ram Chandra Kripalu', artist: 'Traditional', duration: '5:32', src: '/server/music_uploads/Abhishek.mp3', category: 'Bhajan', deity: 'Ram', mood: 'Devotional' },
+        { id: '2', title: 'Achyutam Keshavam', artist: 'Devotional', duration: '4:45', src: '/server/music_uploads/3.mp3', category: 'Bhajan', deity: 'Krishna', mood: 'Peaceful' },
+        { id: '3', title: 'Radhe Radhe Govinda', artist: 'Kirtan', duration: '6:12', src: '/server/music_uploads/7.mp3', category: 'Kirtan', deity: 'Krishna', mood: 'Joyful' },
+        { id: '4', title: 'Hanuman Chalisa', artist: 'M.S. Subbulakshmi', duration: '9:55', src: '/server/music_uploads/4.mp3', category: 'Stotram', deity: 'Hanuman', mood: 'Powerful' },
+        { id: '5', title: 'Hey Ram Hey Ram', artist: 'Jagjit Singh', duration: '5:10', src: '/server/music_uploads/5.mp3', category: 'Bhajan', deity: 'Ram', mood: 'Melancholic' },
+        { id: '6', title: 'Raghupati Raghav Raja Ram', artist: 'Traditional', duration: '4:20', src: '/server/music_uploads/6.mp3', category: 'Dhun', deity: 'Ram', mood: 'Calm' },
+        { id: '7', title: 'Vaishnav Jan To', artist: 'Instrumental', duration: '3:50', src: 'http://localhost:5000/music_uploads/Abhishek.mp3', category: 'Instrumental', deity: 'General', mood: 'Peaceful' },
+        { id: '8', title: 'Hare Krishna Mahamantra', artist: 'Spiritual', duration: '7:30', src: 'http://localhost:5000/music_uploads/Abhishek.mp3', category: 'Mantra', deity: 'Krishna', mood: 'Meditative' },
+        { id: '9', title: 'Shiv Tandav Stotram', artist: 'Powerful', duration: '8:15', src: 'http://localhost:5000/music_uploads/Abhishek.mp3', category: 'Stotram', deity: 'Shiva', mood: 'Energetic' },
+        { id: '10', title: 'Om Jai Jagdish Hare', artist: 'Aarti', duration: '5:45', src: 'http://localhost:5000/music_uploads/Abhishek.mp3', category: 'Aarti', deity: 'Vishnu', mood: 'Devotional' },
     ];
 
     const [playlist, setPlaylist] = useState(initialPlaylist);
