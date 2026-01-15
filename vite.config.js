@@ -28,17 +28,19 @@ export default defineConfig({
         ]
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,json,mp3,wav}'],
-        maximumFileSizeToCacheInBytes: 30000000, // Increased to 30MB for large audio files
+        // EXCLUDE audio files from precache to prevent massive download on install
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,json}'],
+        maximumFileSizeToCacheInBytes: 5000000,
         runtimeCaching: [
           {
+            // Cache Google Fonts
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
             handler: 'CacheFirst',
             options: {
               cacheName: 'google-fonts-cache',
               expiration: {
                 maxEntries: 10,
-                maxAgeSeconds: 60 * 60 * 24 * 365 // <== 365 days
+                maxAgeSeconds: 60 * 60 * 24 * 365
               },
               cacheableResponse: {
                 statuses: [0, 200]
@@ -46,6 +48,7 @@ export default defineConfig({
             }
           },
           {
+            // Cache Google Fonts (Static)
             urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
             handler: 'CacheFirst',
             options: {
@@ -58,6 +61,11 @@ export default defineConfig({
                 statuses: [0, 200]
               }
             }
+          },
+          {
+            // Audio files: NETWORK ONLY (Do not cache, save storage)
+            urlPattern: /\.(?:mp3|wav|m4a)$/i,
+            handler: 'NetworkOnly',
           }
         ]
       }
