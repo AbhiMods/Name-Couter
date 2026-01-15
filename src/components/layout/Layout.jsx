@@ -45,10 +45,20 @@ const Layout = () => {
     }, [shouldShowPlayer]);
 
     const isMusicInfo = location.pathname.startsWith('/music');
+    // Basic mobile detection (width < 768px)
+    const [isMobile, setIsMobile] = React.useState(window.innerWidth < 768);
+
+    React.useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth < 768);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    const shouldHideHeader = isMusicPage && isMobile;
 
     return (
         <div className={styles.layout}>
-            {!immersiveMode && <Header />}
+            {!immersiveMode && !shouldHideHeader && <Header />}
             <main
                 className={clsx(styles.main, shouldShowPlayer && styles.mainWithPlayer)}
                 style={isMusicInfo ? { padding: 0 } : {}}
@@ -65,7 +75,7 @@ const Layout = () => {
                 </div>
             </main>
             {delayedShowPlayer && <MiniPlayer onExpand={() => navigate('/music')} isExiting={isExiting} />}
-            {!immersiveMode && <Footer />}
+            {!immersiveMode && !isMusicPage && <Footer />}
             {!immersiveMode && <BottomNav />}
         </div>
     );

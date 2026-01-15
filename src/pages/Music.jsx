@@ -21,7 +21,7 @@ const Music = () => {
         downloadTrack, downloadedTracks, favoriteTracks
     } = useBhajan();
 
-    const [mainTab, setMainTab] = useState('bhajans'); // 'bhajans' | 'reels'
+    const [mainTab, setMainTab] = useState('reels'); // 'bhajans' | 'reels'
     const [bhajanFilter, setBhajanFilter] = useState('all'); // 'all' | 'favorites' | 'playlists'
     const [isPlayerOpen, setIsPlayerOpen] = useState(false);
 
@@ -47,6 +47,13 @@ const Music = () => {
             }
         }
     }, [isPlaying, delayedShow]);
+
+    // Exclusive Playback Logic: Stop Music when switching to Reels
+    React.useEffect(() => {
+        if (mainTab === 'reels' && isPlaying) {
+            pause();
+        }
+    }, [mainTab, isPlaying, pause]);
 
     const getDisplayList = () => {
         if (bhajanFilter === 'favorites') return favoriteTracks;

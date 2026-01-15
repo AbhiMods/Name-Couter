@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, BarChart2, Sparkles, Music2 } from 'lucide-react';
+import { Home, BarChart2, Sparkles, Clapperboard } from 'lucide-react';
 import styles from './BottomNav.module.css';
 import { useBhajan } from '../../context/BhajanContext';
 
@@ -49,10 +49,10 @@ const BottomNav = () => {
                                 <div className={styles.bar} />
                             </div>
                         ) : (
-                            <Music2 size={24} className={styles.icon} />
+                            <Clapperboard size={24} className={styles.icon} />
                         )}
                     </div>
-                    <span className={styles.label}>Music</span>
+                    <span className={styles.label}>Shorts</span>
                 </NavLink>
 
                 <NavLink

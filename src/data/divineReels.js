@@ -1,51 +1,51 @@
 export const DIVINE_REELS = [
     {
         id: 'reel_1',
-        videoId: 'ruWxewKnpA0', // Premanand Ji
-        title: 'Radha Naam Ki Mahima',
-        category: 'Knowledge',
+        videoId: '5X3br8jJEDk', // Premanand Ji
+        title: '𝐒𝐡𝐫𝐞𝐞 𝐑𝐚𝐝𝐡𝐞 𝐑𝐚𝐝𝐡𝐞',
+        category: 'Bhakti',
         likes: 1420,
         tags: ['Premanand Ji', 'Radha', 'Wisdom']
     },
     {
         id: 'reel_2',
-        videoId: 'l6dgMdCigwI', // Krishna Flute
-        title: 'Divine Krishna Flute',
+        videoId: '1eMSD_EgQeE', // Krishna Flute
+        title: 'Shyama Aan Baso Vrindavan Mein',
         category: 'Bhakti',
         likes: 500,
         tags: ['Krishna', 'Music', 'Peace']
     },
     {
         id: 'reel_3',
-        videoId: 'vsE73eJB_E8', // Placeholder
-        title: 'Shiva Tandava Stotram',
-        category: 'Energy',
-        likes: 12000,
+        videoId: 'ypgi-Cs2uvU', // Placeholder
+        title: 'प्रेम ऐसे किसी से भी हो जाता हैं क्या',
+        category: 'Premanand-Maharaj',
+        likes: 427,
         tags: ['Shiva', 'Power', 'Stotra']
     },
     {
         id: 'reel_4',
-        videoId: 'qosKYNJkCJY',
-        title: 'Morning Aarti Haridwar',
+        videoId: 'gYSgZHsXnvw',
+        title: 'shri krishna',
         category: 'Ritual',
-        likes: 5600,
+        likes: 5680,
         tags: ['Ganga', 'Aarti', 'Morning']
     },
     {
         id: 'reel_5',
-        videoId: 'YRY5hXh6-2c',
-        title: 'Ram Mandir Darshan',
-        category: 'Devotion',
-        likes: 25000,
+        videoId: 'ZwdXVRv-G28',
+        title: 'कमाने लायक हो किसी के',
+        category: 'Premanand-Maharaj',
+        likes: 2810,
         tags: ['Ram', 'Ayodhya', 'Darshan']
     },
-  
-     {
+
+    {
         id: 'reel_7',
         videoId: 'J-2sZAJf6TA',
         title: 'Kedarnath Yatra',
         category: 'Travel',
-        likes: 15600,
+        likes: 1790,
         tags: ['Shiva', 'Kedarnath', 'Himalayas']
     },
     {
@@ -53,7 +53,33 @@ export const DIVINE_REELS = [
         videoId: 'pXTCeMjLduQ',
         title: 'Ganga Aarti Vibes',
         category: 'Peace',
-        likes: 9200,
+        likes: 320,
+        tags: ['Ganga', 'Rishikesh', 'Peace']
+    }
+    ,
+    {
+        id: 'reel_9',
+        videoId: 'CdGc1x7KyM4',
+        title: 'ये करेगे तो 1 साल में आपका जिवन बदल जाएगा',
+        category: 'Premanand-Maharaj',
+        likes: 2370,
+        tags: ['Ram', 'Ayodhya', 'Darshan']
+    },
+
+    {
+        id: 'reel_10',
+        videoId: 'qN2gJHASxZ4',
+        title: 'भगवान ने जो रच रखा वो बरा मंगल मय होगा',
+        category: 'Premanand-Maharaj',
+        likes: 4640,
+        tags: ['Shiva', 'Kedarnath', 'Himalayas']
+    },
+    {
+        id: 'reel_11',
+        videoId: 'Vtgxu9fghO4',
+        title: 'एक बार गलती हो जाए',
+        category: 'Premanand-Maharaj',
+        likes: 984,
         tags: ['Ganga', 'Rishikesh', 'Peace']
     }
 ];

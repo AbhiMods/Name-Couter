@@ -168,8 +168,8 @@
 .actionsBar {
     position: absolute;
     right: 1rem;
-    bottom: 8rem;
-    /* Moved up slightly */
+    bottom: 10rem;
+    /* Moved up to clear BottomNav */
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
@@ -225,7 +225,7 @@
 .bottomInfo {
     position: absolute;
     left: 1rem;
-    bottom: 2.5rem;
+    bottom: 7.5rem;
     right: 4rem;
     z-index: 30;
     pointer-events: none;
