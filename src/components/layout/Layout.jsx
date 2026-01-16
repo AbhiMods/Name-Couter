@@ -74,12 +74,12 @@ const Layout = () => {
     const onTouchMove = (e) => setTouchEnd(e.targetTouches[0].clientX);
 
     const onTouchEnd = () => {
-        if (!touchStart || !touchEnd) return;
+        if (!touchStart || !touchEnd || immersiveMode) return; // Disable swipe in Immersive Mode
         const distance = touchStart - touchEnd;
         const isLeftSwipe = distance > minSwipeDistance;
         const isRightSwipe = distance < -minSwipeDistance;
 
-        const tabs = ['/', '/counters', '/shorts', '/music'];
+        const tabs = ['/', '/name-counter-tools', '/shorts', '/music'];
         const currentIndex = tabs.findIndex(path => location.pathname === path);
 
         if (currentIndex === -1) return; // Not on a main tab

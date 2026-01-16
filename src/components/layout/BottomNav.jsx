@@ -24,7 +24,7 @@ const BottomNav = () => {
                 </NavLink>
 
                 <NavLink
-                    to="/counters"
+                    to="/name-counter-tools"
                     className={({ isActive }) =>
                         isActive ? `${styles.navItem} ${styles.active}` : styles.navItem
                     }
@@ -32,7 +32,7 @@ const BottomNav = () => {
                     <div className={styles.iconWrapper}>
                         <Sparkles size={24} className={styles.icon} />
                     </div>
-                    <span className={styles.label}>Spiritual</span>
+                    <span className={styles.label}>Tools</span>
                 </NavLink>
 
                 <NavLink

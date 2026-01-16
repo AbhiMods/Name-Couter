@@ -84,7 +84,7 @@ const Counters = () => {
     return (
         <div className={styles.container}>
             <header className={styles.header}>
-                <h1 className="text-gradient" style={{ fontSize: '2rem', fontFamily: 'var(--font-display)' }}>Name Counters</h1>
+                <h1 className="text-gradient" style={{ fontSize: '2rem', fontFamily: 'var(--font-display)' }}>Name Counter Tools</h1>
                 <p className={styles.subtitle}>Choose your spiritual practice tool</p>
             </header>
 

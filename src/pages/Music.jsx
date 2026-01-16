@@ -89,7 +89,7 @@ const Music = () => {
                                     className={`${styles.trackCard} ${isCurrent ? styles.activeCard : ''}`}
                                     onClick={() => playTrack(track)}
                                 >
-                                    <div className={`${styles.cardThumbnail} ${isCurrent && isPlaying ? styles.playingThumbnail : ''}`}>
+                                    <div className={`${styles.cardThumbnail} ${isCurrent ? styles.activeThumbnail : ''} ${isCurrent && isPlaying ? styles.playingThumbnail : ''}`}>
                                         {track.thumbnail ? (
                                             <img src={track.thumbnail} alt={track.title} className={styles.cardCustomThumb} />
                                         ) : (
@@ -100,13 +100,9 @@ const Music = () => {
                                         <div className={styles.playOverlay}>
                                             <div className={styles.cardPlayBtn}>
                                                 {isCurrent && isPlaying ? (
-                                                    <div className={styles.equalizer}>
-                                                        <span className={styles.bar} style={{ animationDelay: '0s' }}></span>
-                                                        <span className={styles.bar} style={{ animationDelay: '0.2s' }}></span>
-                                                        <span className={styles.bar} style={{ animationDelay: '0.4s' }}></span>
-                                                    </div>
+                                                    <Pause size={24} fill="#000000" />
                                                 ) : (
-                                                    <Play size={20} fill="white" />
+                                                    <Play size={24} fill="#000000" style={{ marginLeft: '4px' }} />
                                                 )}
                                             </div>
                                         </div>
@@ -148,13 +144,15 @@ const Music = () => {
             </div>
 
             {/* MUSIC PLAYERS */}
-            {/* Only render if we have a song AND (it's playing OR it's in the delayed exit phase) */}
-            {currentSong && delayedShow && (
-                <BottomPlayerBar
-                    onExpand={() => setIsPlayerOpen(true)}
-                    isExiting={isExiting}
-                />
-            )}
+            {/* Only render if we have a song AND (it's playing OR it's in the delayed exit phase) AND Player is NOT open */}
+            {
+                currentSong && delayedShow && !isPlayerOpen && (
+                    <BottomPlayerBar
+                        onExpand={() => setIsPlayerOpen(true)}
+                        isExiting={isExiting}
+                    />
+                )
+            }
             <MusicPlayerModal isOpen={isPlayerOpen} onClose={() => setIsPlayerOpen(false)} />
 
         </div>

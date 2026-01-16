@@ -85,9 +85,7 @@
     display: flex;
     align-items: center;
     gap: var(--space-6);
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
+    /* Removed absolute positioning for safer layout */
 }
 
 .desktopNavLink {

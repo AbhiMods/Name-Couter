@@ -245,23 +245,28 @@
 }
 
 .trackCard:hover .playOverlay,
+.activeThumbnail .playOverlay,
 .playingThumbnail .playOverlay {
     opacity: 1;
 }
 
 .cardPlayBtn {
-    width: 48px;
-    height: 48px;
+    width: 64px;
+    /* Bigger */
+    height: 64px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(4px);
+    background: var(--color-primary);
+    /* Solid Gold */
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    transform: scale(0.8);
-    transition: transform 0.2s;
+    color: var(--color-bg-main);
+    /* Black Icon */
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    transform: scale(0.9);
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    opacity: 1;
+    /* Ensure visibility */
 }
 
 .trackCard:hover .cardPlayBtn {
@@ -327,7 +332,8 @@
 
 .bar {
     width: 4px;
-    background: white;
+    background: #000000;
+    /* Black for visibility on Gold */
     animation: equalize 1s infinite;
 }
 

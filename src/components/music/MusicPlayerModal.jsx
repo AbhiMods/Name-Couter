@@ -37,10 +37,17 @@ const MusicPlayerModal = ({ isOpen, onClose }) => {
     const displayTime = isDragging ? dragTime : currentTime;
 
     // Formatting helper
+    // Formatting helper with Hours support
     const formatTime = (time) => {
         if (!time || isNaN(time)) return '0:00';
-        const minutes = Math.floor(time / 60);
-        const seconds = Math.floor(time % 60);
+        const totalSeconds = Math.floor(time);
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = Math.floor(totalSeconds % 60);
+
+        if (hours > 0) {
+            return `${hours}:${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        }
         return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
     };
 
@@ -66,22 +73,33 @@ const MusicPlayerModal = ({ isOpen, onClose }) => {
                         animate={{ y: 0 }}
                         exit={{ y: "100%" }}
                         transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                        // Stop propagation to prevent Layout swipe gestures
+                        onTouchStart={(e) => e.stopPropagation()}
+                        onTouchMove={(e) => e.stopPropagation()}
+                        onTouchEnd={(e) => e.stopPropagation()}
                     >
-                        {/* Header */}
+                        {/* Blurred Background */}
+                        <div
+                            className={styles.backgroundBlur}
+                            style={{ backgroundImage: `url(${currentSong.thumbnail || '/vite.svg'})` }}
+                        />
+
+                        {/* Header - Close Button on RIGHT */}
                         <div className={styles.header}>
-                            <button onClick={onClose} className={styles.closeBtn}>
+                            <button className={styles.closeBtn} style={{ opacity: 0, pointerEvents: 'none' }}>
+                                {/* Hidden Placeholder for symmetry */}
                                 <ChevronDown size={28} />
                             </button>
                             <span className={styles.headerTitle}>Now Playing</span>
-                            <button className={styles.closeBtn}>
-                                {/* Meatball menu or empty for symmetry */}
+                            <button onClick={onClose} className={styles.closeBtn}>
+                                <ChevronDown size={28} />
                             </button>
                         </div>
 
                         {/* Album Art */}
                         <div className={styles.albumArtContainer}>
                             <motion.img
-                                src={currentSong.src.includes('bhajans') ? '/vite.svg' : (currentSong.thumbnail || '/vite.svg')} // Placeholder logic, update later
+                                src={currentSong.thumbnail || '/vite.svg'} // Simplified logic: always try thumbnail first
                                 alt="Album Art"
                                 className={`${styles.albumArt} ${isPlaying ? styles.playing : ''}`}
                                 animate={{ scale: isPlaying ? 1.05 : 1 }}
@@ -107,7 +125,7 @@ const MusicPlayerModal = ({ isOpen, onClose }) => {
                                 onTouchEnd={handleSeekCommit}
                                 className={styles.progressBar}
                                 style={{
-                                    background: `linear-gradient(to right, var(--color-primary) ${(displayTime / duration) * 100}%, rgba(255,255,255,0.2) ${(displayTime / duration) * 100}%)`
+                                    background: `linear-gradient(to right, var(--color-primary) ${(displayTime / (duration || 1)) * 100}%, rgba(255,255,255,0.2) ${(displayTime / (duration || 1)) * 100}%)`
                                 }}
                             />
                             <div className={styles.timeInfo}>
@@ -129,7 +147,7 @@ const MusicPlayerModal = ({ isOpen, onClose }) => {
                                 className={`${styles.controlBtn} ${styles.playPauseBtn}`}
                                 onClick={isPlaying ? pause : () => playTrack(currentSong)}
                             >
-                                {isPlaying ? <Pause size={32} fill="#1a1a2e" /> : <Play size={32} fill="#1a1a2e" style={{ marginLeft: '4px' }} />}
+                                {isPlaying ? <Pause size={32} fill="currentColor" /> : <Play size={32} fill="currentColor" style={{ marginLeft: '4px' }} />}
                             </button>
 
                             <button className={styles.controlBtn} onClick={next}>

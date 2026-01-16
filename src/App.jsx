@@ -58,7 +58,7 @@ function App() {
                             <Routes>
                               <Route path="/" element={<Layout />}>
                                 <Route index element={<Home />} />
-                                <Route path="counters" element={<Counters />} />
+                                <Route path="name-counter-tools" element={<Counters />} />
                                 {/* <Route path="settings" element={<Settings />} /> REMOVED */}
                                 <Route path="leaderboard" element={<Leaderboard />} />
                                 <Route path="progress" element={<Progress />} />

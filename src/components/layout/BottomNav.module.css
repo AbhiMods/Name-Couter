@@ -1,32 +1,32 @@
 /* BottomNav.module.css */
 .bottomNav {
     position: fixed;
-    bottom: 24px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 90%;
-    max-width: 400px;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    max-width: 100%;
     z-index: 9999;
     background: var(--color-surface);
     /* Very transparent dark */
     backdrop-filter: blur(25px);
     -webkit-backdrop-filter: blur(25px);
-    border-radius: 32px;
-    /* Soft pill shape */
-    border: 1px solid var(--color-border);
-    box-shadow:
-        0 8px 32px rgba(0, 0, 0, 0.4),
-        0 0 0 1px rgba(255, 255, 255, 0.05);
+    border-radius: 0;
+    /* Full width, no radius */
+    border-top: 1px solid var(--color-border);
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
     display: none;
     transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    padding-bottom: env(safe-area-inset-bottom);
 }
 
 .navContainer {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around;
+    /* Spread evenly */
     align-items: center;
-    padding: 0.75rem 1.5rem;
-    height: 64px;
+    padding: 0.5rem 0;
+    height: auto;
+    width: 100%;
 }
 
 .navItem {
@@ -36,11 +36,13 @@
     justify-content: center;
     gap: 4px;
     text-decoration: none;
-    color: var(--color-text-secondary);
-    /* Adapted to theme */
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    color: var(--color-text-primary);
+    opacity: 1;
+    /* Proper White/Black as requested */
+    transition: all 0.3s ease;
     position: relative;
-    width: 48px;
+    flex: 1;
+    padding: 0.5rem 0;
     -webkit-tap-highlight-color: transparent;
 }
 
@@ -49,7 +51,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition: transform 0.3s ease;
 }
 
 .icon {
@@ -62,28 +64,34 @@
     font-size: 10px;
     font-weight: 500;
     letter-spacing: 0.02em;
-    opacity: 0;
-    transform: translateY(4px);
-    transition: all 0.3s ease;
-    position: absolute;
-    bottom: -14px;
+    opacity: 1;
+    /* Always visible */
+    transform: none;
+    transition: color 0.3s ease;
+    position: static;
     white-space: nowrap;
+    margin-top: 2px;
 }
 
 /* Active State */
 .active {
     color: var(--color-primary);
+    opacity: 1;
+    filter: brightness(1.2) drop-shadow(0 0 5px var(--color-primary-glow));
+    /* Brighter Highlight */
 }
 
 .active .iconWrapper {
     transform: translateY(-2px);
-    filter: drop-shadow(0 0 12px var(--color-primary-glow));
+    filter: none;
+    /* Glow moved to parent for stronger effect */
 }
 
 .active .label {
     opacity: 1;
-    transform: translateY(0);
+    transform: none;
     color: var(--color-primary);
+    font-weight: 700;
 }
 
 

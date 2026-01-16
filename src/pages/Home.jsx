@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Volume2, VolumeX, Target, X, Maximize2, Minimize2, LogOut, Mic, MicOff, Play, Pause, Zap } from 'lucide-react';
+import { Volume2, VolumeX, Target, X, Maximize2, Minimize2, LogOut, Mic, MicOff, Play, Pause, Zap, Timer, Clock } from 'lucide-react';
 import SessionSummary from '../components/chant/SessionSummary';
 import ImageCarousel from '../components/chant/ImageCarousel';
 import { useNavigate } from 'react-router-dom';
@@ -503,7 +503,10 @@ const Home = () => {
 
             {/* Combined Session Stats (Timer + Progress) - Relocated */}
             <div className={styles.sessionLine}>
-                <span>{liveTimer}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <Clock size={15} style={{ color: 'var(--color-primary)', opacity: 0.9 }} />
+                    <span>{liveTimer}</span>
+                </div>
                 <span className={styles.statDivider}>•</span>
                 <span>{roundsCompleted > 0 ? `${roundsCompleted} Cycles Done` : (isTargetMode ? `${Math.round(progressRatio * 100)}%` : 'Invincible')}</span>
             </div>

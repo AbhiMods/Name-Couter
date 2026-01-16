@@ -181,3 +181,26 @@
     background: var(--color-primary, #FFD700);
     transition: width 0.2s linear;
 }
+
+/* LIGHT MODE OVERRIDES */
+:global([data-theme="light"]) .playerBar {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+:global([data-theme="light"]) .title {
+    color: #1a1a1a;
+}
+
+:global([data-theme="light"]) .artist {
+    color: #666666;
+}
+
+:global([data-theme="light"]) .controlBtn {
+    color: #4a4a4a;
+}
+
+:global([data-theme="light"]) .controlBtn:hover {
+    color: #000000;
+}

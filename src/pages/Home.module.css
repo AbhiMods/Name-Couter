@@ -16,7 +16,10 @@
     padding-top: 1rem;
     gap: 0;
     /* Removed gap: var(--space-4) to allow manual tight utility spacing */
-    min-height: 70vh;
+    min-height: 100dvh;
+    /* Full height */
+    padding-bottom: 200px;
+    /* Space for Bottom Player */
     text-align: center;
 }
 
@@ -42,7 +45,8 @@
     aspect-ratio: 1 / 1;
     aspect-ratio: 1 / 1;
     height: auto;
-    margin: 0 0 6rem 0;
+    margin: 0;
+    /* No bottom margin, let flex handle it */
     /* Removed top margin */
     flex-shrink: 0;
     transition: all 0.5s ease;
@@ -80,6 +84,8 @@
     display: flex;
     justify-content: center;
     z-index: 100;
+    margin-top: auto;
+    /* Push to bottom */
 }
 
 .controls {
