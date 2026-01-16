@@ -1,3 +1,4 @@
+/* MusicPlayerModal.module.css */
 .modalOverlay {
     position: fixed;
     top: 0;
@@ -5,39 +6,47 @@
     right: 0;
     bottom: 0;
     z-index: 2000;
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(10px);
+    background: rgba(0, 0, 0, 0.9);
+    /* Darker backdrop */
+    backdrop-filter: blur(20px);
+    /* Stronger blur */
     display: flex;
     justify-content: center;
     align-items: flex-end;
-    /* Slide up from bottom */
 }
 
 .modalContent {
     width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    height: 100dvh;
+    background: linear-gradient(180deg, #1A1A1A 0%, #000000 100%);
+    /* Clean dark gradient */
     display: flex;
     flex-direction: column;
-    padding: 2rem;
+    padding: 1.5rem;
+    padding-top: env(safe-area-inset-top, 1rem);
+    /* Handle safe areas */
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
     position: relative;
-    overflow-y: auto;
+    overflow: hidden;
 }
 
 .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 2rem;
-    padding-top: 1rem;
+    margin-bottom: 0.5rem;
+    padding-top: 0.5rem;
+    flex-shrink: 0;
+    width: 100%;
 }
 
 .headerTitle {
     color: white;
-    font-size: 0.9rem;
+    font-size: 0.7rem;
     text-transform: uppercase;
     letter-spacing: 2px;
-    opacity: 0.8;
+    opacity: 0.6;
+    font-weight: 600;
 }
 
 .closeBtn {
@@ -48,94 +57,129 @@
     padding: 0.5rem;
     border-radius: 50%;
     transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
 }
 
 .closeBtn:hover {
     background: rgba(255, 255, 255, 0.1);
 }
 
+/* Flexible Container for Album Art */
 .albumArtContainer {
     flex: 1;
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-bottom: 3rem;
+    min-height: 0;
+    position: relative;
+    width: 100%;
+    padding: 1rem 0 2rem 0;
 }
 
 .albumArt {
-    width: 300px;
-    height: 300px;
-    border-radius: 20px;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    width: 100%;
+    height: 100%;
+    max-width: 85vw;
+    /* Ensure it doesn't touch edges */
+    max-height: 45vh;
+    /* Limit height to leave room for controls */
+    aspect-ratio: 1 / 1;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
     object-fit: cover;
-    transition: transform 0.5s ease;
+    transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .albumArt.playing {
-    transform: scale(1.05);
-    box-shadow: 0 25px 60px rgba(var(--color-primary-rgb), 0.3);
+    transform: scale(1.02);
+    box-shadow: 0 12px 48px rgba(var(--color-primary-rgb), 0.25);
 }
 
+/* Track Info Pinned */
 .trackInfo {
     margin-bottom: 2rem;
+    flex-shrink: 0;
+    text-align: left;
+    width: 100%;
+    padding: 0 0.5rem;
 }
 
 .trackTitle {
     color: white;
-    font-size: 1.8rem;
+    font-size: 1.5rem;
     font-weight: 700;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.25rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    letter-spacing: -0.5px;
 }
 
 .trackArtist {
     color: rgba(255, 255, 255, 0.6);
-    font-size: 1.1rem;
+    font-size: 1rem;
+    font-weight: 500;
 }
 
+/* Progress Bar */
 .progressBarContainer {
     width: 100%;
     margin-bottom: 2rem;
+    flex-shrink: 0;
+    padding: 0 0.5rem;
 }
 
 .progressBar {
     width: 100%;
     -webkit-appearance: none;
     appearance: none;
-    height: 6px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 3px;
-    outline: none;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 2px;
     cursor: pointer;
+    display: block;
+    position: relative;
 }
 
 .progressBar::-webkit-slider-thumb {
     -webkit-appearance: none;
-    width: 16px;
-    height: 16px;
+    width: 12px;
+    height: 12px;
     background: white;
     border-radius: 50%;
     cursor: pointer;
     transition: transform 0.2s;
+    margin-top: -4px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
 .progressBar::-webkit-slider-thumb:hover {
-    transform: scale(1.2);
+    transform: scale(1.3);
 }
 
 .timeInfo {
     display: flex;
     justify-content: space-between;
-    color: rgba(255, 255, 255, 0.6);
-    font-size: 0.8rem;
-    margin-top: 0.5rem;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.75rem;
+    margin-top: 0.75rem;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
 }
 
+/* Controls */
 .controls {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 0 1rem;
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
+    flex-shrink: 0;
+    width: 100%;
 }
 
 .controlBtn {
@@ -143,31 +187,63 @@
     border: none;
     color: white;
     cursor: pointer;
-    transition: transform 0.2s, color 0.2s;
+    transition: transform 0.1s, color 0.2s;
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 0.75rem;
+    opacity: 0.9;
 }
 
-.controlBtn:hover {
-    color: var(--color-primary);
-    transform: scale(1.1);
+.controlBtn:active {
+    transform: scale(0.9);
 }
 
 .playPauseBtn {
-    width: 70px;
-    height: 70px;
+    width: 72px;
+    height: 72px;
     background: white;
     border-radius: 50%;
-    color: #1a1a2e;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    color: #000;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 1;
 }
 
-.playPauseBtn:hover {
-    transform: scale(1.05);
-    color: black;
-    background: white;
-    /* Keep white */
+.playPauseBtn:active {
+    transform: scale(0.95);
 }
 
-/* Animations included in component */
+/* Small screen optimizations */
+@media (max-height: 700px) {
+    .modalContent {
+        padding: 1rem;
+    }
+
+    .albumArtContainer {
+        padding: 0.5rem 0 1rem 0;
+    }
+
+    .albumArt {
+        max-height: 40vh;
+    }
+
+    .trackInfo {
+        margin-bottom: 1rem;
+    }
+
+    .progressBarContainer {
+        margin-bottom: 1rem;
+    }
+
+    .controls {
+        margin-bottom: 0.5rem;
+    }
+
+    .playPauseBtn {
+        width: 60px;
+        height: 60px;
+    }
+}

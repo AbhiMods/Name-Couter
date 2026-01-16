@@ -6,7 +6,6 @@ const ReelItem = ({ reel, isActive, shouldPreload, onLike, isMuted, toggleMute }
     const [liked, setLiked] = useState(false);
     // const [isMuted, setIsMuted] = useState(true); // REMOVED: Managed by Parent
     const [isPlaying, setIsPlaying] = useState(false); // Tracks desired state
-    const [showPlayIcon, setShowPlayIcon] = useState(false); // Animation trigger
     const iframeRef = useRef(null);
 
     // Sanitize ID
@@ -92,20 +91,14 @@ const ReelItem = ({ reel, isActive, shouldPreload, onLike, isMuted, toggleMute }
         if (isPlaying) {
             setIsPlaying(false);
             sendCommand('pauseVideo');
-            setShowPlayIcon(true);
         } else {
             setIsPlaying(true);
-            // Explicit user play -> Force Sound
+            // Force Sound ON - Never Toggle Mute here
+            if (isMuted) toggleMute(); // Only unmute if currently muted
             sendCommand('unMute');
             sendCommand('setVolume', [100]);
             sendCommand('playVideo');
-            setShowPlayIcon(true);
-
-            // Sync global mute state if needed? 
-            // If we force play, we assume unmuted.
-            if (isMuted && toggleMute) toggleMute();
         }
-        setTimeout(() => setShowPlayIcon(false), 800);
     };
 
     // Ensure we render if active OR shouldPreload
@@ -144,24 +137,12 @@ const ReelItem = ({ reel, isActive, shouldPreload, onLike, isMuted, toggleMute }
                 )}
             </div>
 
-            {/* Play/Pause/Unmute Feedback Animation */}
-            {showPlayIcon && (
-                <div className={styles.playIconOverlay}>
-                    {/* Visual Feedback for state change */}
-                    {!isPlaying ? <Pause size={50} fill="white" /> : (isMuted ? <VolumeX size={50} fill="white" /> : <Volume2 size={40} fill="white" />)}
-                </div>
-            )}
+            {/* Play/Pause/Unmute Feedback Animation REMOVED */}{/* No Overlay */}
 
             {/* Static Overlay Gradient */}
             <div className={styles.overlayGradient} />
 
-            {/* Tap for Sound Hint (Only if Muted and Playing) */}
-            {isMuted && isPlaying && !showPlayIcon && (
-                <div className={styles.tapOverlay}>
-                    <VolumeX size={32} />
-                    <span className={styles.tapText}>Tap for Sound</span>
-                </div>
-            )}
+            {/* Tap for Sound Hint REMOVED */}
 
             {/* Info Section */}
             <div className={styles.bottomInfo}>
@@ -187,13 +168,7 @@ const ReelItem = ({ reel, isActive, shouldPreload, onLike, isMuted, toggleMute }
                     <span className={styles.actionLabel}>Share</span>
                 </button>
 
-                {/* Mute/Unmute Indicator Button - Only show when Muted to prompt user */}
-                {isMuted && (
-                    <button className={styles.actionBtn} onClick={(e) => { e.stopPropagation(); toggleMute(); }}>
-                        <VolumeX size={26} />
-                        <span className={styles.actionLabel}>Unmute</span>
-                    </button>
-                )}
+                {/* Unmute Button REMOVED */}{/* No Mute Toggle UI */}
             </div>
         </div>
     );

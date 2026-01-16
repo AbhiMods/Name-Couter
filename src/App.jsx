@@ -19,7 +19,7 @@ const Home = lazy(() => import('./pages/Home'));
 const Leaderboard = lazy(() => import('./pages/Leaderboard'));
 const Progress = lazy(() => import('./pages/Progress'));
 const Music = lazy(() => import('./pages/Music'));
-const Profile = lazy(() => import('./pages/Profile'));
+const Shorts = lazy(() => import('./pages/Shorts'));
 const Counters = lazy(() => import('./pages/Counters'));
 
 const PageLoader = () => (
@@ -63,7 +63,7 @@ function App() {
                                 <Route path="leaderboard" element={<Leaderboard />} />
                                 <Route path="progress" element={<Progress />} />
                                 <Route path="music" element={<Music />} />
-                                <Route path="profile" element={<Profile />} />
+                                <Route path="shorts" element={<Shorts />} />
                                 <Route path="*" element={<Navigate to="/" replace />} />
                               </Route>
                             </Routes>

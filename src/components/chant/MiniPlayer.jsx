@@ -33,27 +33,28 @@ const MiniPlayer = ({ onExpand, isExiting }) => {
         <motion.div
             initial={{ y: 100, opacity: 0, width: '100%', left: 0 }}
             animate={{
-                y: isExiting ? 100 : 0,
-                x: 0, // No x translation needed if we animate left
-                left: isExiting ? 'calc(50% + 40px)' : 0,
-                width: isExiting ? 50 : '100%',
-                height: isExiting ? 50 : 64,
-                borderRadius: isExiting ? 25 : 0,
-                opacity: isExiting ? 0 : 1
+                y: isExiting ? 0 : 0, // Keep y:0 during normal, layout handles position
+                bottom: isExiting ? 20 : 70, // Animate towards bottom nav
+                left: isExiting ? '65%' : 0, // Approximate Music Icon position (need to fine tune)
+                x: isExiting ? '-50%' : 0,
+                width: isExiting ? 40 : '100%',
+                height: isExiting ? 40 : 64,
+                borderRadius: isExiting ? '50%' : 0,
+                opacity: isExiting ? 0 : 1,
+                scale: isExiting ? 0.5 : 1
             }}
             exit={{
-                y: 100,
-                left: 'calc(50% + 40px)',
-                width: 50,
-                height: 50,
-                borderRadius: 25,
                 opacity: 0
             }}
             transition={{
-                duration: 0.8,
-                ease: [0.2, 0.8, 0.2, 1] // Advanced smooth bezier
+                duration: 0.6,
+                ease: "easeInOut"
             }}
-            style={{ overflow: 'hidden' }} // Clip content during shrink
+            style={{
+                overflow: 'hidden',
+                position: isExiting ? 'fixed' : 'relative',
+                zIndex: 100
+            }}
             className={styles.container}
             onClick={onExpand}
         >

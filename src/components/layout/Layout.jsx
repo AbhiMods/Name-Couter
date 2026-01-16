@@ -24,9 +24,10 @@ const Layout = () => {
     // 3. Never in Immersive Mode
     const isHome = location.pathname === '/';
     const isMusicPage = location.pathname.startsWith('/music');
-    // Hide global player on Music page (because it has its own premium player)
-    // We show it on Home now so playback is visible and controllable
-    const shouldShowPlayer = isPlaying && !isMusicPage && !immersiveMode;
+    const isShortsPage = location.pathname.startsWith('/shorts');
+
+    // Hide global player on Music & Shorts pages
+    const shouldShowPlayer = isPlaying && !isMusicPage && !isShortsPage && !immersiveMode;
 
     // Delayed hiding logic
     const [delayedShowPlayer, setDelayedShowPlayer] = React.useState(shouldShowPlayer);
@@ -47,7 +48,7 @@ const Layout = () => {
         }
     }, [shouldShowPlayer]);
 
-    const isMusicInfo = location.pathname.startsWith('/music');
+    const isFullPage = isMusicPage || isShortsPage;
     // Basic mobile detection (width < 768px)
     const [isMobile, setIsMobile] = React.useState(window.innerWidth < 768);
 
@@ -57,21 +58,64 @@ const Layout = () => {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    const shouldHideHeader = isMusicPage && isMobile;
+    // Only hide header on Shorts page
+    const shouldHideHeader = isShortsPage && isMobile;
+
+    // Swipe Navigation Logic
+    const [touchStart, setTouchStart] = React.useState(null);
+    const [touchEnd, setTouchEnd] = React.useState(null);
+    const minSwipeDistance = 50;
+
+    const onTouchStart = (e) => {
+        setTouchEnd(null);
+        setTouchStart(e.targetTouches[0].clientX);
+    };
+
+    const onTouchMove = (e) => setTouchEnd(e.targetTouches[0].clientX);
+
+    const onTouchEnd = () => {
+        if (!touchStart || !touchEnd) return;
+        const distance = touchStart - touchEnd;
+        const isLeftSwipe = distance > minSwipeDistance;
+        const isRightSwipe = distance < -minSwipeDistance;
+
+        const tabs = ['/', '/counters', '/shorts', '/music'];
+        const currentIndex = tabs.findIndex(path => location.pathname === path);
+
+        if (currentIndex === -1) return; // Not on a main tab
+
+        if (isLeftSwipe) {
+            // Next Tab
+            if (currentIndex < tabs.length - 1) {
+                navigate(tabs[currentIndex + 1]);
+            }
+        }
+        if (isRightSwipe) {
+            // Prev Tab
+            if (currentIndex > 0) {
+                navigate(tabs[currentIndex - 1]);
+            }
+        }
+    };
 
     return (
-        <div className={styles.layout}>
+        <div
+            className={styles.layout}
+            onTouchStart={onTouchStart}
+            onTouchMove={onTouchMove}
+            onTouchEnd={onTouchEnd}
+        >
             {!immersiveMode && !shouldHideHeader && <Header />}
             <main
                 className={clsx(styles.main, shouldShowPlayer && styles.mainWithPlayer)}
-                style={isMusicInfo ? { padding: 0 } : {}}
+                style={isFullPage ? { padding: 0 } : {}}
             >
                 <div
                     className="container"
                     style={
-                        immersiveMode
+                        immersiveMode || isFullPage
                             ? { height: '100vh', padding: 0, maxWidth: '100%' }
-                            : (isMusicInfo ? { padding: 0, maxWidth: '100%' } : {})
+                            : {}
                     }
                 >
                     <Outlet />
@@ -81,7 +125,7 @@ const Layout = () => {
             <PromoPopup />
             <FeaturePopup />
             <FeedbackPopup />
-            {!immersiveMode && !isMusicPage && <Footer />}
+            {!immersiveMode && !isShortsPage && <Footer />}
             {!immersiveMode && <BottomNav />}
         </div>
     );

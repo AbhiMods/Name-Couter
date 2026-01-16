@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Flower, WifiOff, CloudUpload, Sun, Moon } from 'lucide-react';
+import { Flower, WifiOff, CloudUpload, Sun, Moon, User } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { useStats } from '../../context/StatsContext';
 import styles from './Header.module.css';
@@ -29,12 +29,12 @@ const Header = () => {
                         Home
                     </NavLink>
                     <NavLink
-                        to="/counters"
+                        to="/shorts"
                         className={({ isActive }) =>
                             isActive ? `${styles.desktopNavLink} ${styles.desktopNavLinkActive}` : styles.desktopNavLink
                         }
                     >
-                        Name Counter
+                        Shorts
                     </NavLink>
                     <NavLink
                         to="/music"
@@ -75,6 +75,16 @@ const Header = () => {
                     >
                         {isDarkMode ? <Sun size={24} /> : <Moon size={24} />}
                     </button>
+
+                    {/* Progress Link - Formerly Bottom Nav */}
+                    <NavLink
+                        to="/progress"
+                        className={styles.navLink}
+                        title="Your Progress"
+                        style={{ color: 'var(--color-text-primary)' }}
+                    >
+                        <User size={24} />
+                    </NavLink>
                 </nav>
             </div>
         </header>

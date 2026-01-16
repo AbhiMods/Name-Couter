@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, BarChart2, Sparkles, Clapperboard } from 'lucide-react';
+import { Home, Sparkles, Clapperboard, Music } from 'lucide-react';
 import styles from './BottomNav.module.css';
 import { useBhajan } from '../../context/BhajanContext';
 
@@ -36,6 +36,18 @@ const BottomNav = () => {
                 </NavLink>
 
                 <NavLink
+                    to="/shorts"
+                    className={({ isActive }) =>
+                        isActive ? `${styles.navItem} ${styles.active}` : styles.navItem
+                    }
+                >
+                    <div className={styles.iconWrapper}>
+                        <Clapperboard size={24} className={styles.icon} />
+                    </div>
+                    <span className={styles.label}>Shorts</span>
+                </NavLink>
+
+                <NavLink
                     to="/music"
                     className={({ isActive }) =>
                         isActive ? `${styles.navItem} ${styles.active}` : styles.navItem
@@ -49,22 +61,10 @@ const BottomNav = () => {
                                 <div className={styles.bar} />
                             </div>
                         ) : (
-                            <Clapperboard size={24} className={styles.icon} />
+                            <Music size={24} className={styles.icon} />
                         )}
                     </div>
-                    <span className={styles.label}>Shorts</span>
-                </NavLink>
-
-                <NavLink
-                    to="/progress"
-                    className={({ isActive }) =>
-                        isActive ? `${styles.navItem} ${styles.active}` : styles.navItem
-                    }
-                >
-                    <div className={styles.iconWrapper}>
-                        <BarChart2 size={24} className={styles.icon} />
-                    </div>
-                    <span className={styles.label}>Progress</span>
+                    <span className={styles.label}>Music</span>
                 </NavLink>
             </div>
         </nav>

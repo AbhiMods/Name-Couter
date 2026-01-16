@@ -7,7 +7,7 @@ import {
 import { useBhajan } from '../context/BhajanContext';
 import { useTheme } from '../context/ThemeContext';
 import Card from '../components/ui/Card';
-import ReelsFeed from '../components/music/ReelsFeed';
+// import ReelsFeed from '../components/music/ReelsFeed'; // Removed in refactor
 import MusicPlayerModal from '../components/music/MusicPlayerModal';
 import BottomPlayerBar from '../components/music/BottomPlayerBar';
 import styles from './Music.module.css';
@@ -21,11 +21,8 @@ const Music = () => {
         downloadTrack, downloadedTracks, favoriteTracks
     } = useBhajan();
 
-    const [mainTab, setMainTab] = useState('reels'); // 'bhajans' | 'reels'
     const [bhajanFilter, setBhajanFilter] = useState('all'); // 'all' | 'favorites' | 'playlists'
     const [isPlayerOpen, setIsPlayerOpen] = useState(false);
-
-    const [refreshKey, setRefreshKey] = useState(0); // Hack to re-mount/refresh feed
 
     // Delayed Show Logic for BottomPlayerBar
     const [delayedShow, setDelayedShow] = useState(isPlaying);
@@ -48,13 +45,6 @@ const Music = () => {
         }
     }, [isPlaying, delayedShow]);
 
-    // Exclusive Playback Logic: Stop Music when switching to Reels
-    React.useEffect(() => {
-        if (mainTab === 'reels' && isPlaying) {
-            pause();
-        }
-    }, [mainTab, isPlaying, pause]);
-
     const getDisplayList = () => {
         if (bhajanFilter === 'favorites') return favoriteTracks;
         return playlist;
@@ -63,124 +53,101 @@ const Music = () => {
     const displayList = getDisplayList();
 
     return (
-        <div className={`${styles.container} ${mainTab === 'reels' ? styles.reelsMode : ''}`}>
-            {/* Header / Tabs */}
-            <div className={styles.header}>
-                <div className={styles.tabs}>
+        <div className={styles.container}>
+            {/* Header / Tabs - REMOVED, now just title or implicit */}
+            {/* Sticky Header for Filters */}
+            <div className={styles.stickyHeader}>
+                <div className={styles.filterTabs}>
                     <button
-                        className={`${styles.tab} ${mainTab === 'bhajans' ? styles.activeTab : ''}`}
-                        onClick={() => setMainTab('bhajans')}
+                        className={`${styles.filterTab} ${bhajanFilter === 'all' ? styles.activeFilter : ''}`}
+                        onClick={() => setBhajanFilter('all')}
                     >
-                        Bhajans
+                        All Tracks
                     </button>
                     <button
-                        className={`${styles.tab} ${mainTab === 'reels' ? styles.activeTab : ''}`}
-                        onClick={() => setMainTab('reels')}
+                        className={`${styles.filterTab} ${bhajanFilter === 'favorites' ? styles.activeFilter : ''}`}
+                        onClick={() => setBhajanFilter('favorites')}
                     >
-                        Reels
+                        Favorites
                     </button>
                 </div>
             </div>
 
             {/* Content Area */}
-            {mainTab === 'bhajans' ? (
-                <div className={styles.contentArea}>
+            <div className={styles.contentArea}>
+                {/* Grid Layout */}
+                <div className={styles.trackGrid}>
+                    {displayList.length > 0 ? (
+                        displayList.map((track) => {
+                            const isCurrent = currentSong?.id === track.id;
+                            const isFav = favorites.has(track.id);
+                            const isDownloaded = downloadedTracks.has(track.id);
 
-                    {/* Filter Tabs for Bhajans */}
-                    <div className={styles.filterTabs}>
-                        <button
-                            className={`${styles.filterTab} ${bhajanFilter === 'all' ? styles.activeFilter : ''}`}
-                            onClick={() => setBhajanFilter('all')}
-                        >
-                            All Tracks
-                        </button>
-                        <button
-                            className={`${styles.filterTab} ${bhajanFilter === 'favorites' ? styles.activeFilter : ''}`}
-                            onClick={() => setBhajanFilter('favorites')}
-                        >
-                            Favorites
-                        </button>
-                    </div>
+                            return (
+                                <div
+                                    key={track.id}
+                                    className={`${styles.trackCard} ${isCurrent ? styles.activeCard : ''}`}
+                                    onClick={() => playTrack(track)}
+                                >
+                                    <div className={`${styles.cardThumbnail} ${isCurrent && isPlaying ? styles.playingThumbnail : ''}`}>
+                                        {track.thumbnail ? (
+                                            <img src={track.thumbnail} alt={track.title} className={styles.cardCustomThumb} />
+                                        ) : (
+                                            <MusicIcon size={32} />
+                                        )}
 
-                    {/* Grid Layout */}
-                    <div className={styles.trackGrid}>
-                        {displayList.length > 0 ? (
-                            displayList.map((track) => {
-                                const isCurrent = currentSong?.id === track.id;
-                                const isFav = favorites.has(track.id);
-                                const isDownloaded = downloadedTracks.has(track.id);
-
-                                return (
-                                    <div
-                                        key={track.id}
-                                        className={`${styles.trackCard} ${isCurrent ? styles.activeCard : ''}`}
-                                        onClick={() => playTrack(track)}
-                                    >
-                                        <div className={`${styles.cardThumbnail} ${isCurrent && isPlaying ? styles.playingThumbnail : ''}`}>
-                                            {track.thumbnail ? (
-                                                <img src={track.thumbnail} alt={track.title} className={styles.cardCustomThumb} />
-                                            ) : (
-                                                <MusicIcon size={32} />
-                                            )}
-
-                                            {/* Hover/Active Overlay */}
-                                            <div className={styles.playOverlay}>
-                                                <div className={styles.cardPlayBtn}>
-                                                    {isCurrent && isPlaying ? (
-                                                        <div className={styles.equalizer}>
-                                                            <span className={styles.bar} style={{ animationDelay: '0s' }}></span>
-                                                            <span className={styles.bar} style={{ animationDelay: '0.2s' }}></span>
-                                                            <span className={styles.bar} style={{ animationDelay: '0.4s' }}></span>
-                                                        </div>
-                                                    ) : (
-                                                        <Play size={20} fill="white" />
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className={styles.cardInfo}>
-                                            <h4 className={styles.cardTitle}>{track.title}</h4>
-                                            <p className={styles.cardArtist}>{track.artist}</p>
-
-                                            <div className={styles.cardActions}>
-                                                <button
-                                                    onClick={(e) => { e.stopPropagation(); toggleFavorite(track.id); }}
-                                                    className={styles.actionBtn}
-                                                >
-                                                    <Heart size={18} fill={isFav ? "#ef4444" : "none"} color={isFav ? "#ef4444" : "currentColor"} />
-                                                </button>
-
-                                                {isDownloaded ? (
-                                                    <CheckCircle size={18} className={styles.downloadedIcon} />
+                                        {/* Hover/Active Overlay */}
+                                        <div className={styles.playOverlay}>
+                                            <div className={styles.cardPlayBtn}>
+                                                {isCurrent && isPlaying ? (
+                                                    <div className={styles.equalizer}>
+                                                        <span className={styles.bar} style={{ animationDelay: '0s' }}></span>
+                                                        <span className={styles.bar} style={{ animationDelay: '0.2s' }}></span>
+                                                        <span className={styles.bar} style={{ animationDelay: '0.4s' }}></span>
+                                                    </div>
                                                 ) : (
-                                                    <button
-                                                        onClick={(e) => { e.stopPropagation(); downloadTrack(track.id); }}
-                                                        className={styles.actionBtn}
-                                                    >
-                                                        <Download size={18} />
-                                                    </button>
+                                                    <Play size={20} fill="white" />
                                                 )}
                                             </div>
                                         </div>
                                     </div>
-                                );
-                            })
-                        ) : (
-                            <div className={styles.emptyState}>
-                                <p>No tracks found.</p>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            ) : (
-                /* REELS SECTION */
-                <div className={styles.reelsArea}>
-                    <ReelsFeed key={refreshKey} />
-                </div>
-            )}
 
-            {/* NEW MUSIC PLAYERS */}
+                                    <div className={styles.cardInfo}>
+                                        <h4 className={styles.cardTitle}>{track.title}</h4>
+                                        <p className={styles.cardArtist}>{track.artist}</p>
+
+                                        <div className={styles.cardActions}>
+                                            <button
+                                                onClick={(e) => { e.stopPropagation(); toggleFavorite(track.id); }}
+                                                className={styles.actionBtn}
+                                            >
+                                                <Heart size={18} fill={isFav ? "#ef4444" : "none"} color={isFav ? "#ef4444" : "currentColor"} />
+                                            </button>
+
+                                            {isDownloaded ? (
+                                                <CheckCircle size={18} className={styles.downloadedIcon} />
+                                            ) : (
+                                                <button
+                                                    onClick={(e) => { e.stopPropagation(); downloadTrack(track.id); }}
+                                                    className={styles.actionBtn}
+                                                >
+                                                    <Download size={18} />
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })
+                    ) : (
+                        <div className={styles.emptyState}>
+                            <p>No tracks found.</p>
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {/* MUSIC PLAYERS */}
             {/* Only render if we have a song AND (it's playing OR it's in the delayed exit phase) */}
             {currentSong && delayedShow && (
                 <BottomPlayerBar

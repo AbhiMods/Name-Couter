@@ -117,7 +117,7 @@ const MusicPlayerModal = ({ isOpen, onClose }) => {
                         </div>
 
                         {/* Controls */}
-                        <div className={styles.controls} style={{ marginBottom: '5rem' }}> {/* Extra bottom padding to clear Nav */}
+                        <div className={styles.controls}>
                             <button className={styles.controlBtn} onClick={() => toggleFavorite(currentSong.id)}>
                                 <Heart size={24} fill={isFav ? "var(--color-primary)" : "none"} color={isFav ? "var(--color-primary)" : "white"} />
                             </button>
