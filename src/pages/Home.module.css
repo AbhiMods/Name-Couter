@@ -62,7 +62,8 @@
 
 .progressCircleBg {
     fill: none;
-    stroke: rgba(255, 255, 255, 0.05);
+    stroke: var(--color-border);
+    /* Adapted to theme */
 }
 
 .progressCircleFg {
@@ -212,7 +213,8 @@
 .breathingCircle {
     position: absolute;
     inset: 0;
-    background: radial-gradient(circle, var(--color-primary) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(var(--color-primary-rgb), 0.15) 0%, transparent 70%);
+    /* More subtle */
     pointer-events: none;
     z-index: 0;
 }
@@ -281,11 +283,12 @@
     font-family: var(--font-mono);
     font-size: 1.1rem;
     color: var(--color-text-secondary);
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--color-surface);
+    /* Adapted to theme */
     padding: 0.5rem 1rem;
     /* Slightly reduced padding */
     border-radius: 2rem;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--color-border);
     backdrop-filter: blur(4px);
     width: max-content;
 }
@@ -476,13 +479,14 @@
     z-index: 20;
     pointer-events: none;
 
-    background: rgba(10, 10, 15, 0.95);
-    /* More opaque for visibility */
+    background: var(--color-surface);
+    /* Adapted to theme */
     backdrop-filter: blur(16px);
     padding: 0.5rem 1rem;
     border-radius: 2rem;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--color-border);
+    /* Adapted to theme */
+    box-shadow: var(--shadow-lg);
 
     width: max-content;
     max-width: 90%;
@@ -646,10 +650,10 @@
 .zenButton {
     pointer-events: auto;
     /* Re-enable clicks on the buttons */
-    background: rgba(15, 15, 20, 0.6);
+    background: var(--color-surface);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--color-border);
     color: var(--color-text-secondary);
     padding: 0.75rem 1.5rem;
     border-radius: 2rem;

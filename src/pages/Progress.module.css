@@ -60,15 +60,14 @@
 
 /* Glassmorphism Card Styles */
 /* Glassmorphism Card Styles */
+/* Glassmorphism Card Styles */
 .statCard,
 .chartCard {
-    /* Slightly lighter/more blue-ish gradient for "professional" dark mode look */
-    background: linear-gradient(145deg, rgba(30, 30, 40, 0.7) 0%, rgba(20, 20, 30, 0.5) 100%);
+    background: var(--color-surface);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    /* Brighter border */
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-lg);
     border-radius: 1.5rem;
 }
 
@@ -91,33 +90,33 @@
     padding: 1.5rem;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 
-    /* Brighter shine gradient */
+    /* Brighter shine gradient adapted for theme */
     background: linear-gradient(110deg,
-            rgba(30, 30, 40, 0.7) 30%,
-            rgba(255, 255, 255, 0.08) 50%,
-            rgba(30, 30, 40, 0.7) 70%);
+            var(--color-surface) 30%,
+            rgba(255, 255, 255, 0.1) 50%,
+            var(--color-surface) 70%);
     background-size: 200% 100%;
     animation: shine 6s infinite linear;
 }
 
 .statCard:hover {
     transform: translateY(-2px);
-    box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.4);
-    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.15);
+    border-color: var(--color-primary);
 }
 
 .statIcon {
     width: 44px;
     height: 44px;
     border-radius: 12px;
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(var(--color-primary-rgb), 0.1);
     /* More visible background */
     display: flex;
     align-items: center;
     justify-content: center;
     color: var(--color-primary);
     /* Keep primary color for icons */
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(var(--color-primary-rgb), 0.2);
 }
 
 .statInfo {
@@ -129,7 +128,7 @@
 .statLabel {
     /* Much lighter text color for readability */
     font-size: 0.8rem;
-    color: rgba(255, 255, 255, 0.7);
+    color: var(--color-text-secondary);
     text-transform: uppercase;
     letter-spacing: 0.05em;
     font-weight: 600;
@@ -140,11 +139,9 @@
     font-size: 2rem;
     /* Slightly larger */
     font-weight: 700;
-    color: #ffffff;
-    /* Pure white for numbers */
+    color: var(--color-text-primary);
     line-height: 1.2;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-    /* Pop text off background */
+    /* Removed text shadow for cleaner look in light mode */
 }
 
 .chartCard {

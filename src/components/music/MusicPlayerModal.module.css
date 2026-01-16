@@ -18,8 +18,8 @@
 .modalContent {
     width: 100%;
     height: 100dvh;
-    background: linear-gradient(180deg, #1A1A1A 0%, #000000 100%);
-    /* Clean dark gradient */
+    background: var(--color-bg-primary);
+    /* Adapted to theme */
     display: flex;
     flex-direction: column;
     padding: 1.5rem;
@@ -41,18 +41,18 @@
 }
 
 .headerTitle {
-    color: white;
+    color: var(--color-text-tertiary);
     font-size: 0.7rem;
     text-transform: uppercase;
     letter-spacing: 2px;
-    opacity: 0.6;
+    opacity: 0.8;
     font-weight: 600;
 }
 
 .closeBtn {
     background: none;
     border: none;
-    color: white;
+    color: var(--color-text-primary);
     cursor: pointer;
     padding: 0.5rem;
     border-radius: 50%;
@@ -65,41 +65,11 @@
 }
 
 .closeBtn:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(var(--color-text-primary-rgb), 0.1);
 }
 
-/* Flexible Container for Album Art */
-.albumArtContainer {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 0;
-    position: relative;
-    width: 100%;
-    padding: 1rem 0 2rem 0;
-}
+/* ... existing albumArt ... */
 
-.albumArt {
-    width: 100%;
-    height: 100%;
-    max-width: 85vw;
-    /* Ensure it doesn't touch edges */
-    max-height: 45vh;
-    /* Limit height to leave room for controls */
-    aspect-ratio: 1 / 1;
-    border-radius: 12px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-    object-fit: cover;
-    transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-.albumArt.playing {
-    transform: scale(1.02);
-    box-shadow: 0 12px 48px rgba(var(--color-primary-rgb), 0.25);
-}
-
-/* Track Info Pinned */
 .trackInfo {
     margin-bottom: 2rem;
     flex-shrink: 0;
@@ -109,7 +79,7 @@
 }
 
 .trackTitle {
-    color: white;
+    color: var(--color-text-primary);
     font-size: 1.5rem;
     font-weight: 700;
     margin-bottom: 0.25rem;
@@ -120,7 +90,7 @@
 }
 
 .trackArtist {
-    color: rgba(255, 255, 255, 0.6);
+    color: var(--color-text-secondary);
     font-size: 1rem;
     font-weight: 500;
 }
@@ -138,7 +108,8 @@
     -webkit-appearance: none;
     appearance: none;
     height: 4px;
-    background: rgba(255, 255, 255, 0.15);
+    background: var(--color-border);
+    /* Adapts to theme */
     border-radius: 2px;
     cursor: pointer;
     display: block;
@@ -149,12 +120,12 @@
     -webkit-appearance: none;
     width: 12px;
     height: 12px;
-    background: white;
+    background: var(--color-primary);
     border-radius: 50%;
     cursor: pointer;
     transition: transform 0.2s;
     margin-top: -4px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
 .progressBar::-webkit-slider-thumb:hover {
@@ -164,7 +135,7 @@
 .timeInfo {
     display: flex;
     justify-content: space-between;
-    color: rgba(255, 255, 255, 0.5);
+    color: var(--color-text-tertiary);
     font-size: 0.75rem;
     margin-top: 0.75rem;
     font-weight: 500;
@@ -185,7 +156,7 @@
 .controlBtn {
     background: none;
     border: none;
-    color: white;
+    color: var(--color-text-primary);
     cursor: pointer;
     transition: transform 0.1s, color 0.2s;
     display: flex;
@@ -202,10 +173,12 @@
 .playPauseBtn {
     width: 72px;
     height: 72px;
-    background: white;
+    background: var(--color-text-primary);
+    /* Inverted for contrast */
     border-radius: 50%;
-    color: #000;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    color: var(--color-bg-primary);
+    /* Inverted for contrast */
+    box-shadow: var(--shadow-lg);
     display: flex;
     align-items: center;
     justify-content: center;

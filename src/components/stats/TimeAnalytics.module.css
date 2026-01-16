@@ -32,10 +32,10 @@
 
 .rangeSelector {
     display: flex;
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--color-surface);
     padding: 3px;
     border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--color-border);
 }
 
 .rangeSelector button {
@@ -58,11 +58,11 @@
 }
 
 .totalCard {
-    background: linear-gradient(145deg, rgba(23, 23, 23, 0.6) 0%, rgba(20, 20, 20, 0.4) 100%);
+    background: var(--color-surface);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-lg);
     border-radius: 1.5rem;
     padding: 1.5rem;
 }
@@ -129,7 +129,7 @@
     align-items: center;
     justify-content: space-between;
     padding-bottom: 0.5rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    border-bottom: 1px solid var(--color-border);
 }
 
 .statRow:last-child {

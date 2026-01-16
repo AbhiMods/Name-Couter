@@ -6,8 +6,8 @@
     width: 100%;
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    background: rgba(2, 2, 5, 0.6);
-    /* Very dark transluscent */
+    background: var(--color-surface);
+    /* Adapted to theme */
     border-bottom: 1px solid var(--color-border);
     padding: var(--space-4) 0;
 }
