@@ -12,6 +12,15 @@
     padding: var(--space-4) 0;
 }
 
+.transparentHeader {
+    background: transparent;
+    border-bottom: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    position: absolute;
+    /* Overlay */
+}
+
 .headerContent {
     display: flex;
     align-items: center;
@@ -70,7 +79,7 @@
 
 .navLink:hover {
     color: var(--color-text-primary);
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--color-surface-hover);
     /* Subtle highlight */
 }
 

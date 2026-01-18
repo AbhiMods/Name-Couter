@@ -1,0 +1,30 @@
+{
+     "banners": [
+          {
+               "id": "banner_1",
+               "imageUrl": "https://www.shutterstock.com/image-vector/happy-krishna-janmashtami-festival-template-260nw-2658934237.jpg",
+               "title": "Start Your Spiritual Journey",
+               "link": "/radha-naam-jap-counter",
+               "active": true,
+               "maxViews": 5
+          },
+          {
+               "id": "banner_2",
+               "imageUrl": "https://www.shutterstock.com/image-vector/happy-hanuman-jayanti-celebration-banner-260nw-1950392167.jpg",
+               "title": "Listen to Divine Bhajans",
+               "link": "/music",
+               "active": true,
+               "maxViews": 10
+          },
+          {
+               "id": "banner_3",
+               "imageUrl": "https://static.vecteezy.com/system/resources/previews/001/256/899/non_2x/lord-krishna-playing-flute-with-orange-sash-janmashtami-banner-design-vector.jpg",
+               "title": "Watch Devotional Shorts",
+               "link": "/shorts",
+               "active": true,
+               "maxViews": 1
+          }
+     ],
+     "interval": 5000,
+     "aspectRatio": "16/9"
+}

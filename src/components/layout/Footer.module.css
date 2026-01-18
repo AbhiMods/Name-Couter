@@ -1,11 +1,14 @@
 .footer {
-    border-top: 1px solid var(--color-border);
+    border-top: none;
     padding: var(--spacing-lg) 0;
     text-align: center;
-    color: var(--color-text-muted);
-    font-size: var(--font-size-sm);
-    margin-top: auto;
-    /* Push to bottom if flex container */
+    color: rgba(255, 255, 255, 0.4);
+    /* Subtle white text */
+    font-size: 0.8rem;
+    position: relative;
+    z-index: 10;
+    margin-top: -2rem;
+    /* Pull up slightly over the bottom padding of container */
 }
 
 .heart {

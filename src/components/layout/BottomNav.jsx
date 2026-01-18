@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, Sparkles, Clapperboard, Music } from 'lucide-react';
+import { Home, Sparkles, Clapperboard, Music, LibraryBig } from 'lucide-react';
 import styles from './BottomNav.module.css';
 import { useBhajan } from '../../context/BhajanContext';
 
@@ -24,15 +24,15 @@ const BottomNav = () => {
                 </NavLink>
 
                 <NavLink
-                    to="/name-counter-tools"
+                    to="/library"
                     className={({ isActive }) =>
                         isActive ? `${styles.navItem} ${styles.active}` : styles.navItem
                     }
                 >
                     <div className={styles.iconWrapper}>
-                        <Sparkles size={24} className={styles.icon} />
+                        <LibraryBig size={24} className={styles.icon} />
                     </div>
-                    <span className={styles.label}>Tools</span>
+                    <span className={styles.label}>Library</span>
                 </NavLink>
 
                 <NavLink

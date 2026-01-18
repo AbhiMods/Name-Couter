@@ -24,12 +24,12 @@
 
 .main {
     flex: 1;
-    padding: var(--space-8) 0;
-    /* Updated from spacing-xl */
+    /* padding: var(--space-8) 0;  -- REMOVED to let pages control their own padding */
     display: flex;
     flex-direction: column;
     position: relative;
     z-index: 1;
+    width: 100%;
 }
 
 @media (max-width: 768px) {

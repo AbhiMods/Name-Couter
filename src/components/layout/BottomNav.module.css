@@ -7,12 +7,14 @@
     max-width: 100%;
     z-index: 9999;
     background: var(--color-surface);
-    /* Very transparent dark */
-    backdrop-filter: blur(25px);
-    -webkit-backdrop-filter: blur(25px);
+    /* Use theme surface color */
+    /* Semi-transparent dark for glass effect */
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     border-radius: 0;
     /* Full width, no radius */
     border-top: 1px solid var(--color-border);
+    /* Use theme border */
     box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
     display: none;
     transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);

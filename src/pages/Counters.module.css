@@ -1,97 +1,211 @@
 .container {
-    padding-top: 5rem;
-    /* Space for fixed header */
-    padding-bottom: 6rem;
-    /* Space for bottom nav if any */
+    padding-top: 4.5rem;
+    padding-bottom: 7rem;
     padding-left: 1rem;
     padding-right: 1rem;
     min-height: 100vh;
+    width: 100%;
+    margin: 0;
     box-sizing: border-box;
+    /* Rich Gradient Background covering full page */
+    background: var(--color-bg-gradient);
+    background-color: var(--color-bg-main);
+    background-attachment: fixed;
 }
 
 .header {
     text-align: center;
     margin-bottom: 2rem;
+    position: relative;
+    z-index: 10;
+}
+
+.title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    font-family: var(--font-display);
+    color: var(--color-text-primary);
+    /* Fallback */
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-text-primary) 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: var(--glow-text);
+    letter-spacing: -0.5px;
+}
+
+/* Light mode specific title adjustment */
+[data-theme='light'] .title {
+    background: linear-gradient(135deg, var(--color-primary-dim) 0%, var(--color-text-primary) 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: none;
 }
 
 .subtitle {
     color: var(--color-text-secondary);
-    margin-top: 0.5rem;
-    font-size: 1rem;
+    font-size: 1.1rem;
+    max-width: 600px;
+    margin: 0 auto;
+    font-weight: 300;
 }
 
 .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 1rem;
-    max-width: 800px;
+    grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+    gap: 1.5rem;
+    max-width: 1200px;
     margin: 0 auto;
 }
 
 .card {
-    border-radius: 20px;
+    border-radius: 24px;
     padding: 1.5rem;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     justify-content: space-between;
-    min-height: 160px;
+    min-height: 200px;
     position: relative;
     cursor: pointer;
     overflow: hidden;
-    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+
+    /* Glassmorphism base */
+    background: var(--color-surface);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--color-border);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+[data-theme='light'] .card {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    background: rgba(255, 255, 255, 0.6);
+}
+
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, transparent 100%);
+    z-index: 0;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+[data-theme='light'] .card::before {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, transparent 100%);
 }
 
 .card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--color-primary-glow);
+}
+
+.card:hover::before {
+    opacity: 1;
 }
 
 .card:active {
-    transform: scale(0.98);
+    transform: scale(0.96);
 }
 
+/* Icon Styles */
 .cardIcon {
-    background: rgba(255, 255, 255, 0.1);
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 1rem;
-    backdrop-filter: blur(4px);
+    margin-bottom: 1.5rem;
+    position: relative;
+    z-index: 1;
+
+    /* Icon Background */
+    background: rgba(255, 255, 255, 0.08);
+    /* Default dark mode glass */
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+    transition: all 0.4s ease;
+}
+
+[data-theme='light'] .cardIcon {
+    background: rgba(0, 0, 0, 0.05);
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.05);
+}
+
+.card:hover .cardIcon {
+    transform: scale(1.1) rotate(5deg);
+    background: var(--color-surface-hover);
 }
 
 .cardContent {
+    position: relative;
+    z-index: 1;
     width: 100%;
 }
 
 .cardTitle {
-    font-size: 1.1rem;
+    font-size: 1.25rem;
     font-weight: 700;
     margin: 0;
-    color: #fff;
+    color: var(--color-text-primary);
     font-family: var(--font-display);
+    margin-bottom: 0.25rem;
+    letter-spacing: 0.3px;
 }
 
 .cardSubtitle {
-    font-size: 0.8rem;
-    color: rgba(255, 255, 255, 0.7);
-    margin: 0.25rem 0 0 0;
+    font-size: 0.85rem;
+    color: var(--color-text-secondary);
+    line-height: 1.4;
 }
 
+/* Hindi Text - optional decorative element */
+.hindiText {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 1.5rem;
+    opacity: 0.1;
+    color: var(--color-text-primary);
+    font-family: 'Tiro Devanagari Hindi', serif;
+    font-weight: 900;
+    pointer-events: none;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.card:hover .hindiText {
+    opacity: 0.2;
+    transform: scale(1.2) rotate(-10deg);
+}
+
+/* Arrow/Action on Hover */
 .arrowIcon {
     position: absolute;
     bottom: 1.5rem;
     right: 1.5rem;
-    font-size: 1.2rem;
-    color: rgba(255, 255, 255, 0.5);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--color-surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-primary);
     opacity: 0;
     transform: translateX(-10px);
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    backdrop-filter: blur(4px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .card:hover .arrowIcon {
@@ -99,19 +213,28 @@
     transform: translateX(0);
 }
 
+
 /* Responsive adjustments */
 @media (min-width: 768px) {
     .grid {
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 1.5rem;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 2rem;
+    }
+
+    .container {
+        padding-top: 6rem;
+    }
+
+    .title {
+        font-size: 3.5rem;
     }
 
     .card {
-        min-height: 180px;
+        min-height: 220px;
         padding: 2rem;
     }
 
     .cardTitle {
-        font-size: 1.25rem;
+        font-size: 1.5rem;
     }
 }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { Flower, WifiOff, CloudUpload, Sun, Moon, User } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { useStats } from '../../context/StatsContext';
@@ -8,9 +8,14 @@ import styles from './Header.module.css';
 const Header = () => {
     const { isOnline, pendingSync } = useStats();
     const { isDarkMode, toggleTheme } = useTheme();
+    const location = useLocation();
+    const isHome = location.pathname === '/' || location.pathname === '/chant'; // Apply to both Main List and Chant page? No, just Main List likely. 
+    // Actually user said "Home Page". The new Home is '/'.
+    // Let's stick to '/' for now. 
+    const isTransparent = location.pathname === '/';
 
     return (
-        <header className={styles.header}>
+        <header className={`${styles.header} ${isTransparent ? styles.transparentHeader : ''}`}>
             <div className={`container ${styles.headerContent}`}>
                 <NavLink to="/" className={styles.logo}>
                     <Flower className={styles.logoIcon} size={28} />

@@ -21,6 +21,7 @@ const Progress = lazy(() => import('./pages/Progress'));
 const Music = lazy(() => import('./pages/Music'));
 const Shorts = lazy(() => import('./pages/Shorts'));
 const Counters = lazy(() => import('./pages/Counters'));
+const Library = lazy(() => import('./pages/Library'));
 
 const PageLoader = () => (
   <div style={{
@@ -57,8 +58,9 @@ function App() {
                           <Suspense fallback={<PageLoader />}>
                             <Routes>
                               <Route path="/" element={<Layout />}>
-                                <Route index element={<Home />} />
-                                <Route path="name-counter-tools" element={<Counters />} />
+                                <Route index element={<Counters />} />
+                                <Route path="radha-naam-jap-counter" element={<Home />} />
+                                <Route path="library" element={<Library />} />
                                 {/* <Route path="settings" element={<Settings />} /> REMOVED */}
                                 <Route path="leaderboard" element={<Leaderboard />} />
                                 <Route path="progress" element={<Progress />} />

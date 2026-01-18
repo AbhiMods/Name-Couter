@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import Header from './Header';
 import Footer from './Footer';
@@ -14,26 +14,24 @@ import clsx from 'clsx';
 
 const Layout = () => {
     const { immersiveMode } = useTheme();
-    const { currentSong, isPlaying } = useBhajan();
+    const { isPlaying } = useBhajan();
     const navigate = useNavigate();
     const location = useLocation();
 
     // Visibility Logic:
-    // 1. Never on Home ('/')
-    // 2. Only if playing (or paused with active song? User said "Hidden instantly when music stops or pauses" -> strictly isPlaying)
-    // 3. Never in Immersive Mode
-    const isHome = location.pathname === '/';
+    const isChantPage = location.pathname === '/radha-naam-jap-counter';
     const isMusicPage = location.pathname.startsWith('/music');
     const isShortsPage = location.pathname.startsWith('/shorts');
+    const isLibraryPage = location.pathname === '/library';
 
     // Hide global player on Music & Shorts pages
     const shouldShowPlayer = isPlaying && !isMusicPage && !isShortsPage && !immersiveMode;
 
     // Delayed hiding logic
-    const [delayedShowPlayer, setDelayedShowPlayer] = React.useState(shouldShowPlayer);
-    const [isExiting, setIsExiting] = React.useState(false);
+    const [delayedShowPlayer, setDelayedShowPlayer] = useState(shouldShowPlayer);
+    const [isExiting, setIsExiting] = useState(false);
 
-    React.useEffect(() => {
+    useEffect(() => {
         if (shouldShowPlayer) {
             setDelayedShowPlayer(true);
             setIsExiting(false);
@@ -50,9 +48,9 @@ const Layout = () => {
 
     const isFullPage = isMusicPage || isShortsPage;
     // Basic mobile detection (width < 768px)
-    const [isMobile, setIsMobile] = React.useState(window.innerWidth < 768);
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
-    React.useEffect(() => {
+    useEffect(() => {
         const handleResize = () => setIsMobile(window.innerWidth < 768);
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
@@ -62,8 +60,8 @@ const Layout = () => {
     const shouldHideHeader = isShortsPage && isMobile;
 
     // Swipe Navigation Logic
-    const [touchStart, setTouchStart] = React.useState(null);
-    const [touchEnd, setTouchEnd] = React.useState(null);
+    const [touchStart, setTouchStart] = useState(null);
+    const [touchEnd, setTouchEnd] = useState(null);
     const minSwipeDistance = 50;
 
     const onTouchStart = (e) => {
@@ -79,7 +77,7 @@ const Layout = () => {
         const isLeftSwipe = distance > minSwipeDistance;
         const isRightSwipe = distance < -minSwipeDistance;
 
-        const tabs = ['/', '/name-counter-tools', '/shorts', '/music'];
+        const tabs = ['/', '/library', '/shorts', '/music'];
         const currentIndex = tabs.findIndex(path => location.pathname === path);
 
         if (currentIndex === -1) return; // Not on a main tab
@@ -111,10 +109,14 @@ const Layout = () => {
                 style={isFullPage ? { padding: 0 } : {}}
             >
                 <div
-                    className="container"
+                    className={
+                        // Don't use 'container' class for Home to allow full-width background
+                        // Also full width for immersive/music/shorts
+                        immersiveMode || isFullPage || location.pathname === '/' ? '' : 'container'
+                    }
                     style={
-                        immersiveMode || isFullPage
-                            ? { height: '100vh', padding: 0, maxWidth: '100%' }
+                        immersiveMode || isFullPage || location.pathname === '/'
+                            ? { minHeight: '100vh', padding: 0, maxWidth: '100%' }
                             : {}
                     }
                 >
