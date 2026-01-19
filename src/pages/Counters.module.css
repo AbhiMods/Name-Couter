@@ -177,9 +177,11 @@
     position: absolute;
     top: 1rem;
     bottom: auto;
-    right: auto;
-    left: 1rem;
+    right: 3.5rem;
+    /* Positioned to the left of the pin button (1rem + 32px + gap) */
+    left: auto;
     font-size: 1.5rem;
+    text-align: right;
     opacity: 0.1;
     color: var(--color-text-primary);
     font-family: 'Tiro Devanagari Hindi', serif;
