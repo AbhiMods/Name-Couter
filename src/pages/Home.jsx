@@ -90,9 +90,31 @@ const Home = () => {
         floatingAnimations, floatingTextColor
     } = useTheme();
 
-    const { play: playBgMusic, stop: stopBgMusic, isPlaying: isBgMusicPlaying, volume: bgMusicVolume, setVolume: setBgMusicVolume } = useBgMusic();
+    const { play: playBgMusic, stop: stopBgMusic, isPlaying: isBgMusicPlaying, volume: bgMusicVolume, setVolume: setBgMusicVolume, selectedTrackId, setSelectedTrackId } = useBgMusic();
     const [isBgMuted, setIsBgMuted] = useState(false);
     const prevVolumeRef = useRef(0.5);
+
+    // --- CUSTOM BG MUSIC RESTORE LOGIC FOR RADHA COUNTER ---
+    const activeTrackRef = useRef(selectedTrackId);
+
+    useEffect(() => {
+        // Restore Radha Preference on mount
+        const radhaTrack = localStorage.getItem('radha_bg_music_track');
+        // If coming from HK counter, we must restore Radha's track
+        if (radhaTrack && radhaTrack !== 'none') {
+            if (activeTrackRef.current !== radhaTrack) {
+                setSelectedTrackId(radhaTrack);
+            }
+        }
+        // If no 'radha_bg_music_track' exists yet (first time after update), 
+        // we accept whatever is current, and it will be saved by the effect below.
+    }, [setSelectedTrackId]);
+
+    // Save changes to Radha preference
+    useEffect(() => {
+        activeTrackRef.current = selectedTrackId;
+        localStorage.setItem('radha_bg_music_track', selectedTrackId);
+    }, [selectedTrackId]);
 
     const toggleBgMute = (e) => {
         if (e) e.stopPropagation();
@@ -179,9 +201,7 @@ const Home = () => {
     // We want music to continue playing across tabs
     useEffect(() => {
         return () => {
-            // stopBgMusic(); // Allow auto-play ambience to continue? Maybe stop ambience but keep Bhajan?
-            // Actually user wants persistence. Let's start by NOT stopping anything.
-            // If they want to stop, they can pause.
+            stopBgMusic();
         };
     }, []);
 

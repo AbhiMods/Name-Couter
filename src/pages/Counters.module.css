@@ -54,7 +54,8 @@
 
 .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+    grid-template-columns: 1fr;
+    /* Force single column on mobile */
     gap: 1.5rem;
     max-width: 1200px;
     margin: 0 auto;
@@ -79,7 +80,8 @@
     border: 1px solid var(--color-border);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    /* Smooth ease-out instead of spring */
 }
 
 [data-theme='light'] .card {
@@ -105,7 +107,8 @@
 }
 
 .card:hover {
-    transform: translateY(-8px) scale(1.02);
+    transform: translateY(-5px) scale(1.01);
+    /* Reduced movement for smoother feel */
     box-shadow: var(--shadow-lg);
     border-color: var(--color-primary-glow);
 }
@@ -173,7 +176,9 @@
 .hindiText {
     position: absolute;
     top: 1rem;
-    right: 1rem;
+    bottom: auto;
+    right: auto;
+    left: 1rem;
     font-size: 1.5rem;
     opacity: 0.1;
     color: var(--color-text-primary);
@@ -185,7 +190,8 @@
 
 .card:hover .hindiText {
     opacity: 0.2;
-    transform: scale(1.2) rotate(-10deg);
+    transform: scale(1.1) translateY(-2px);
+    /* Removed rotation, added slight lift */
 }
 
 /* Arrow/Action on Hover */
@@ -213,6 +219,45 @@
     transform: translateX(0);
 }
 
+
+/* Pin Button */
+.pinButton {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-secondary);
+    transition: all 0.3s ease;
+    z-index: 20;
+    /* Above card content */
+    border: none;
+    cursor: pointer;
+    backdrop-filter: blur(4px);
+}
+
+.pinButton:hover {
+    background: var(--color-surface-hover);
+    color: var(--color-primary);
+    transform: scale(1.1);
+}
+
+.pinned {
+    background: var(--color-primary);
+    color: white;
+    box-shadow: 0 0 10px var(--color-primary-glow);
+}
+
+.pinned:hover {
+    background: var(--color-primary);
+    /* Keep it solid when pinned */
+    opacity: 0.9;
+}
 
 /* Responsive adjustments */
 @media (min-width: 768px) {

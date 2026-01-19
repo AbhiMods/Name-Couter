@@ -21,7 +21,10 @@ const Progress = lazy(() => import('./pages/Progress'));
 const Music = lazy(() => import('./pages/Music'));
 const Shorts = lazy(() => import('./pages/Shorts'));
 const Counters = lazy(() => import('./pages/Counters'));
+import UpcomingFestivals from './pages/UpcomingFestivals';
 const Library = lazy(() => import('./pages/Library'));
+// const UpcomingFestivals = lazy(() => import('./pages/UpcomingFestivals')); // Switched to eager load
+const HareKrishnaHome = lazy(() => import('./pages/HareKrishnaHome'));
 
 const PageLoader = () => (
   <div style={{
@@ -60,7 +63,9 @@ function App() {
                               <Route path="/" element={<Layout />}>
                                 <Route index element={<Counters />} />
                                 <Route path="radha-naam-jap-counter" element={<Home />} />
+                                <Route path="hare-krishna-naam-jap-counter" element={<HareKrishnaHome />} />
                                 <Route path="library" element={<Library />} />
+                                <Route path="library/upcoming-festivals" element={<UpcomingFestivals />} />
                                 {/* <Route path="settings" element={<Settings />} /> REMOVED */}
                                 <Route path="leaderboard" element={<Leaderboard />} />
                                 <Route path="progress" element={<Progress />} />

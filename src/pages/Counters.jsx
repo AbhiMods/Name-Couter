@@ -1,10 +1,11 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useName } from '../context/NameContext';
-import { Target, Music, Zap, Heart, Star, LayoutGrid, Sun, Moon, Sparkles, Feather, Flame, Flower } from 'lucide-react';
+import { Target, Music, Zap, Heart, Star, LayoutGrid, Sun, Moon, Sparkles, Feather, Flame, Flower, Pin } from 'lucide-react';
 import { motion } from 'framer-motion';
 import styles from './Counters.module.css';
 import BannerCarousel from '../components/common/BannerCarousel';
+import clsx from 'clsx';
 
 const Counters = () => {
     const navigate = useNavigate();
@@ -81,6 +82,88 @@ const Counters = () => {
         special: true
     };
 
+    const [pinnedIds, setPinnedIds] = React.useState(() => {
+        const saved = localStorage.getItem('pinned_mantras');
+        return saved ? JSON.parse(saved) : [];
+    });
+
+    const togglePin = (e, id) => {
+        e.stopPropagation();
+        setPinnedIds(prev => {
+            const isPinned = prev.includes(id);
+            let newPinned;
+            if (isPinned) {
+                newPinned = prev.filter(p => p !== id);
+            } else {
+                newPinned = [id, ...prev]; // Add to top
+            }
+            localStorage.setItem('pinned_mantras', JSON.stringify(newPinned));
+            return newPinned;
+        });
+    };
+
+    // Sort names: Pinned first, then original order
+    const sortedNames = [...allNames].sort((a, b) => {
+        const isAPinned = pinnedIds.includes(a.id);
+        const isBPinned = pinnedIds.includes(b.id);
+        if (isAPinned && !isBPinned) return -1;
+        if (!isAPinned && isBPinned) return 1;
+        return 0; // Maintain original relative order
+    });
+
+    // Combine all pinnable items
+    const allItems = [
+        // Special Cards
+        {
+            id: '108_counter',
+            label: '108 Mala Practice',
+            subtitle: 'Traditional Counting',
+            hindiText: '१०८',
+            special: true,
+            icon: Target,
+            color: '#FFD700',
+            bg: 'linear-gradient(135deg, rgba(255, 215, 0, 0.15) 0%, rgba(255, 215, 0, 0.05) 100%)',
+            border: '1px solid rgba(255, 215, 0, 0.2)',
+            iconBg: 'rgba(255, 215, 0, 0.2)'
+        },
+        {
+            id: 'hare_krishna', // Changed to consistent ID for pinning logic
+            label: 'Hare Krishna',
+            subtitle: 'Maha Mantra Counter',
+            hindiText: 'हरे कृष्ण',
+            special: true,
+            icon: Feather,
+            color: '#4da6ff',
+            bg: 'linear-gradient(135deg, rgba(77, 166, 255, 0.15) 0%, rgba(77, 166, 255, 0.05) 100%)',
+            border: '1px solid rgba(77, 166, 255, 0.2)',
+            iconBg: 'rgba(77, 166, 255, 0.2)',
+            link: '/hare-krishna-naam-jap-counter'
+        },
+        // Standard Mantras
+        ...allNames.map(item => ({
+            ...item,
+            icon: null, // Will use getIconForId
+            bg: getGradientForId(item.id)
+        }))
+    ];
+
+    // Sort items: Pinned first, then original order
+    const sortedItems = [...allItems].sort((a, b) => {
+        const isAPinned = pinnedIds.includes(a.id);
+        const isBPinned = pinnedIds.includes(b.id);
+        if (isAPinned && !isBPinned) return -1;
+        if (!isAPinned && isBPinned) return 1;
+        return 0;
+    });
+
+    const handleCardClick = (item) => {
+        if (item.link) {
+            navigate(item.link);
+        } else {
+            handleSelect(item.id);
+        }
+    };
+
     return (
         <div className={styles.container}>
             {/* Dynamic Banner Carousel */}
@@ -89,7 +172,7 @@ const Counters = () => {
             <header className={styles.header}>
                 <motion.h1
                     className={styles.title}
-                    style={{ fontSize: '1.75rem', marginTop: '0.5rem', marginBottom: '0.25rem' }} // Smaller title as requested
+                    style={{ fontSize: '1.75rem', marginTop: '0.5rem', marginBottom: '0.25rem' }}
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6 }}
@@ -113,49 +196,48 @@ const Counters = () => {
                 initial="hidden"
                 animate="visible"
             >
-                {/* 108 Mala Special Card */}
-                <motion.div
-                    className={styles.card}
-                    variants={itemVariants}
-                    onClick={() => handleSelect(malaCard.id)}
-                    style={{ background: 'linear-gradient(135deg, rgba(255, 215, 0, 0.15) 0%, rgba(255, 215, 0, 0.05) 100%)', border: '1px solid rgba(255, 215, 0, 0.2)' }}
-                >
-                    <div className={styles.hindiText}>{malaCard.hindiText}</div>
-                    <div className={styles.cardIcon} style={{ background: 'rgba(255, 215, 0, 0.2)', color: '#FFD700' }}>
-                        <Target size={32} />
-                    </div>
-                    <div className={styles.cardContent}>
-                        <h3 className={styles.cardTitle}>{malaCard.label}</h3>
-                        <p className={styles.cardSubtitle}>{malaCard.subtitle}</p>
-                    </div>
-                    <div className={styles.arrowIcon}>→</div>
-                </motion.div>
+                {sortedItems.map((item) => {
+                    const isPinned = pinnedIds.includes(item.id);
+                    const ItemIcon = item.icon; // For special cards that define it directly
 
-                {/* All Mantras */}
-                {allNames.map((item) => (
-                    <motion.div
-                        key={item.id}
-                        className={styles.card}
-                        variants={itemVariants}
-                        onClick={() => handleSelect(item.id)}
-                        style={{ background: getGradientForId(item.id) }}
-                    >
-                        {item.hindiText && <div className={styles.hindiText}>{item.hindiText}</div>}
+                    return (
+                        <motion.div
+                            layout
+                            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                            key={item.id}
+                            className={styles.card}
+                            variants={itemVariants}
+                            onClick={() => handleCardClick(item)}
+                            style={{
+                                background: item.bg,
+                                border: item.border || '1px solid var(--color-border)'
+                            }}
+                        >
+                            <button
+                                className={clsx(styles.pinButton, isPinned && styles.pinned)}
+                                onClick={(e) => togglePin(e, item.id)}
+                                title={isPinned ? "Unpin Mantra" : "Pin to Top"}
+                            >
+                                <Pin size={16} fill={isPinned ? "currentColor" : "none"} />
+                            </button>
 
-                        <div className={styles.cardIcon}>
-                            {getIconForId(item.id)}
-                        </div>
+                            {item.hindiText && <div className={styles.hindiText}>{item.hindiText}</div>}
 
-                        <div className={styles.cardContent}>
-                            <h3 className={styles.cardTitle}>{item.label}</h3>
-                            <p className={styles.cardSubtitle}>{item.subtitle}</p>
-                        </div>
+                            <div className={styles.cardIcon} style={item.iconBg ? { background: item.iconBg, color: item.color } : {}}>
+                                {ItemIcon ? <ItemIcon size={32} /> : getIconForId(item.id)}
+                            </div>
 
-                        <div className={styles.arrowIcon}>→</div>
-                    </motion.div>
-                ))}
+                            <div className={styles.cardContent}>
+                                <h3 className={styles.cardTitle}>{item.label}</h3>
+                                <p className={styles.cardSubtitle}>{item.subtitle}</p>
+                            </div>
 
-                {/* Zen Mode / Custom Placeholder */}
+                            <div className={styles.arrowIcon}>→</div>
+                        </motion.div>
+                    );
+                })}
+
+                {/* Zen Mode / Custom Placeholder (Always Last, Unpinnable) */}
                 <motion.div
                     className={styles.card}
                     variants={itemVariants}

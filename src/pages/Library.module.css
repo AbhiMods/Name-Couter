@@ -1,0 +1,32 @@
+.container {
+     width: 100%;
+     min-height: 100vh;
+     padding-bottom: 6rem;
+     /* Space for bottom nav */
+     color: white;
+     background: transparent;
+     display: flex;
+     flex-direction: column;
+}
+
+.header {
+     padding: 2rem 1.5rem 1rem 1.5rem;
+     text-align: center;
+}
+
+.title {
+     font-family: var(--font-display);
+     font-size: 2rem;
+     margin: 0 0 0.5rem 0;
+     background: linear-gradient(135deg, #fff 0%, rgba(255, 255, 255, 0.7) 100%);
+     -webkit-background-clip: text;
+     background-clip: text;
+     -webkit-text-fill-color: transparent;
+}
+
+.subtitle {
+     font-size: 0.95rem;
+     color: rgba(255, 255, 255, 0.6);
+     margin: 0;
+     line-height: 1.5;
+}
