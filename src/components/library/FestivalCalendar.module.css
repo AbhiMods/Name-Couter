@@ -23,6 +23,7 @@
      align-items: center;
      gap: 0.75rem;
      font-family: var(--font-display);
+     white-space: nowrap;
 }
 
 .icon {

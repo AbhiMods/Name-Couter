@@ -97,9 +97,6 @@
 }
 
 
-
-
-
 /* Hover/Touch Feedback */
 .navItem:active .iconWrapper {
     transform: scale(0.9);

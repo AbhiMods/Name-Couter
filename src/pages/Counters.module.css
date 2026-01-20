@@ -251,14 +251,17 @@
 
 .pinned {
     background: var(--color-primary);
-    color: white;
-    box-shadow: 0 0 10px var(--color-primary-glow);
+    color: #000;
+    box-shadow: 0 0 15px var(--color-primary-glow);
+    transform: scale(1.1);
+    border: 2px solid rgba(255, 255, 255, 0.2);
 }
 
 .pinned:hover {
     background: var(--color-primary);
-    /* Keep it solid when pinned */
-    opacity: 0.9;
+    opacity: 1;
+    transform: scale(1.15);
+    box-shadow: 0 0 20px var(--color-primary-glow);
 }
 
 /* Responsive adjustments */

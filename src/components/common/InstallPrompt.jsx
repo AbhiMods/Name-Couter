@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Download, X } from 'lucide-react';
+import { Download } from 'lucide-react';
 import Button from '../ui/Button';
 
 const InstallPrompt = () => {
@@ -54,9 +54,7 @@ const InstallPrompt = () => {
           setIsVisible(false);
      };
 
-     const handleDismiss = () => {
-          setIsVisible(false);
-     };
+
 
      if (!isVisible || isInstalled) return null;
 
@@ -100,24 +98,6 @@ const InstallPrompt = () => {
                                    background: 'radial-gradient(circle, rgba(var(--color-primary-rgb), 0.15) 0%, transparent 70%)',
                                    pointerEvents: 'none',
                               }} />
-
-                              {/* Close Button */}
-                              <button
-                                   onClick={handleDismiss}
-                                   style={{
-                                        position: 'absolute',
-                                        top: '16px',
-                                        right: '16px',
-                                        background: 'transparent',
-                                        border: 'none',
-                                        color: 'rgba(255,255,255,0.5)',
-                                        cursor: 'pointer',
-                                        padding: '4px',
-                                        zIndex: 2
-                                   }}
-                              >
-                                   <X size={18} />
-                              </button>
 
                               <div style={{ display: 'flex', gap: '16px', alignItems: 'center', position: 'relative', zIndex: 1 }}>
                                    <div style={{

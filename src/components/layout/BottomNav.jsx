@@ -24,18 +24,6 @@ const BottomNav = () => {
                 </NavLink>
 
                 <NavLink
-                    to="/library"
-                    className={({ isActive }) =>
-                        isActive ? `${styles.navItem} ${styles.active}` : styles.navItem
-                    }
-                >
-                    <div className={styles.iconWrapper}>
-                        <LibraryBig size={24} className={styles.icon} />
-                    </div>
-                    <span className={styles.label}>Library</span>
-                </NavLink>
-
-                <NavLink
                     to="/shorts"
                     className={({ isActive }) =>
                         isActive ? `${styles.navItem} ${styles.active}` : styles.navItem
@@ -65,6 +53,18 @@ const BottomNav = () => {
                         )}
                     </div>
                     <span className={styles.label}>Music</span>
+                </NavLink>
+
+                <NavLink
+                    to="/library"
+                    className={({ isActive }) =>
+                        isActive ? `${styles.navItem} ${styles.active}` : styles.navItem
+                    }
+                >
+                    <div className={styles.iconWrapper}>
+                        <LibraryBig size={24} className={styles.icon} />
+                    </div>
+                    <span className={styles.label}>Library</span>
                 </NavLink>
             </div>
         </nav>

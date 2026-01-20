@@ -3,7 +3,6 @@ import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import Header from './Header';
 import Footer from './Footer';
 import BottomNav from './BottomNav';
-import MiniPlayer from '../chant/MiniPlayer';
 import PromoPopup from '../common/PromoPopup';
 import FeaturePopup from '../common/FeaturePopup';
 import FeedbackPopup from '../common/FeedbackPopup';
@@ -25,27 +24,32 @@ const Layout = () => {
     const isShortsPage = location.pathname.startsWith('/shorts');
     const isLibraryPage = location.pathname === '/library';
 
-    // Hide global player on Music & Shorts pages
-    const shouldShowPlayer = isPlaying && !isMusicPage && !isShortsPage && !immersiveMode;
+    // Allowed pages for Mini Player (Home & Library)
+    const isAllowedPage = !isMusicPage && !isShortsPage && !immersiveMode;
 
     // Delayed hiding logic
-    const [delayedShowPlayer, setDelayedShowPlayer] = useState(shouldShowPlayer);
+    const [delayedShowPlayer, setDelayedShowPlayer] = useState(isPlaying && isAllowedPage);
     const [isExiting, setIsExiting] = useState(false);
 
     useEffect(() => {
-        if (shouldShowPlayer) {
+        if (isPlaying && isAllowedPage) {
+            // Case 1: Playing on allowed page -> SHOW
             setDelayedShowPlayer(true);
             setIsExiting(false);
-        } else {
-            // Start exit animation
+        } else if (!isAllowedPage) {
+            // Case 2: Navigated to disallowed page (Music/Shorts) -> HIDE IMMEDIATELY
             setIsExiting(true);
+            const timer = setTimeout(() => setDelayedShowPlayer(false), 400); // Match exit animation
+            return () => clearTimeout(timer);
+        } else {
+            // Case 3: Paused on allowed page -> HIDE AFTER DELAY
             const timer = setTimeout(() => {
-                setDelayedShowPlayer(false);
-                setIsExiting(false);
-            }, 4000); // 4 seconds delay as requested
+                setIsExiting(true);
+                setTimeout(() => setDelayedShowPlayer(false), 400);
+            }, 3000);
             return () => clearTimeout(timer);
         }
-    }, [shouldShowPlayer]);
+    }, [isPlaying, isAllowedPage]);
 
     const isFullPage = isMusicPage || isShortsPage;
     // Basic mobile detection (width < 768px)
@@ -106,7 +110,7 @@ const Layout = () => {
         >
             {!immersiveMode && !shouldHideHeader && <Header />}
             <main
-                className={clsx(styles.main, shouldShowPlayer && styles.mainWithPlayer)}
+                className={clsx(styles.main, delayedShowPlayer && styles.mainWithPlayer)}
                 style={isFullPage ? { padding: 0 } : {}}
             >
                 <div
@@ -124,8 +128,6 @@ const Layout = () => {
                     <Outlet />
                 </div>
             </main>
-            {delayedShowPlayer && <MiniPlayer onExpand={() => navigate('/music')} isExiting={isExiting} />}
-            <PromoPopup />
             <FeaturePopup />
             <FeedbackPopup />
             <InstallPrompt />

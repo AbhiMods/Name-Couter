@@ -71,9 +71,7 @@ const FestivalCalendar = () => {
                          <Calendar size={24} className={styles.icon} />
                          Upcoming Festivals
                     </h2>
-                    <div className={styles.locationBadge}>
-                         <span>India</span>
-                    </div>
+
                </div>
 
                <div className={styles.listContainer}>
