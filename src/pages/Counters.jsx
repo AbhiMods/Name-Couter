@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useName } from '../context/NameContext';
-import { Target, Music, Zap, Heart, Star, LayoutGrid, Sun, Moon, Sparkles, Feather, Flame, Flower, Pin } from 'lucide-react';
+import { Target, Music, Zap, Heart, Star, LayoutGrid, Sun, Moon, Sparkles, Feather, Flame, Flower, Pin, Calendar as CalendarIcon, BookOpen } from 'lucide-react';
 import { motion } from 'framer-motion';
 import styles from './Counters.module.css';
 import BannerCarousel from '../components/common/BannerCarousel';
@@ -16,14 +16,14 @@ const Counters = () => {
         const icons = {
             'ram': <Zap size={28} color="#ff9933" />,
             'radha': <Heart size={28} color="#ff4d4d" />,
-            'krishna': <Feather size={28} color="#4da6ff" />, // Feather for Krishna
+            'krishna': <Feather size={28} color="#4da6ff" />,
             'jai_shri_ram': <Star size={28} color="#ff9933" />,
-            'om_namah_shivaya': <Moon size={28} color="#E0E0E0" />, // Moon for Shiva
-            'ganesh': <Flower size={28} color="#FFD700" />, // Flower/Modak
+            'om_namah_shivaya': <Moon size={28} color="#E0E0E0" />,
+            'ganesh': <Flower size={28} color="#FFD700" />,
             'hanuman': <Flame size={28} color="#ff5722" />,
             'gayatri': <Sun size={28} color="#FFD700" />,
             'vasudevaya': <Sparkles size={28} color="#4da6ff" />,
-            'durga': <Target size={28} color="#ff0000" />, // Power
+            'durga': <Target size={28} color="#ff0000" />,
             'om': <Music size={28} color="#fff" />,
             'guru': <Sparkles size={28} color="#FFA500" />,
         };
@@ -31,14 +31,12 @@ const Counters = () => {
     };
 
     const getGradientForId = (id) => {
-        // Subtle gradients for cards
         const gradients = {
             'ram': 'linear-gradient(135deg, rgba(255, 153, 51, 0.1) 0%, rgba(255, 153, 51, 0.02) 100%)',
             'radha': 'linear-gradient(135deg, rgba(255, 77, 77, 0.1) 0%, rgba(255, 77, 77, 0.02) 100%)',
             'krishna': 'linear-gradient(135deg, rgba(77, 166, 255, 0.1) 0%, rgba(77, 166, 255, 0.02) 100%)',
             'om_namah_shivaya': 'linear-gradient(135deg, rgba(200, 200, 255, 0.1) 0%, rgba(200, 200, 255, 0.02) 100%)',
             'ganesh': 'linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(255, 215, 0, 0.02) 100%)',
-            // Default dark glass
             'default': 'linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%)'
         };
         return gradients[id] || gradients['default'];
@@ -48,9 +46,7 @@ const Counters = () => {
         hidden: { opacity: 0 },
         visible: {
             opacity: 1,
-            transition: {
-                staggerChildren: 0.05
-            }
+            transition: { staggerChildren: 0.05 }
         }
     };
 
@@ -68,18 +64,9 @@ const Counters = () => {
             localStorage.setItem('divine_target', '108');
         } else {
             updateName(id);
-            localStorage.setItem('divine_target', '0'); // Default to unlimited for specific mantras
+            localStorage.setItem('divine_target', '0');
         }
         navigate('/radha-naam-jap-counter');
-    };
-
-    // Special Card for 108 Counters (Standard Practice)
-    const malaCard = {
-        id: '108_counter',
-        label: '108 Mala Practice',
-        subtitle: 'Traditional Counting',
-        hindiText: '१०८',
-        special: true
     };
 
     const [pinnedIds, setPinnedIds] = React.useState(() => {
@@ -95,25 +82,23 @@ const Counters = () => {
             if (isPinned) {
                 newPinned = prev.filter(p => p !== id);
             } else {
-                newPinned = [id, ...prev]; // Add to top
+                newPinned = [id, ...prev];
             }
             localStorage.setItem('pinned_mantras', JSON.stringify(newPinned));
             return newPinned;
         });
     };
 
-    // Sort names: Pinned first, then original order
-    const sortedNames = [...allNames].sort((a, b) => {
-        const isAPinned = pinnedIds.includes(a.id);
-        const isBPinned = pinnedIds.includes(b.id);
-        if (isAPinned && !isBPinned) return -1;
-        if (!isAPinned && isBPinned) return 1;
-        return 0; // Maintain original relative order
-    });
+    const handleCardClick = (item) => {
+        if (item.link) {
+            navigate(item.link);
+        } else {
+            handleSelect(item.id);
+        }
+    };
 
     // Combine all pinnable items
     const allItems = [
-        // Special Cards
         {
             id: '108_counter',
             label: '108 Mala Practice',
@@ -127,7 +112,7 @@ const Counters = () => {
             iconBg: 'rgba(255, 215, 0, 0.2)'
         },
         {
-            id: 'hare_krishna', // Changed to consistent ID for pinning logic
+            id: 'hare_krishna',
             label: 'Hare Krishna',
             subtitle: 'Maha Mantra Counter',
             hindiText: 'हरे कृष्ण',
@@ -139,15 +124,13 @@ const Counters = () => {
             iconBg: 'rgba(77, 166, 255, 0.2)',
             link: '/hare-krishna-naam-jap-counter'
         },
-        // Standard Mantras
         ...allNames.map(item => ({
             ...item,
-            icon: null, // Will use getIconForId
+            icon: null,
             bg: getGradientForId(item.id)
         }))
     ];
 
-    // Sort items: Pinned first, then original order
     const sortedItems = [...allItems].sort((a, b) => {
         const isAPinned = pinnedIds.includes(a.id);
         const isBPinned = pinnedIds.includes(b.id);
@@ -155,40 +138,58 @@ const Counters = () => {
         if (!isAPinned && isBPinned) return 1;
         return 0;
     });
+    const today = new Date();
+    const dayName = today.toLocaleDateString('en-US', { weekday: 'short' });
+    const dateNum = today.getDate();
 
-    const handleCardClick = (item) => {
-        if (item.link) {
-            navigate(item.link);
-        } else {
-            handleSelect(item.id);
-        }
-    };
+    /* ... */
 
     return (
         <div className={styles.container}>
             {/* Dynamic Banner Carousel */}
             <BannerCarousel />
 
-            <header className={styles.header}>
-                <motion.h1
-                    className={styles.title}
-                    style={{ fontSize: '1.75rem', marginTop: '0.5rem', marginBottom: '0.25rem' }}
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6 }}
-                >
-                    Choose Your Chant
-                </motion.h1>
-                <motion.p
-                    className={styles.subtitle}
-                    style={{ fontSize: '0.95rem' }}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.2, duration: 0.6 }}
-                >
-                    Select a deity or mantra to begin your spiritual journey.
-                </motion.p>
-            </header>
+            {/* Quick Access Row - iOS Style */}
+            <div className={styles.quickAccessRow}>
+                {/* 1. Calendar App Icon */}
+                <Link to="/calendar" className={styles.quickAccessItem}>
+                    <div className={clsx(styles.appIconBox, styles.calendarBox)}>
+                        <div className={styles.calendarHeader}>
+                            <span className={styles.calendarDay}>{dayName}</span>
+                        </div>
+                        <div className={styles.calendarBody}>
+                            <span className={styles.calendarDate}>{dateNum}</span>
+                        </div>
+                    </div>
+                    <span className={styles.quickAccessLabel}>Calendar</span>
+                </Link>
+
+                {/* 2. Bhajan App Icon */}
+                <Link to="/music" className={styles.quickAccessItem}>
+                    <div className={styles.appIconBox}>
+                        <Music size={32} color="#FF5722" fill="#FF5722" fillOpacity={0.2} />
+                    </div>
+                    <span className={styles.quickAccessLabel}>Bhajan</span>
+                </Link>
+
+                {/* 3. Prarthana App Icon */}
+                <Link to="/library" className={styles.quickAccessItem}>
+                    <div className={styles.appIconBox}>
+                        <BookOpen size={32} color="#2196F3" fill="#2196F3" fillOpacity={0.2} />
+                    </div>
+                    <span className={styles.quickAccessLabel}>Prarthana</span>
+                </Link>
+
+                {/* 4. Japa App Icon (New) */}
+                <Link to="/radha-naam-jap-counter" className={styles.quickAccessItem}>
+                    <div className={styles.appIconBox}>
+                        <Sparkles size={32} color="#4CAF50" fill="#4CAF50" fillOpacity={0.2} />
+                    </div>
+                    <span className={styles.quickAccessLabel}>Japa</span>
+                </Link>
+            </div>
+
+
 
             <motion.div
                 className={styles.grid}

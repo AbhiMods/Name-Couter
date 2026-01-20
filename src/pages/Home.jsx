@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Volume2, VolumeX, Target, X, Maximize2, Minimize2, LogOut, Mic, MicOff, Play, Pause, Zap, Timer, Clock } from 'lucide-react';
+import { Volume2, VolumeX, Target, X, Maximize2, Minimize2, LogOut, Mic, MicOff, Play, Pause, Zap, Timer, Clock, Music, Calendar as CalendarIcon, BookOpen } from 'lucide-react';
 import SessionSummary from '../components/chant/SessionSummary';
 import ImageCarousel from '../components/chant/ImageCarousel';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import clsx from 'clsx';
 import Card from '../components/ui/Card';

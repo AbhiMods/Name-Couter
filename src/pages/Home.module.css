@@ -720,10 +720,70 @@
     transform: scale(1.1);
 }
 
+/* Quick Access Row */
+.quickAccessRow {
+    display: flex;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+    margin-bottom: 0.5rem;
+    z-index: 10;
+    width: 100%;
+}
+
+.quickAccessItem {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+    padding: 0.5rem 0.75rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    backdrop-filter: blur(8px);
+    border-radius: 12px;
+    cursor: pointer;
+    min-width: 70px;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.quickAccessItem:hover {
+    background: rgba(var(--color-primary-rgb), 0.1);
+    border-color: rgba(var(--color-primary-rgb), 0.3);
+    transform: translateY(-2px);
+}
+
+.quickAccessItem:active {
+    transform: scale(0.95);
+}
+
+.quickAccessIcon {
+    color: var(--color-primary);
+    opacity: 0.9;
+}
+
+.quickAccessLabel {
+    font-size: 0.7rem;
+    font-family: var(--font-sans);
+    color: var(--color-text-secondary);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+}
+
 @media (max-width: 480px) {
     .musicToggle {
         top: 0.5rem;
         right: 0.5rem;
         padding: 0.5rem;
+    }
+
+    .quickAccessRow {
+        gap: 0.5rem;
+    }
+
+    .quickAccessItem {
+        padding: 0.4rem 0.6rem;
+        min-width: 60px;
     }
 }

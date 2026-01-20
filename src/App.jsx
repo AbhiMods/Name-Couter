@@ -20,6 +20,7 @@ const Leaderboard = lazy(() => import('./pages/Leaderboard'));
 const Progress = lazy(() => import('./pages/Progress'));
 const Music = lazy(() => import('./pages/Music'));
 const Shorts = lazy(() => import('./pages/Shorts'));
+const CalendarPage = lazy(() => import('./pages/CalendarPage'));
 const Counters = lazy(() => import('./pages/Counters'));
 import UpcomingFestivals from './pages/UpcomingFestivals';
 const Library = lazy(() => import('./pages/Library'));
@@ -71,6 +72,7 @@ function App() {
                                 <Route path="progress" element={<Progress />} />
                                 <Route path="music" element={<Music />} />
                                 <Route path="shorts" element={<Shorts />} />
+                                <Route path="calendar" element={<CalendarPage />} />
                                 <Route path="*" element={<Navigate to="/" replace />} />
                               </Route>
                             </Routes>

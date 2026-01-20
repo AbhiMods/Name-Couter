@@ -288,3 +288,126 @@
         font-size: 1.5rem;
     }
 }
+
+/* Quick Access Row - iOS Style */
+.quickAccessRow {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    /* Wider gap for app icons */
+    margin-top: 1.5rem;
+    margin-bottom: 2rem;
+    z-index: 100;
+    width: 100%;
+    padding: 0 1rem;
+}
+
+.quickAccessItem {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.quickAccessItem:active {
+    transform: scale(0.92);
+}
+
+/* App Icon Box (White squircle) */
+.appIconBox {
+    width: 60px;
+    height: 60px;
+    background: #ffffff;
+    border-radius: 14px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Specific styling for the Calendar Icon to match reference */
+.calendarBox {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    background: #ffffff;
+}
+
+.calendarHeader {
+    width: 100%;
+    height: 18px;
+    background: #ff4d4d;
+    /* Red header */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.calendarDay {
+    color: white;
+    font-size: 8px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.calendarBody {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding-bottom: 2px;
+}
+
+.calendarDate {
+    color: #333;
+    font-size: 24px;
+    font-weight: 600;
+    font-family: var(--font-sans);
+}
+
+/* Icons for other apps */
+.appIconBox svg {
+    /* Ensure icons fit nicely */
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.quickAccessLabel {
+    font-size: 0.75rem;
+    font-family: var(--font-sans);
+    color: var(--color-text-primary);
+    font-weight: 500;
+    text-align: center;
+    margin-top: 0.2rem;
+}
+
+@media (max-width: 480px) {
+    .quickAccessRow {
+        gap: 1rem;
+    }
+
+    .appIconBox {
+        width: 52px;
+        height: 52px;
+        border-radius: 12px;
+    }
+
+    .calendarHeader {
+        height: 16px;
+    }
+
+    .calendarDate {
+        font-size: 20px;
+    }
+
+    .quickAccessLabel {
+        font-size: 0.7rem;
+    }
+}
