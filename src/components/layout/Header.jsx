@@ -50,6 +50,14 @@ const Header = () => {
                         Music
                     </NavLink>
                     <NavLink
+                        to="/library"
+                        className={({ isActive }) =>
+                            isActive ? `${styles.desktopNavLink} ${styles.desktopNavLinkActive}` : styles.desktopNavLink
+                        }
+                    >
+                        Library
+                    </NavLink>
+                    <NavLink
                         to="/progress"
                         className={({ isActive }) =>
                             isActive ? `${styles.desktopNavLink} ${styles.desktopNavLinkActive}` : styles.desktopNavLink

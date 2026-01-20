@@ -2,9 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Heart, Share2, Volume2, VolumeX, Bookmark, Play, Pause, AlertCircle } from 'lucide-react';
 import styles from './Reels.module.css';
 
-const ReelItem = ({ reel, isActive, shouldPreload, onLike, isMuted, toggleMute }) => {
-    const [liked, setLiked] = useState(false);
-    // const [isMuted, setIsMuted] = useState(true); // REMOVED: Managed by Parent
+const ReelItem = ({ reel, isActive, shouldPreload, onLike, isMuted, toggleMute, onEnded, isLiked }) => {
+    // const [liked, setLiked] = useState(false); // REMOVED: Managed by Parent
     const [isPlaying, setIsPlaying] = useState(false); // Tracks desired state
     const iframeRef = useRef(null);
 
@@ -71,17 +70,23 @@ const ReelItem = ({ reel, isActive, shouldPreload, onLike, isMuted, toggleMute }
 
     const handleLike = (e) => {
         e.stopPropagation();
-        if (!liked) {
-            setLiked(true);
-            onLike(reel.id);
-        }
+        onLike(); // Parent handles toggling logic
     };
 
     const handleShare = (e) => {
         e.stopPropagation();
-        const url = `https://youtube.com/shorts/${videoId}`;
+        // Generate Deep Link to this specific reel on our app
+        const url = `${window.location.origin}/shorts?id=${reel.id}`;
+
         if (navigator.share) {
-            navigator.share({ title: reel.title, url }).catch(() => { });
+            navigator.share({ title: reel.title, url }).catch(() => {
+                // Fallback: Copy to clipboard if share fails or isn't supported (optional but good UX)
+                navigator.clipboard.writeText(url);
+                alert("Link copied to clipboard!");
+            });
+        } else {
+            navigator.clipboard.writeText(url);
+            alert("Link copied to clipboard!");
         }
     };
 
@@ -156,10 +161,10 @@ const ReelItem = ({ reel, isActive, shouldPreload, onLike, isMuted, toggleMute }
             {/* Actions Bar */}
             <div className={styles.actionsBar}>
                 <button
-                    className={`${styles.actionBtn} ${liked ? styles.liked : ''}`}
+                    className={`${styles.actionBtn} ${isLiked ? styles.liked : ''}`}
                     onClick={handleLike}
                 >
-                    <Heart size={28} fill={liked ? "#ef4444" : "rgba(0,0,0,0.5)"} strokeWidth={liked ? 0 : 2} />
+                    <Heart size={28} fill={isLiked ? "#ef4444" : "rgba(0,0,0,0.5)"} strokeWidth={isLiked ? 0 : 2} />
                     <span className={styles.actionLabel}>{reel.likes}</span>
                 </button>
 

@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useStats } from '../context/StatsContext';
-import { Calendar, TrendingUp, BarChart2, Award, Trophy } from 'lucide-react';
+import { Calendar, TrendingUp, BarChart2, Award, Trophy, MessageSquare, Heart } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Card from '../components/ui/Card';
 import Leaderboard from './Leaderboard';
@@ -8,6 +8,7 @@ import Badges from '../components/stats/Badges';
 import TimeAnalytics from '../components/stats/TimeAnalytics';
 import AnimatedCounter from '../components/ui/AnimatedCounter';
 import FeedbackModal from '../components/stats/FeedbackModal';
+import DonateModal from '../components/common/DonateModal';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import styles from './Progress.module.css';
 
@@ -16,6 +17,7 @@ const Progress = () => {
     const { getHistory, totalCount, getStreak } = useStats();
     const [viewRange, setViewRange] = useState(7); // 7 for weekly, 30 for monthly
     const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
+    const [isDonateOpen, setIsDonateOpen] = useState(false);
 
     const historyData = useMemo(() => getHistory(viewRange), [getHistory, viewRange]);
     const maxCount = useMemo(() => Math.max(...historyData.map(d => d.count), 1), [historyData]);
@@ -163,21 +165,43 @@ const Progress = () => {
                 <Leaderboard />
             </section>
 
-            {/* SECTION 4: FEEDBACK */}
-            <section className={styles.section}>
-                <Card className={styles.feedbackCard}>
-                    <button
-                        className={styles.feedbackButton}
-                        onClick={() => setIsFeedbackOpen(true)}
+            {/* SECTION 4: ACTIONS (Feedback & Support) */}
+            <section className={styles.section} style={{ flexDirection: 'row', justifyContent: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+                <button
+                    className={styles.feedbackButton}
+                    onClick={() => setIsFeedbackOpen(true)}
+                >
+                    <motion.span
+                        animate={{ rotate: [0, -10, 10, -10, 10, 0] }}
+                        transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
                     >
-                        Give Feedback
-                    </button>
-                </Card>
+                        <MessageSquare size={18} />
+                    </motion.span>
+                    Give Feedback
+                </button>
+
+                <button
+                    className={styles.donateButton}
+                    onClick={() => setIsDonateOpen(true)}
+                >
+                    <motion.span
+                        animate={{ scale: [1, 1.2, 1] }}
+                        transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 1 }}
+                    >
+                        <Heart size={18} fill="currentColor" />
+                    </motion.span>
+                    Support Developer
+                </button>
             </section>
 
             <FeedbackModal
                 isOpen={isFeedbackOpen}
                 onClose={() => setIsFeedbackOpen(false)}
+            />
+
+            <DonateModal
+                isOpen={isDonateOpen}
+                onClose={() => setIsDonateOpen(false)}
             />
         </div>
     );

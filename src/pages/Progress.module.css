@@ -366,24 +366,88 @@
     margin: 0;
 }
 
-.feedbackButton {
-    background: var(--color-primary);
-    color: white;
-    border: none;
-    padding: 0.75rem 2rem;
-    border-radius: var(--radius-md);
-    font-weight: 600;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: opacity 0.2s, transform 0.2s, box-shadow 0.2s;
+/* Button Shine Animation */
+@keyframes buttonShine {
+    0% {
+        transform: translateX(-100%) skewX(-15deg);
+    }
+
+    100% {
+        transform: translateX(200%) skewX(-15deg);
+    }
 }
 
-.feedbackButton:hover {
-    opacity: 0.9;
-    transform: translateY(-1px);
+.feedbackButton,
+.donateButton {
+    position: relative;
+    overflow: hidden;
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.2s;
+    flex: 1;
+    min-width: fit-content;
+    /* Allow shrinking to content */
+    max-width: 240px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    white-space: nowrap;
+    /* Force text to stay on one line */
+}
+
+.feedbackButton::after,
+.donateButton::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(to right,
+            transparent,
+            rgba(255, 255, 255, 0.2),
+            transparent);
+    transform: translateX(-150%) skewX(-15deg);
+    animation: buttonShine 3s infinite;
+}
+
+.feedbackButton {
+    background: var(--color-primary);
+    color: black;
+    border: none;
     box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.3);
 }
 
-.feedbackButton:active {
+.donateButton {
+    background: transparent;
+    color: var(--color-primary);
+    border: 1px solid var(--color-primary);
+    /* Thinner border looks cleaner */
+}
+
+.feedbackButton:hover,
+.donateButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(var(--color-primary-rgb), 0.25);
+}
+
+.feedbackButton:active,
+.donateButton:active {
     transform: translateY(0);
+}
+
+@media (max-width: 480px) {
+
+    .feedbackButton,
+    .donateButton {
+        padding: 0.6rem 0.5rem;
+        /* Tighter padding for mobile */
+        font-size: 0.75rem;
+        /* Smaller font to fit text */
+        gap: 0.3rem;
+    }
 }

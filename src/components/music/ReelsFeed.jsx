@@ -14,7 +14,15 @@ const ReelsFeed = () => {
     const [availableIds, setAvailableIds] = useState([]); // Pool of IDs yet to be shown in this cycle
 
     // Dynamic Stats State
-    const [sessionLikes, setSessionLikes] = useState({}); // Map of uniqueId -> addedLikes
+    const [sessionLikes, setSessionLikes] = useState(() => {
+        // Initialize from LocalStorage
+        try {
+            const saved = localStorage.getItem('shorts_likes');
+            return saved ? JSON.parse(saved) : {};
+        } catch (e) {
+            return {};
+        }
+    }); // Map of uniqueId (or originalId) -> addedLikes
 
     const containerRef = useRef(null);
 
@@ -28,8 +36,29 @@ const ReelsFeed = () => {
     };
 
     const initializeFeed = () => {
-        // Start fresh: Shuffle all IDs
-        const allReels = shuffle([...DIVINE_REELS]);
+        // Check for Shared Reel ID in URL
+        const searchParams = new URL(window.location.href).searchParams;
+        const sharedId = searchParams.get('id');
+
+        let allReels = [...DIVINE_REELS];
+
+        if (sharedId) {
+            const index = allReels.findIndex(r => r.id === sharedId);
+            if (index !== -1) {
+                // Remove shared reel from list
+                const sharedReel = allReels.splice(index, 1)[0];
+                // Shuffle the remaining reels
+                allReels = shuffle(allReels);
+                // Prepend the shared reel to the start
+                allReels.unshift(sharedReel);
+            } else {
+                // Shared ID invalid/not found, just shuffle all
+                allReels = shuffle(allReels);
+            }
+        } else {
+            // No shared ID, standard shuffle
+            allReels = shuffle(allReels);
+        }
 
         // Take first batch (e.g., 5) to display
         const initialBatchSize = Math.min(5, allReels.length);
@@ -115,11 +144,13 @@ const ReelsFeed = () => {
         }
     };
 
-    const handleLike = (uniqueId) => {
-        setSessionLikes(prev => ({
-            ...prev,
-            [uniqueId]: (prev[uniqueId] || 0) + 1
-        }));
+    const handleLike = (originalId) => {
+        setSessionLikes(prev => {
+            const isCurrentlyLiked = !!prev[originalId];
+            const newLikes = { ...prev, [originalId]: !isCurrentlyLiked };
+            localStorage.setItem('shorts_likes', JSON.stringify(newLikes));
+            return newLikes;
+        });
     };
 
     const toggleGlobalMute = () => {
