@@ -7,6 +7,7 @@ import MiniPlayer from '../chant/MiniPlayer';
 import PromoPopup from '../common/PromoPopup';
 import FeaturePopup from '../common/FeaturePopup';
 import FeedbackPopup from '../common/FeedbackPopup';
+import InstallPrompt from '../common/InstallPrompt';
 import styles from './Layout.module.css';
 import { useTheme } from '../../context/ThemeContext';
 import { useBhajan } from '../../context/BhajanContext';
@@ -127,6 +128,7 @@ const Layout = () => {
             <PromoPopup />
             <FeaturePopup />
             <FeedbackPopup />
+            <InstallPrompt />
             {!immersiveMode && !isShortsPage && <Footer />}
             {!immersiveMode && <BottomNav />}
         </div>
