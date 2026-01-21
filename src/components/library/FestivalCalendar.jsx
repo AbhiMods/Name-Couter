@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Calendar, Sparkles, Clock, ArrowRight } from 'lucide-react';
+import { Calendar, Sparkles, Clock } from 'lucide-react';
 import styles from './FestivalCalendar.module.css';
 
 const FestivalCalendar = () => {
@@ -113,11 +113,6 @@ const FestivalCalendar = () => {
                                    </div>
 
                                    {/* Right: Action/Decor */}
-                                   <div className={styles.actionColumn}>
-                                        <div className={styles.arrowCircle}>
-                                             <ArrowRight size={20} />
-                                        </div>
-                                   </div>
                               </motion.div>
                          );
                     })}

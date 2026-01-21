@@ -34,20 +34,20 @@ const Header = () => {
                         Home
                     </NavLink>
                     <NavLink
-                        to="/shorts"
+                        to="/aastha"
                         className={({ isActive }) =>
                             isActive ? `${styles.desktopNavLink} ${styles.desktopNavLinkActive}` : styles.desktopNavLink
                         }
                     >
-                        Shorts
+                        Aastha
                     </NavLink>
                     <NavLink
-                        to="/music"
+                        to="/bhajan"
                         className={({ isActive }) =>
                             isActive ? `${styles.desktopNavLink} ${styles.desktopNavLinkActive}` : styles.desktopNavLink
                         }
                     >
-                        Music
+                        Bhajan
                     </NavLink>
                     <NavLink
                         to="/library"

@@ -165,7 +165,7 @@ const Counters = () => {
                 </Link>
 
                 {/* 2. Bhajan App Icon */}
-                <Link to="/music" className={styles.quickAccessItem}>
+                <Link to="/bhajan" className={styles.quickAccessItem}>
                     <div className={styles.appIconBox}>
                         <Music size={32} color="#FF5722" fill="#FF5722" fillOpacity={0.2} />
                     </div>
@@ -222,7 +222,7 @@ const Counters = () => {
                                 <Pin size={16} fill={isPinned ? "currentColor" : "none"} />
                             </button>
 
-                            {item.hindiText && <div className={styles.hindiText}>{item.hindiText}</div>}
+
 
                             <div className={styles.cardIcon} style={item.iconBg ? { background: item.iconBg, color: item.color } : {}}>
                                 {ItemIcon ? <ItemIcon size={32} /> : getIconForId(item.id)}

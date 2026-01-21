@@ -20,8 +20,8 @@ const Layout = () => {
 
     // Visibility Logic:
     const isChantPage = location.pathname === '/radha-naam-jap-counter';
-    const isMusicPage = location.pathname.startsWith('/music');
-    const isShortsPage = location.pathname.startsWith('/shorts');
+    const isMusicPage = location.pathname.startsWith('/bhajan');
+    const isShortsPage = location.pathname.startsWith('/aastha');
     const isLibraryPage = location.pathname === '/library';
 
     // Allowed pages for Mini Player (Home & Library)
@@ -37,7 +37,7 @@ const Layout = () => {
             setDelayedShowPlayer(true);
             setIsExiting(false);
         } else if (!isAllowedPage) {
-            // Case 2: Navigated to disallowed page (Music/Shorts) -> HIDE IMMEDIATELY
+            // Case 2: Navigated to disallowed page (Bhajan/Aastha) -> HIDE IMMEDIATELY
             setIsExiting(true);
             const timer = setTimeout(() => setDelayedShowPlayer(false), 400); // Match exit animation
             return () => clearTimeout(timer);
@@ -82,7 +82,7 @@ const Layout = () => {
         const isLeftSwipe = distance > minSwipeDistance;
         const isRightSwipe = distance < -minSwipeDistance;
 
-        const tabs = ['/', '/library', '/shorts', '/music'];
+        const tabs = ['/', '/library', '/aastha', '/bhajan'];
         const currentIndex = tabs.findIndex(path => location.pathname === path);
 
         if (currentIndex === -1) return; // Not on a main tab

@@ -20,22 +20,20 @@ const Library = () => {
           {
                id: 'wallpaper',
                title: 'Wallpaper Download',
-               subtitle: 'Divine HD Backgrounds',
-               icon: ImageIcon,
-               link: '#', // Placeholder
-               color: '#4FACFE', // Blue
-               bgGradient: 'linear-gradient(135deg, rgba(79, 172, 254, 0.1) 0%, rgba(0, 242, 254, 0.02) 100%)',
-               comingSoon: true
+               subtitle: 'Phone & PC Backgrounds',
+               icon: ImageIcon, // Image icon
+               link: '/library/wallpapers',
+               color: '#4CAF50', // Green
+               bgGradient: 'linear-gradient(135deg, rgba(76, 175, 80, 0.1) 0%, rgba(200, 230, 201, 0.02) 100%)'
           },
           {
                id: 'mantra-library',
                title: 'Mantra Library',
                subtitle: 'Texts & Meanings',
                icon: BookOpen, // Book
-               link: '#', // Placeholder
+               link: '/library/mantras',
                color: '#FF9A9E', // Pink/Red
-               bgGradient: 'linear-gradient(135deg, rgba(255, 154, 158, 0.1) 0%, rgba(254, 207, 239, 0.02) 100%)',
-               comingSoon: true
+               bgGradient: 'linear-gradient(135deg, rgba(255, 154, 158, 0.1) 0%, rgba(254, 207, 239, 0.02) 100%)'
           }
      ];
 

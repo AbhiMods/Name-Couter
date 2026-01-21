@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, Sparkles, Clapperboard, Music, LibraryBig } from 'lucide-react';
+import { Home, PlayCircle, Music, LibraryBig } from 'lucide-react'; // Changed Clapperboard to PlayCircle
 import styles from './BottomNav.module.css';
 import { useBhajan } from '../../context/BhajanContext';
 
@@ -24,19 +24,19 @@ const BottomNav = () => {
                 </NavLink>
 
                 <NavLink
-                    to="/shorts"
+                    to="/aastha"
                     className={({ isActive }) =>
                         isActive ? `${styles.navItem} ${styles.active}` : styles.navItem
                     }
                 >
                     <div className={styles.iconWrapper}>
-                        <Clapperboard size={24} className={styles.icon} />
+                        <PlayCircle size={24} className={styles.icon} />
                     </div>
-                    <span className={styles.label}>Shorts</span>
+                    <span className={styles.label}>Aastha</span>
                 </NavLink>
 
                 <NavLink
-                    to="/music"
+                    to="/bhajan"
                     className={({ isActive }) =>
                         isActive ? `${styles.navItem} ${styles.active}` : styles.navItem
                     }
@@ -52,7 +52,7 @@ const BottomNav = () => {
                             <Music size={24} className={styles.icon} />
                         )}
                     </div>
-                    <span className={styles.label}>Music</span>
+                    <span className={styles.label}>Bhajan</span>
                 </NavLink>
 
                 <NavLink

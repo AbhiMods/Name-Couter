@@ -24,8 +24,12 @@ const CalendarPage = lazy(() => import('./pages/CalendarPage'));
 const Counters = lazy(() => import('./pages/Counters'));
 import UpcomingFestivals from './pages/UpcomingFestivals';
 const Library = lazy(() => import('./pages/Library'));
-// const UpcomingFestivals = lazy(() => import('./pages/UpcomingFestivals')); // Switched to eager load
+const WallpaperLibrary = lazy(() => import('./pages/wallpapers/WallpaperLibrary'));
+
 const HareKrishnaHome = lazy(() => import('./pages/HareKrishnaHome'));
+const MantraLibrary = lazy(() => import('./pages/mantras/MantraLibrary'));
+const HanumanChalisa = lazy(() => import('./pages/mantras/HanumanChalisa'));
+const GayatriMantra = lazy(() => import('./pages/mantras/GayatriMantra'));
 
 const PageLoader = () => (
   <div style={{
@@ -66,12 +70,16 @@ function App() {
                                 <Route path="radha-naam-jap-counter" element={<Home />} />
                                 <Route path="hare-krishna-naam-jap-counter" element={<HareKrishnaHome />} />
                                 <Route path="library" element={<Library />} />
+                                <Route path="library/wallpapers" element={<WallpaperLibrary />} />
                                 <Route path="library/upcoming-festivals" element={<UpcomingFestivals />} />
+                                <Route path="library/mantras" element={<MantraLibrary />} />
+                                <Route path="hanuman-chalisa" element={<HanumanChalisa />} />
+                                <Route path="gayatri-mantra" element={<GayatriMantra />} />
                                 {/* <Route path="settings" element={<Settings />} /> REMOVED */}
                                 <Route path="leaderboard" element={<Leaderboard />} />
                                 <Route path="progress" element={<Progress />} />
-                                <Route path="music" element={<Music />} />
-                                <Route path="shorts" element={<Shorts />} />
+                                <Route path="bhajan" element={<Music />} />
+                                <Route path="aastha" element={<Shorts />} />
                                 <Route path="calendar" element={<CalendarPage />} />
                                 <Route path="*" element={<Navigate to="/" replace />} />
                               </Route>
