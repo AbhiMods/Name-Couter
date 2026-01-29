@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useName } from '../context/NameContext';
+// import { useName } from '../context/NameContext'; // REMOVED
+import { NAMES } from '../data/mantras'; // NEW
 import { Target, Music, Zap, Heart, Star, LayoutGrid, Sun, Moon, Sparkles, Feather, Flame, Flower, Pin, Calendar as CalendarIcon, BookOpen } from 'lucide-react';
 import { motion } from 'framer-motion';
 import styles from './Counters.module.css';
@@ -9,7 +10,8 @@ import clsx from 'clsx';
 
 const Counters = () => {
     const navigate = useNavigate();
-    const { updateName, allNames } = useName();
+    // const { updateName, allNames } = useName(); // REMOVED
+    const allNames = NAMES; // Mapped local constant
 
     // Mapping icons to IDs for visual variety
     const getIconForId = (id) => {
@@ -63,7 +65,8 @@ const Counters = () => {
         if (id === '108_counter') {
             localStorage.setItem('divine_target', '108');
         } else {
-            updateName(id);
+            // Update selected name directly in LocalStorage
+            localStorage.setItem('divine_selected_name', id);
             localStorage.setItem('divine_target', '0');
         }
         navigate('/radha-naam-jap-counter');

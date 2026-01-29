@@ -4,7 +4,7 @@ import { useStats } from './StatsContext';
 const LeaderboardContext = createContext(null);
 
 const MOCK_LEADERBOARD = [
-    { id: 'dev_1', name: 'Abhishek Sharma', count: 125400, avatar: '🕉️' },
+    { id: 'dev_1', name: 'Abhishek', count: 125400, avatar: '🕉️' },
     { id: 'dev_2', name: 'Aman Maurya', count: 98200, avatar: '✨' },
     { id: 'dev_3', name: 'Kajal Singh', count: 85000, avatar: '🙏' },
     { id: 'dev_4', name: 'Suraj Iyer', count: 62100, avatar: '📿' },

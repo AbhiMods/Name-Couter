@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Smartphone, Monitor, Download, Image as ImageIcon, Loader2, Check } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Smartphone, Monitor, Download, Image as ImageIcon, Loader2, Check } from 'lucide-react';
+
 import styles from '../Counters.module.css'; // Reusing existing card styles
 import SEO from '../../components/common/SEO';
 
 const WallpaperLibrary = () => {
-    const navigate = useNavigate();
+
     const [activeTab, setActiveTab] = useState('phone'); // 'phone' or 'pc'
     const [downloadingId, setDownloadingId] = useState(null);
     const [downloadedIds, setDownloadedIds] = useState(new Set()); // Track all downloaded IDs
@@ -144,28 +144,7 @@ const WallpaperLibrary = () => {
             {/* Header */}
             <header className={styles.header} style={{ marginBottom: '2rem', marginTop: '1rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', marginBottom: '1rem' }}>
-                    <button 
-                        onClick={() => navigate('/library')}
-                        style={{ 
-                            position: 'absolute', 
-                            left: 0, 
-                            top: '50%',
-                            transform: 'translateY(-50%)',
-                            background: 'rgba(255, 255, 255, 0.1)', 
-                            border: 'none', 
-                            borderRadius: '50%',
-                            width: '40px',
-                            height: '40px',
-                            color: 'var(--color-text-primary)',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            backdropFilter: 'blur(10px)'
-                        }}
-                    >
-                        <ArrowLeft size={24} />
-                    </button>
+
                     <h1 className="text-2xl font-bold text-center" style={{ margin: 0 }}>Wallpaper Library</h1>
                 </div>
                 <p className={styles.subtext} style={{ textAlign: 'center' }}>

@@ -82,4 +82,31 @@ export const DIVINE_REELS = [
         likes: 984,
         tags: ['Ganga', 'Rishikesh', 'Peace']
     }
+
+    ,
+    {
+        id: 'reel_12',
+        videoId: 'sUUlswaaPzI',
+        title: 'सब कुछ हो जाएगा नाम जप के तो देखो',
+        category: 'Premanand-Maharaj',
+        likes: 1230,
+        tags: ['Ram', 'Darshan']
+    },
+
+    {
+        id: 'reel_13',
+        videoId: 'N0cimeqV_xY',
+        title: 'राधा नाम की महिमा',
+        category: 'Premanand-Maharaj',
+        likes: 4640,
+        tags: ['Shiva', 'Kedarnath', 'Himalayas']
+    },
+    {
+        id: 'reel_15',
+        videoId: 'eM21URfsHiY',
+        title: 'Tera sumiran hanumat veera ✨️',
+        category: 'Hanuman',
+        likes: 984,
+        tags: ['Ganga', 'Rishikesh', 'Peace']
+    }
 ];

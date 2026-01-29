@@ -24,7 +24,7 @@
 
 .main {
     flex: 1;
-    /* padding: var(--space-8) 0;  -- REMOVED to let pages control their own padding */
+    padding-top: 80px; /* Space for Fixed Header */
     display: flex;
     flex-direction: column;
     position: relative;

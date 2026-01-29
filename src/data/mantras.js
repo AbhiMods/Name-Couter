@@ -1,7 +1,3 @@
-import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
-
-const NameContext = createContext();
-
 export const NAMES = [
     { id: 'ram', label: 'Ram Ram', subtitle: 'Peace & Virtue', text: 'Ram Ram', hindiText: 'राम' },
     { id: 'radha', label: 'Radha Radha', subtitle: 'Divine Love', text: 'Radha Radha', hindiText: 'राधा' },
@@ -16,57 +12,3 @@ export const NAMES = [
     { id: 'om', label: 'Om', subtitle: 'Universal Sound', text: 'Om', hindiText: 'ॐ' },
     { id: 'guru', label: 'Guru Mantra', subtitle: 'Guidance & Grace', text: 'Gurur Brahma Gurur Vishnu', hindiText: 'गुरुर्ब्रह्मा गुरुर्विष्णुः' },
 ];
-
-export const NameProvider = ({ children }) => {
-    const [selectedNameId, setSelectedNameId] = useState(() => {
-        return localStorage.getItem('divine_selected_name') || 'radha';
-    });
-
-    useEffect(() => {
-        localStorage.setItem('divine_selected_name', selectedNameId);
-    }, [selectedNameId]);
-
-    const selectedName = NAMES.find(n => n.id === selectedNameId) || NAMES[0];
-
-    // Simply switch ID, strictly from static list
-    const updateName = (id) => {
-        if (NAMES.find(n => n.id === id)) {
-            setSelectedNameId(id);
-        }
-    };
-
-    // No-op for removed features to prevent errors in consumers
-    const addCustomName = () => {};
-    const removeCustomName = () => {};
-    const toggleSound = () => {}; 
-    const updateCustomAudio = () => {};
-    const playChant = () => {}; // Sound removed
-
-    return (
-        <NameContext.Provider value={{
-            selectedName,
-            selectedNameId,
-            updateName,
-            allNames: NAMES, // Only static names
-            addCustomName,
-            removeCustomName,
-            soundEnabled: false,
-            toggleSound,
-            volume: 0,
-            setVolume: () => {},
-            playChant,
-            customAudios: {},
-            updateCustomAudio
-        }}>
-            {children}
-        </NameContext.Provider>
-    );
-};
-
-export const useName = () => {
-    const context = useContext(NameContext);
-    if (!context) {
-        throw new Error('useName must be used within a NameProvider');
-    }
-    return context;
-};

@@ -144,6 +144,13 @@ export const BhajanProvider = ({ children }) => {
         setIsPlaying(false);
     };
 
+    const play = () => {
+        if (audioRef.current && currentSong) {
+            audioRef.current.play().catch(e => console.log('Resume failed', e));
+            setIsPlaying(true);
+        }
+    };
+
     const stop = () => {
         audioRef.current.pause();
         audioRef.current.currentTime = 0;
@@ -209,6 +216,7 @@ export const BhajanProvider = ({ children }) => {
             downloadedTracks,
             setVolume,
             playTrack,
+            play,
             pause,
             stop,
             seek,

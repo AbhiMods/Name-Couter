@@ -1,7 +1,7 @@
 import React, { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Layout from './components/layout/Layout';
-import { NameProvider } from './context/NameContext';
+// import { NameProvider } from './context/NameContext'; // REMOVED
 import { StatsProvider } from './context/StatsContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { LeaderboardProvider } from './context/LeaderboardContext';
@@ -55,7 +55,6 @@ function App() {
         <StatsProvider>
           <BgMusicProvider>
             <BhajanProvider>
-              <NameProvider>
                 <LeaderboardProvider>
                   <PromoProvider>
                     <FeatureProvider>
@@ -90,7 +89,6 @@ function App() {
                     </FeatureProvider>
                   </PromoProvider>
                 </LeaderboardProvider>
-              </NameProvider>
             </BhajanProvider>
           </BgMusicProvider>
         </StatsProvider>

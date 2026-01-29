@@ -12,13 +12,13 @@ import BhajanModal from '../components/chant/BhajanModal';
 import TargetSettings from '../components/chant/TargetSettings';
 import CelebrationModal from '../components/chant/CelebrationModal';
 import FeatureGuideModal from '../components/common/FeatureGuideModal';
-import { useName } from '../context/NameContext';
+import { NAMES } from '../data/mantras'; // NEW
 import { useStats } from '../context/StatsContext';
 import { useTheme } from '../context/ThemeContext';
 import { useBgMusic } from '../context/BgMusicContext';
 import { useBhajan } from '../context/BhajanContext';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
-import styles from './Home.module.css';
+import styles from './Home.module.css'; // Ensure this matches actual file extension
 import useVoiceCommand from '../hooks/useVoiceCommand';
 
 const Home = () => {
@@ -27,6 +27,15 @@ const Home = () => {
     const [count, setCount] = useState(() => {
         return parseInt(localStorage.getItem('divine_count'), 10) || 0;
     });
+
+    // Selected Name State (Replaces Context)
+    const [selectedNameId] = useState(() => {
+        return localStorage.getItem('divine_selected_name') || 'radha';
+    });
+    const selectedName = NAMES.find(n => n.id === selectedNameId) || NAMES[0];
+    
+    // Audio removed per previous request
+    const soundEnabled = false; 
 
     const [showTargetModal, setShowTargetModal] = useState(false);
 
@@ -83,7 +92,7 @@ const Home = () => {
     const [sessionDuration, setSessionDuration] = useState('00:00');
     const [liveTimer, setLiveTimer] = useState('00:00');
 
-    const { selectedName, playChant, toggleSound, soundEnabled } = useName();
+    // const { selectedName, playChant, toggleSound, soundEnabled } = useName(); // REMOVED
     const { incrementStats, setIsJapaActive } = useStats();
     const {
         immersiveMode, toggleImmersiveMode, immersiveConfig,

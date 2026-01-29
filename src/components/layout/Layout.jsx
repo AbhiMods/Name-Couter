@@ -11,6 +11,7 @@ import styles from './Layout.module.css';
 import { useTheme } from '../../context/ThemeContext';
 import { useBhajan } from '../../context/BhajanContext';
 import clsx from 'clsx';
+import BottomPlayerBar from '../music/BottomPlayerBar';
 
 const Layout = () => {
     const { immersiveMode } = useTheme();
@@ -24,12 +25,36 @@ const Layout = () => {
     const isShortsPage = location.pathname.startsWith('/aastha');
     const isLibraryPage = location.pathname === '/library';
 
-    // Allowed pages for Mini Player (Home & Library)
-    const isAllowedPage = !isMusicPage && !isShortsPage && !immersiveMode;
+    // Allowed pages for Mini Player (Home, Library, & Bhajan)
+    // User requested Player to be visible in Bhajan section too.
+    // Hidden only in Aastha (Shorts) and Zen Mode.
+    const isAllowedPage = !isShortsPage && !immersiveMode;
 
     // Delayed hiding logic
     const [delayedShowPlayer, setDelayedShowPlayer] = useState(isPlaying && isAllowedPage);
     const [isExiting, setIsExiting] = useState(false);
+
+    // Auto-Stop/Resume for Aastha (Shorts)
+    // We use a ref to track if music was playing BEFORE entering Aastha
+    const wasPlayingBeforeAastha = React.useRef(false);
+
+    useEffect(() => {
+        if (isShortsPage) {
+            // Entering Aastha
+            if (isPlaying) {
+                wasPlayingBeforeAastha.current = true;
+                // We need to pause. We can import pause from useBhajan inside component
+                // defined below as `pauseBhajan`
+            }
+            // Note: We can't call pause here because we need the function from context.
+            // We'll handle side-effects in a separate effect that has access to `play` and `pause`.
+        } else {
+            // Leaving Aastha (or regular navigation)
+            // If we just left Aastha and stored state is true, resume.
+            // But we need to know if we JUST left Aastha.
+            // This logic is tricky in a single effect. Use a separate effect below.
+        }
+    }, [isShortsPage, isPlaying]);
 
     useEffect(() => {
         if (isPlaying && isAllowedPage) {
@@ -37,19 +62,40 @@ const Layout = () => {
             setDelayedShowPlayer(true);
             setIsExiting(false);
         } else if (!isAllowedPage) {
-            // Case 2: Navigated to disallowed page (Bhajan/Aastha) -> HIDE IMMEDIATELY
+            // Case 2: Navigated to disallowed page (Aastha) -> HIDE IMMEDIATELY
             setIsExiting(true);
-            const timer = setTimeout(() => setDelayedShowPlayer(false), 400); // Match exit animation
+            const timer = setTimeout(() => setDelayedShowPlayer(false), 400);
             return () => clearTimeout(timer);
         } else {
-            // Case 3: Paused on allowed page -> HIDE AFTER DELAY
+            // Case 3: Paused on allowed page -> HIDE AFTER DELAY (2s)
             const timer = setTimeout(() => {
                 setIsExiting(true);
                 setTimeout(() => setDelayedShowPlayer(false), 400);
-            }, 3000);
+            }, 2000); // Updated to 2 seconds per user request
             return () => clearTimeout(timer);
         }
     }, [isPlaying, isAllowedPage]);
+
+    // Aastha Resume Logic Implementation
+    const { pause: pauseBhajan, play: playBhajan } = useBhajan();
+    
+    useEffect(() => {
+        // When entering Aastha
+        if (isShortsPage) {
+            if (isPlaying) {
+                wasPlayingBeforeAastha.current = true;
+                pauseBhajan();
+            }
+        } 
+        // When leaving Aastha (not shorts page, but was playing before)
+        else {
+             if (wasPlayingBeforeAastha.current) {
+                playBhajan();
+                wasPlayingBeforeAastha.current = false; // Reset
+             }
+        }
+    }, [isShortsPage]); // Depend on location change (isShortsPage derived from location)
+    // Note: We don't depend on `isPlaying` here to avoid loops, only on route switch.
 
     const isFullPage = isMusicPage || isShortsPage;
     // Basic mobile detection (width < 768px)
@@ -64,49 +110,12 @@ const Layout = () => {
     // Only hide header on Shorts page
     const shouldHideHeader = isShortsPage && isMobile;
 
-    // Swipe Navigation Logic
-    const [touchStart, setTouchStart] = useState(null);
-    const [touchEnd, setTouchEnd] = useState(null);
-    const minSwipeDistance = 50;
 
-    const onTouchStart = (e) => {
-        setTouchEnd(null);
-        setTouchStart(e.targetTouches[0].clientX);
-    };
-
-    const onTouchMove = (e) => setTouchEnd(e.targetTouches[0].clientX);
-
-    const onTouchEnd = () => {
-        if (!touchStart || !touchEnd || immersiveMode) return; // Disable swipe in Immersive Mode
-        const distance = touchStart - touchEnd;
-        const isLeftSwipe = distance > minSwipeDistance;
-        const isRightSwipe = distance < -minSwipeDistance;
-
-        const tabs = ['/', '/library', '/aastha', '/bhajan'];
-        const currentIndex = tabs.findIndex(path => location.pathname === path);
-
-        if (currentIndex === -1) return; // Not on a main tab
-
-        if (isLeftSwipe) {
-            // Next Tab
-            if (currentIndex < tabs.length - 1) {
-                navigate(tabs[currentIndex + 1]);
-            }
-        }
-        if (isRightSwipe) {
-            // Prev Tab
-            if (currentIndex > 0) {
-                navigate(tabs[currentIndex - 1]);
-            }
-        }
-    };
 
     return (
         <div
             className={styles.layout}
-            onTouchStart={onTouchStart}
-            onTouchMove={onTouchMove}
-            onTouchEnd={onTouchEnd}
+
         >
             {!immersiveMode && !shouldHideHeader && <Header />}
             <main
@@ -132,6 +141,15 @@ const Layout = () => {
             <FeedbackPopup />
             <InstallPrompt />
             {!immersiveMode && !isShortsPage && <Footer />}
+            
+            {/* Mini Player */}
+            {!immersiveMode && delayedShowPlayer && (
+                <BottomPlayerBar 
+                     isExiting={isExiting} 
+                     onExpand={() => navigate('/bhajan')} 
+                />
+            )}
+
             {!immersiveMode && <BottomNav />}
         </div>
     );

@@ -208,38 +208,39 @@
     width: 32px;
     height: 32px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.1);
+    background: transparent; /* No background */
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--color-text-secondary);
+    color: var(--color-text-tertiary); /* Default subtle color */
     transition: all 0.3s ease;
     z-index: 20;
     /* Above card content */
     border: none;
     cursor: pointer;
-    backdrop-filter: blur(4px);
+    /* backdrop-filter: blur(4px); Removed blur since no background */
 }
 
 .pinButton:hover {
-    background: var(--color-surface-hover);
-    color: var(--color-primary);
+    background: transparent;
+    color: var(--color-primary); /* Yellow on hover */
     transform: scale(1.1);
 }
 
 .pinned {
-    background: var(--color-primary);
-    color: #000;
-    box-shadow: 0 0 15px var(--color-primary-glow);
+    background: transparent;
+    color: #FFD700; /* Gold/Yellow when pinned */
+    /* box-shadow: 0 0 15px var(--color-primary-glow); Removed glow box */
     transform: scale(1.1);
-    border: 2px solid rgba(255, 255, 255, 0.2);
+    /* border: 2px solid rgba(255, 255, 255, 0.2); Removed border */
+    filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.6)); /* Text/Icon glow only */
 }
 
 .pinned:hover {
-    background: var(--color-primary);
+    background: transparent;
     opacity: 1;
     transform: scale(1.15);
-    box-shadow: 0 0 20px var(--color-primary-glow);
+    /* box-shadow: 0 0 20px var(--color-primary-glow); */
 }
 
 /* Responsive adjustments */
@@ -270,9 +271,9 @@
 /* Quick Access Row - iOS Style */
 .quickAccessRow {
     display: flex;
-    justify-content: space-between;
-    gap: 1.25rem;
-    /* Reduced gap for tighter look */
+    justify-content: center;
+    gap: 2rem;
+    /* Centered with fixed gap */
     margin-top: 1.5rem;
     margin-bottom: 2rem;
     z-index: 100;

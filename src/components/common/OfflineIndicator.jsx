@@ -28,25 +28,27 @@ const OfflineIndicator = () => {
                     transition={{ duration: 0.3 }}
                     style={{
                         position: 'fixed',
-                        bottom: '24px',
+                        bottom: '90px', // Raised to clear bottom nav
                         left: '50%',
                         transform: 'translateX(-50%)',
-                        zIndex: 9999,
+                        zIndex: 10000, // Higher than bottom nav
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '10px',
-                        padding: '10px 20px',
-                        backgroundColor: '#bd2b2b', // Red-ish for warning, or primary color? User wants "offline mode activate", red is clear.
+                        gap: '8px',
+                        padding: '8px 16px',
+                        backgroundColor: 'rgba(189, 43, 43, 0.95)', // Slightly translucent red
+                        backdropFilter: 'blur(8px)', // Glass effect
                         color: 'white',
-                        borderRadius: '30px',
-                        boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+                        borderRadius: '24px', // Standard pill shape
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.1)',
                         fontWeight: '500',
-                        fontSize: '0.9rem',
-                        pointerEvents: 'none' // Don't block clicks
+                        fontSize: '0.85rem',
+                        pointerEvents: 'none',
+                        whiteSpace: 'nowrap'
                     }}
                 >
                     <WifiOff size={18} />
-                    <span>You are offline. App is ready.</span>
+                    <span>You are offline</span>
                 </motion.div>
             )}
         </AnimatePresence>
